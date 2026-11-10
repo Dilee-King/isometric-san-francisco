@@ -71,7 +71,7 @@ python -m pip install -r tools/requirements.txt
 python tools/package_tiles.py
 ```
 
-重新制作结构参照可运行 `python tools/prepare_source.py --source data/source/ferry.json`，再把生成的 `public/map/v1/scene.json` 保存到 `data/source/scene.json`，最后重新打包。模型生成不是确定性流程；这里保存的是选定原图与来源记录。
+重新制作结构参照可运行 `python tools/prepare_source.py --source data/source/ferry.json`；它会同步更新 `data/source/` 中的结构图、场景与两张遮罩，再运行 `python tools/package_tiles.py`。模型生成不是确定性流程；这里保存的是选定原图与来源记录。
 
 ## License
 

@@ -4,12 +4,14 @@ This is a working continuous sample, not a full-city map.
 
 ## Observed checks
 
-- `npm test`: 9 meaningful projection, route, clock, pause, toggle, dwell and lighting invariants passed. Initial test run failed before `model.ts` existed, then passed after implementation.
+- `npm test`: 10 meaningful projection, route, clock, pause, visibility, toggle, dwell and lighting invariants passed. Initial test run failed before `model.ts` existed, then passed after implementation.
 - `npm run build`: TypeScript and Vite production build passed. OpenSeadragon and React currently share one approximately 595 kB minified application bundle (approximately 166 kB gzip); no frame-rate guarantee is claimed.
 - `python tools/package_tiles.py`: equal 1536 × 1024 day/night layers, 36 DZI pyramid tiles total, 6 native-detail tiles per appearance, 22 source-directed road cycles. All ship centrelines avoid source land/piers with hull clearance.
 - Actual production-browser workflow: car/ferry/cargo/plane motion; all-clock pause; independent traffic toggles; automatic day clock while paused; pan/zoom; night tile loading; cloudy/fog/rain presets; About/Escape; 390 × 844 mobile controls; reduced-motion initial pause. No page errors or failed resource responses in that run.
 - Initial observed desktop frame: 26 visible cars, three boats, one aircraft. Counts change with simulation time and viewport; 72 car instances are configured overall.
 - Two paused full-page captures were pixel-identical (`ImageChops.difference(...).getbbox()` returned `None`). This check was performed after map assets settled.
+- A fresh independent whole-branch review identified three material edge paths: background worker advancement, unavailable WebGL2 weather controls, and stale source masks during regeneration. All three were reproduced before fixes and then passed regression checks: a model visibility invariant; `tools/qa-regressions.js`; and `python tools/test_source_pipeline.py`. The browser visibility check dispatches a synthetic Page Visibility event; it does not claim an observed OS/minimized-tab transition.
+- Without WebGL2, the map/night/traffic remain available, a capability notice appears, and unavailable weather controls are disabled. Hidden pages suspend all scene clocks without changing the user's pause choice.
 
 Script: [qa-browser.js](../tools/qa-browser.js), executed through the Playwright CLI against the local production preview. Screenshots in [screenshots](screenshots/) are captures of the actual application, not generated interface mockups.
 

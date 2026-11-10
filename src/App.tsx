@@ -104,6 +104,7 @@ export default function App() {
     aboutClose = useRef<HTMLButtonElement>(null);
   const [frame, setFrame] = useState(initial),
     [ready, setReady] = useState(false),
+    [weatherAvailable, setWeatherAvailable] = useState(true),
     [error, setError] = useState(""),
     [about, setAbout] = useState(false),
     [settings, setSettings] = useState(() => window.innerWidth > 680),
@@ -121,7 +122,10 @@ export default function App() {
           host.current,
           data,
           setFrame,
-          () => setReady(true),
+          () => {
+            setReady(true);
+            setWeatherAvailable(!!map.current?.atmosphere.gl);
+          },
           setError,
         );
         (window as unknown as { __sf: MapView }).__sf = map.current;
@@ -258,6 +262,7 @@ export default function App() {
               <button
                 key={w}
                 aria-pressed={controls.weather === w}
+                disabled={!weatherAvailable && w !== "clear"}
                 onClick={() => map.current?.setControls({ weather: w })}
               >
                 <Icon
@@ -267,6 +272,13 @@ export default function App() {
               </button>
             ))}
           </div>
+          {!weatherAvailable && (
+            <p className="capability-note" role="status">
+              此浏览器暂不支持天气特效。
+              <br />
+              地图、昼夜与交通仍可使用。
+            </p>
+          )}
           <label className="range-label" htmlFor="intensity">
             <span>天气强度</span>
             <span>{Math.round(controls.intensity * 100)}%</span>
@@ -274,6 +286,7 @@ export default function App() {
           <input
             id="intensity"
             aria-label="天气强度"
+            disabled={!weatherAvailable}
             type="range"
             min=".15"
             max="1"

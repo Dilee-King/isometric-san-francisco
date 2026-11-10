@@ -74,6 +74,13 @@ test("automatic day clock wraps without resetting transport", () => {
   assert.ok(s.hour < 0.1);
   assert.equal(s.transportTime, 100.1);
 });
+test("hidden-page suspension freezes all clocks without changing the user's pause choice", () => {
+  const s = { transportTime: 22, environmentTime: 10, hour: 19 };
+  const controls = { ...defaultControls, paused: false, autoHour: true };
+  assert.deepEqual(advance(s, 0.08, controls, false), s);
+  assert.equal(controls.paused, false);
+  assert.ok(advance(s, 0.03, controls, true).transportTime > s.transportTime);
+});
 const car: Route = {
   id: "car",
   kind: "car",

@@ -117,8 +117,11 @@ export class MapView {
       "旧金山连续地图；拖动平移，滚轮缩放，空格暂停，Home 全景",
     );
     host.addEventListener("keydown", this.keydown);
+    document.addEventListener("visibilitychange", this.visibility);
+    this.visibility();
     this.setControls({ paused });
   }
+  visibility = () => this.worker.postMessage({ hidden: document.hidden });
   setControls(partial: Partial<Controls>, hour?: number) {
     this.sequence++;
     this.frame = {
@@ -216,5 +219,6 @@ export class MapView {
     this.sprites.destroy();
     this.atmosphere.destroy();
     this.host.removeEventListener("keydown", this.keydown);
+    document.removeEventListener("visibilitychange", this.visibility);
   }
 }

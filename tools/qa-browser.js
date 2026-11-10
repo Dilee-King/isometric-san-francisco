@@ -211,4 +211,4 @@ async (page) => {
     errors,
     badRequests,
   };
-};
+}

@@ -57,8 +57,9 @@ export function advance(
   state: Clock,
   delta: number,
   controls: Controls,
+  visible = true,
 ): Clock {
-  if (controls.paused || !Number.isFinite(delta) || delta <= 0)
+  if (!visible || controls.paused || !Number.isFinite(delta) || delta <= 0)
     return { ...state };
   const dt = Math.min(0.1, delta);
   return {

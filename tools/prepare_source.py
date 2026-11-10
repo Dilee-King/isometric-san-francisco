@@ -36,7 +36,7 @@ def main():
     parser.add_argument('--osm', type=Path)
     args = parser.parse_args()
     d = json.loads(args.source.read_text(encoding='utf-8'))
-    out = ROOT/'public/map/v1'
+    out = ROOT/'data/source'
     out.mkdir(parents=True, exist_ok=True)
     (ROOT/'data/source').mkdir(parents=True, exist_ok=True)
     (ROOT/'data/source/ferry.json').write_bytes(args.source.read_bytes())
@@ -165,7 +165,10 @@ def main():
     metadata={'schemaVersion':1,'release':'waterfront-v1','width':CROP[2]-CROP[0],'height':CROP[3]-CROP[1],'sourceImageCrop':CROP,'extent':d['extent'],'crs':d['crs'],'originLonLat':d['originLonLat'],'originUTM':d['originUTM'],'projection':{'scale':SCALE,'origin':[OX-CROP[0],OY-CROP[1]],'sinElevation':SE,'cosElevation':CE,'east':[.8,.6],'north':[.6,-.8]},'depthEncoding':{'offset':2000,'range':4000,'channels':'RG16; B=source structural mask'},'sourceBuildings':len(d['buildings']),'roads':roads,'lamps':lamps,'windows':visible_windows,'land':d['land'],'landmarks':[{'name':'Ferry Building','nameZh':'渡轮大厦','p':[cp.x,cp.y,22]},{'name':'Financial District','nameZh':'金融区','p':[-380,-50,110]},{'name':'Embarcadero','nameZh':'滨海大道','p':[105,190,4]}]}
     (out/'scene.json').write_text(json.dumps(metadata,separators=(',',':')),encoding='utf-8')
     provenance={'sourceSnapshotDate':'2026-11-09','sourceSHA256':hashlib.sha256(args.source.read_bytes()).hexdigest(),'geometry':['DataSF Building Footprints (PDDL)','USGS San Francisco 2023 lidar (public domain)','OpenStreetMap 2026-11-09 snapshot (ODbL 1.0)'],'sourceAudit':d['audit'],'camera':'orthographic; azimuth implicit in east/north basis; elevation 39 degrees','renderedSize':[W,H],'displayRegistration':'Single source projection. Imagegen may introduce local deviations; source depth and windows are display proxies, not measured final-art geometry.'}
-    (ROOT/'data/provenance.json').write_text(json.dumps(provenance,indent=2),encoding='utf-8')
+    provenance_path=ROOT/'data/provenance.json'
+    if provenance_path.exists():
+        previous=json.loads(provenance_path.read_text(encoding='utf-8'));previous.update(provenance);provenance=previous
+    provenance_path.write_text(json.dumps(provenance,indent=2),encoding='utf-8')
     print(f'Prepared {W}x{H}; {len(surfaces)} faces; {len(roads)} road segments; {len(visible_windows)} facade light samples')
 
 

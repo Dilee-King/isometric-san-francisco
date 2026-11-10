@@ -782,3 +782,14 @@ input[type="range"]::-webkit-slider-thumb {
     min-width: 44px;
   }
 }
+.capability-note {
+  font-size: 10px;
+  line-height: 1.7;
+  color: #c4b89a;
+  margin: 8px 0;
+}
+button:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
