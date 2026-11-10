@@ -6,6 +6,8 @@ coverage/
 .vite/
 .cache/
 .local/
+.playwright-cli/
+.superpowers/
 __pycache__/
 *.py[cod]
 .venv/

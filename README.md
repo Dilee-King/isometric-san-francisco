@@ -4,7 +4,9 @@
 
 An illustrated isometric San Francisco, with a living waterfront, moving traffic, and changing light and weather.
 
-**当前状态：方案与仓库初始化。尚未发布地图应用，也没有完成全市图块。**
+**当前版本：可运行的连续滨水样区 v0.1。** 已包含车辆、两艘渡轮、一艘货船、偶发飞机飞越、昼夜精绘图块及晴／云／雾／雨。覆盖是三处地标周边的连续样区，尚未扩展至全市。
+
+![实际运行夜景](docs/screenshots/night.png)
 
 ## 方向
 
@@ -14,12 +16,12 @@ An illustrated isometric San Francisco, with a living waterfront, moving traffic
 
 | 组成 | 目标行为 | 当前状态 |
 | --- | --- | --- |
-| 城市地图 | 细密建筑、街道、山坡、码头与岸线，连续缩放浏览 | 设计完成，未实现 |
-| 车辆 | 按道路、方向、车道和信号组织的示意交通 | 已定义要求，未实现 |
-| 船舶 | 航道、码头停靠、慢速货船与渡轮尾流 | 已定义要求，未实现 |
-| 飞机 | 与固定地图坐标配准的偶发飞越 | 已定义要求，未实现 |
-| 日夜 | 配准的昼暮夜图层、窗灯、路灯与交通灯光 | 已定义要求，未实现 |
-| 天气 | 晴、多云、海雾、雨，独立于时间组合 | 已定义要求，未实现 |
+| 城市地图 | 细密建筑、街道、码头与岸线，连续缩放浏览 | 已交付连续样区 |
+| 车辆 | 72 个车辆实例、22 条有向道路环线、推定车道偏移、转向与短暂停等 | 已实现示意交通；未做完整信号控制或车辆跟驰 |
+| 船舶 | 两艘渡轮、一艘慢速货船、停靠等待与水面尾流 | 已实现；船体航线对源陆地／码头执行避障检查 |
+| 飞机 | 与地图配准的偶发高空飞越和航行灯 | 已实现 |
+| 日夜 | 配准昼夜图块混合、黄昏过渡、独立路灯与交通灯光 | 已实现；不计算物理太阳投影 |
+| 天气 | 晴、多云、海雾、雨，独立于时间组合 | 已实现 WebGL2 效果和强度控制 |
 
 首期不含 SFO 机场地面，飞机先表现为空中飞越。交通与天气是可控的演示动画；接入实时数据属于独立的后续工作。
 
@@ -27,7 +29,7 @@ An illustrated isometric San Francisco, with a living waterfront, moving traffic
 
 离线制作统一相机下的精绘图块，浏览器加载二维图块与动态叠加层。以纽约公开的 React / TypeScript / Vite / OpenSeadragon / DZI 流程为首版基础，参考温哥华的 WebGL 图层和 worker 交通组织。所有图层共用一套世界坐标到画面的变换。
 
-昼暮夜版本和效果遮罩必须配准；车辆、船舶及地面灯光应接受建筑遮挡。移动太阳阴影只有在具备可重照明数据时才列为完成，单纯给整图加色不满足日夜效果的验收要求。
+本版使用源几何深度进行地面对象中心点遮挡，昼夜图块共享尺寸和视角。AI 精绘可能产生局部边缘差异，遮挡与窗灯是展示近似，不是最终画面的逐像素实测深度；细小对象可能在建筑边缘整体出现或隐藏。
 
 完整方法见 [项目设计](docs/project-design.md)、[技术参照核对](docs/reference-audit.md) 和 [视觉规范](DESIGN.md)。
 
@@ -43,7 +45,33 @@ An illustrated isometric San Francisco, with a living waterfront, moving traffic
 
 ## 阅读与运行
 
-当前提交是文档版本，没有 `npm run dev`、构建产物或在线演示。后续应用交付时会在这里补充经过实际验证的安装与运行步骤。
+需要 Node.js 24+。运行应用不需要账号、地图 API key 或外部地图服务。首次安装依赖需要网络：
+
+```powershell
+npm ci
+npm run dev
+```
+
+打开终端显示的本地地址，默认 `http://127.0.0.1:5186/`。拖动平移、滚轮缩放；右侧控制时间、天气与交通，底部控制播放、交通速度和地名。自动昼夜约 5 分钟一循环。暂停会冻结交通、日夜与天气，仍可浏览地图。减少动态效果偏好下默认暂停。
+
+```powershell
+npm test
+npm run build
+npm run preview
+```
+
+生产预览默认 `http://127.0.0.1:4186/`。实际验证与限制见 [v0.1 验证记录](docs/VERIFICATION-v0.1.md)。
+
+## 图块与数据复现
+
+原始精绘 PNG、完整提示词、源派生几何与掩膜已保留。图像由内置 imagegen 生成；Python 只执行源几何栅格化、格式转换和确定性图块切分。准备依赖见 `tools/requirements.txt`。
+
+```powershell
+python -m pip install -r tools/requirements.txt
+python tools/package_tiles.py
+```
+
+重新制作结构参照可运行 `python tools/prepare_source.py --source data/source/ferry.json`，再把生成的 `public/map/v1/scene.json` 保存到 `data/source/scene.json`，最后重新打包。模型生成不是确定性流程；这里保存的是选定原图与来源记录。
 
 ## License
 

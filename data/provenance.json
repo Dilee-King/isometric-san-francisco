@@ -1,0 +1,69 @@
+{
+  "sourceSnapshotDate": "2026-11-09",
+  "sourceSHA256": "ee8068592949d83fc310dbd504eaf1f58f4533247f66140774d35c72385c55fe",
+  "geometry": [
+    "DataSF Building Footprints (PDDL)",
+    "USGS San Francisco 2023 lidar (public domain)",
+    "OpenStreetMap 2026-11-09 snapshot (ODbL 1.0)"
+  ],
+  "sourceAudit": {
+    "nodes": 206,
+    "downloadBytes": 72804265,
+    "croppedPoints": 6365098,
+    "classCounts": {
+      "1": 5114250,
+      "2": 568605,
+      "9": 679851,
+      "17": 782,
+      "20": 1610
+    },
+    "maximumEptDepth": 7,
+    "horizontalSourceCRS": "EPSG:3857",
+    "sceneCRS": "EPSG:32610",
+    "verticalUnits": "metres, NAVD88 as described by NOAA; EPT Z not horizontally rescaled",
+    "roofPointSelection": "ASPRS class 1 unclassified surface returns inside DataSF footprints; not classified building points",
+    "buildingCount": 377,
+    "roofBandCount": 3858,
+    "fallbackBuildingCount": 1,
+    "treeCount": 346,
+    "roadCount": 1829,
+    "landAreaM2": 979369,
+    "roofBandGridM": 2,
+    "roofBandHeightM": 2,
+    "footprintLicense": "PDDL",
+    "osmLicense": "ODbL 1.0",
+    "lidarLicense": "US Government public domain",
+    "sourceDates": {
+      "lidar": "spring 2023",
+      "footprints": "2010 source, 2016/2017 processing; API retrieved 2026-11-09",
+      "osm": "OSM API downloaded 2026-11-09"
+    },
+    "terrainTriangles": 5942,
+    "typicalRoofHeight": "median of equal-area 2m roof grid cells, not point-return-weighted median"
+  },
+  "camera": "orthographic; azimuth implicit in east/north basis; elevation 39 degrees",
+  "renderedSize": [
+    3072,
+    2048
+  ],
+  "displayRegistration": "Single source projection. Imagegen may introduce local deviations; source depth and windows are display proxies, not measured final-art geometry.",
+  "artwork": [
+    {
+      "role": "day",
+      "path": "assets/waterfront-day.png",
+      "prompt": "assets/prompts/waterfront-day.txt",
+      "service": "Codex built-in imagegen",
+      "modelIdentity": "not separately exposed by tool",
+      "sha256": "7cc6b9f0b23941b6a299c39d98265949d162582a692880000f100d44138e4c6d"
+    },
+    {
+      "role": "night",
+      "path": "assets/waterfront-night.png",
+      "prompt": "assets/prompts/waterfront-night.txt",
+      "service": "Codex built-in imagegen",
+      "modelIdentity": "not separately exposed by tool",
+      "sha256": "34ce8b16d893513f823e99ca4071e715e434b2578158ae02bea1bd3e0412acaa"
+    }
+  ],
+  "packaging": "Pillow deterministic resizing, WebP conversion and DZI cutting only; no semantic image editing in Python"
+}
