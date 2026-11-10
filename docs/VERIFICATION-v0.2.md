@@ -22,7 +22,10 @@ Browser flows: [qa-browser.js](../tools/qa-browser.js), [qa-regressions.js](../t
 
 ## Publication
 
-The deployment commit, independent review and live HTTPS result will be recorded after publication.
+- [Live v0.2 demo](https://dilee-king.github.io/isometric-san-francisco/?v=0.2.0).
+- [GitHub Actions verification and Pages deployment](https://github.com/Dilee-King/isometric-san-francisco/actions/runs/42901775919): build and deploy both completed successfully for commit `e7646fd34a70dab69e9366dc1685b9ccd52eb897`. The runtime implementation is the independently reviewed `6988222` tree; `e7646fd` adds its review record.
+- An actual HTTPS browser check reported `waterfront-v2`, `webgl2-world-mesh`, English UI, moving transport, active wet day/night layers, 26 cars / three boats / one aircraft in the initial frame, zero page/console errors and zero failed resource responses. See [online rain day](screenshots/v0.2/online-rain-day.png) and [online rain night](screenshots/v0.2/online-rain-night.png).
+- The subsequent documentation/capture commit is marked `[skip ci]`; it changes no deployed application code or assets.
 
 ## Remaining display limits
 

@@ -59,4 +59,4 @@ Validation: wet-versus-dry paused screenshots, English desktop/390 px UI, workin
 
 - [x] Run a fresh whole-branch review, resolve material findings with regression checks.
 - [x] Capture actual screenshots/recording, update verification and credits.
-- [ ] Push GitHub, wait for deployment, verify the live page and show the user.
+- [x] Push GitHub, wait for deployment, verify the live page and show the user.
