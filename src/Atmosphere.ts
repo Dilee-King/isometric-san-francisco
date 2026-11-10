@@ -1,4 +1,5 @@
 import { nightAmount } from "./model.ts";
+import { MAP_ROOT } from "./assets.ts";
 import type { Frame, SceneData } from "./types.ts";
 import type { ViewTransform } from "./SpriteRenderer.ts";
 
@@ -17,6 +18,7 @@ uniform float intensity;
 uniform int weather;
 uniform sampler2D waterTex;
 uniform sampler2D depthTex;
+uniform sampler2D hardTex;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);}
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);}
 void main(){
@@ -33,10 +35,6 @@ void main(){
  vec3 color=mix(vec3(.70,.85,.83),vec3(.35,.59,.65),night);
  float alpha=sparkle*(.045+night*.02);
  if(weather==1){
-   float cloud=noise(p*5.+vec2(time*.012,time*.007));
-   color=vec3(.07,.14,.19);alpha+=intensity*(.07+.16*cloud);
- }
- if(weather==2){
    float a=noise(p*4.+vec2(-time*.012,time*.006));
    float b=noise(p*11.+vec2(-time*.018,0.));
    float bank=smoothstep(.05,.85,p.x*.7+a*.55);
@@ -44,15 +42,28 @@ void main(){
    float fog=intensity*(.15+.75*bank)*(.58+.42*b)*altitude;
    color=mix(vec3(.73,.80,.79),vec3(.20,.29,.35),night);alpha=max(alpha,fog);
  }
- if(weather==3){
+ if(weather==2){
    vec2 world=p*imageSize;
-   vec2 rain=vec2((world.x-world.y*.18)/9.,(world.y-time*300.)/75.);
-   vec2 cell=floor(rain);vec2 f=fract(rain);
-   float streak=(1.-smoothstep(.015,.06,abs(f.x-.5)))*smoothstep(.14,.3,f.y)*(1.-smoothstep(.45,.9,f.y));
-   float drop=streak*step(1.-intensity*.75,hash(cell));
-   vec3 rainColor=mix(vec3(.57,.71,.75),vec3(.36,.51,.60),night);
-   float rainAlpha=.12*intensity+drop*.46;
-   color=mix(rainColor,vec3(.80,.89,.89),drop);alpha=max(alpha,rainAlpha);
+   float drops=0.;
+   for(int layer=0;layer<3;layer++){
+     float k=float(layer),rate=180.+k*95.;
+     vec2 rain=vec2((world.x-world.y*.12+k*31.)/(10.+k*4.),(world.y-time*rate)/(39.+k*16.));
+     vec2 cell=floor(rain);vec2 f=fract(rain);
+     float phase=hash(vec2(cell.x,k+8.));
+     float streak=(1.-smoothstep(.018,.064,abs(f.x-phase)))*smoothstep(.08,.25,f.y)*(1.-smoothstep(.5,.85,f.y));
+     drops+=streak*step(.65-intensity*.35,hash(cell+vec2(k*49.,13.)))*(.55-k*.12);
+   }
+   vec2 impactCell=floor(world/13.);vec2 impact=fract(world/13.);
+   float seed=hash(impactCell),age=fract(time*(1.2+seed)+seed*9.);
+   float radial=length((impact-vec2(.2+seed*.6,.25+hash(impactCell+8.)*.5))*vec2(1.,1.65));
+   float ring=(1.-smoothstep(.015,.05,abs(radial-age*.47)))*(1.-age)*step(.35,seed);
+   float hard=texture(hardTex,p).r;
+   float surface=max(water,hard*.55);
+   float impactAlpha=ring*surface*intensity*.17;
+   float veil=intensity*(.035+.07*noise(p*5.+vec2(time*.01,0.)));
+   vec3 rainColor=mix(vec3(.58,.69,.72),vec3(.23,.34,.43),night);
+   float rainAlpha=veil+clamp(drops,0.,1.)*(.22+intensity*.2)+impactAlpha;
+   color=mix(rainColor,vec3(.74,.84,.85),min(1.,drops+ring*surface));alpha=max(alpha,rainAlpha);
  }
  fragColor=vec4(color,clamp(alpha,0.,.84));
 }`;
@@ -114,12 +125,13 @@ export class Atmosphere {
       "weather",
       "waterTex",
       "depthTex",
+      "hardTex",
     ])
       this.uniforms[name] = gl.getUniformLocation(p, name);
     this.ready = Promise.all(
-      ["water", "depth"].map(async (name, index) => {
+      ["water", "depth", "hard"].map(async (name, index) => {
         const image = new Image();
-        image.src = `${import.meta.env.BASE_URL}map/v1/${name}.png`;
+        image.src = `${MAP_ROOT}${name}.png`;
         await image.decode();
         const tex = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0 + index);
@@ -170,7 +182,7 @@ export class Atmosphere {
     gl.uniform1f(u.intensity, frame.controls.intensity);
     gl.uniform1i(
       u.weather,
-      ["clear", "cloudy", "fog", "rain"].indexOf(frame.controls.weather),
+      ["clear", "fog", "rain"].indexOf(frame.controls.weather),
     );
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }

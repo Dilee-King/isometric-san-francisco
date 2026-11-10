@@ -1,82 +1,77 @@
 # Isometric San Francisco
 
-旧金山市区与海湾沿岸的精细等轴测地图，计划加入车、船、飞机，以及可以独立组合的日夜与天气变化。
+A living illustrated waterfront, inspired by [Isometric NYC](https://cannoneyed.com/projects/isometric-nyc) and [Isometric Vancouver](https://vancouver.isoworld.xyz/).
 
-An illustrated isometric San Francisco, with a living waterfront, moving traffic, and changing light and weather.
+**[Explore the live map](https://dilee-king.github.io/isometric-san-francisco/?v=0.2.0)** · [Actual demo video](docs/Waterfront-actual-demo-v0.2.mp4) · [Verification](docs/VERIFICATION-v0.2.md) · [Roadmap](ROADMAP.md)
 
-**当前版本：可运行的连续滨水样区 v0.1。** 已包含车辆、两艘渡轮、一艘货船、偶发飞机飞越、昼夜精绘图块及晴／云／雾／雨。覆盖是三处地标周边的连续样区，尚未扩展至全市。
+![Rain on the San Francisco waterfront](docs/screenshots/v0.2/rain-day.png)
 
-**[打开在线演示](https://dilee-king.github.io/isometric-san-francisco/)** · [实际运行录屏](docs/Waterfront-actual-demo.mp4) · [验证记录](docs/VERIFICATION-v0.1.md)
+The current release is a continuous sample around the Ferry Building, Financial District and Embarcadero. It is not a city-wide map.
 
-![实际运行夜景](docs/screenshots/night.png)
+## What changed in v0.2
 
-## 方向
+- **Transport perspective:** cars, ferries, the cargo ship and aircraft are built in forward/side/up metres. Every body, cabin, hull, wing and tail vertex uses the map's orthographic camera. World-space widths, height and foreshortening replace rotated top-view icons.
+- **A visibly wet city:** Rain switches to separately authored wet daytime/nighttime tiles, with darker roofs, soaked paving, puddles, reflections and rain-disturbed water. Animated streaks, surface impacts and reduced visibility complement those surface changes.
+- **Three weather choices:** Clear, Coastal Fog and Rain. The approved dry artwork and fog treatment are retained.
+- **English throughout the current experience:** interface, accessibility text, place labels and main documentation. The decorative lower-left caption and sample label have been removed.
 
-沿用 [Isometric NYC](https://cannoneyed.com/projects/isometric-nyc) 与 [Isometric Vancouver](https://vancouver.isoworld.xyz/) 的公开制作思路：统一正交相机、真实城市结构参照、逐块绘制与接缝修整、多级图块浏览。浏览体验采用固定斜视角，支持平移和缩放。
+## Explore
 
-首期目标是旧金山市区及北部、东部海湾沿岸。制作从 Ferry Building、Financial District 与 Embarcadero 的连续样区开始，再逐块向相邻市区、北部滨水、SoMa 与 Mission Bay 扩展。这个制作顺序是当前提案；完整边界由覆盖清单记录。
+Drag to pan; scroll or use the map tools to zoom. The right panel controls time, weather and transport. On a phone, open **Environment** to reveal the controls.
 
-| 组成 | 目标行为 | 当前状态 |
-| --- | --- | --- |
-| 城市地图 | 细密建筑、街道、码头与岸线，连续缩放浏览 | 已交付连续样区 |
-| 车辆 | 72 个车辆实例、22 条有向道路环线、推定车道偏移、转向与短暂停等 | 已实现示意交通；未做完整信号控制或车辆跟驰 |
-| 船舶 | 两艘渡轮、一艘慢速货船、停靠等待与水面尾流 | 已实现；船体航线对源陆地／码头执行避障检查 |
-| 飞机 | 与地图配准的偶发高空飞越和航行灯 | 已实现 |
-| 日夜 | 配准昼夜图块混合、黄昏过渡、独立路灯与交通灯光 | 已实现；不计算物理太阳投影 |
-| 天气 | 晴、多云、海雾、雨，独立于时间组合 | 已实现 WebGL2 效果和强度控制 |
+- Choose Morning, Day, Dusk or Night, or scrub the time slider.
+- Enable **Auto day/night** for an approximately five-minute cycle.
+- Select Clear, Coastal Fog or Rain; adjust weather intensity.
+- Toggle Cars, Boats and Aircraft independently. Aircraft appear as occasional overflights.
+- Pause freezes traffic, time and weather. Map navigation stays available. Hidden tabs suspend all clocks without changing the pause setting.
+- Reduced-motion preference starts the scene paused. Without WebGL2, projected Canvas transport and the dry map/night view remain available; unavailable weather effects are explained and disabled.
 
-首期不含 SFO 机场地面，飞机先表现为空中飞越。交通与天气是可控的演示动画；接入实时数据属于独立的后续工作。
+Keyboard: focus the map, then use Space to play/pause, Home to reset, and + / − to zoom. All controls are keyboard accessible.
 
-## 技术路线
+## Run locally
 
-离线制作统一相机下的精绘图块，浏览器加载二维图块与动态叠加层。以纽约公开的 React / TypeScript / Vite / OpenSeadragon / DZI 流程为首版基础，参考温哥华的 WebGL 图层和 worker 交通组织。所有图层共用一套世界坐标到画面的变换。
-
-本版使用源几何深度进行地面对象中心点遮挡，昼夜图块共享尺寸和视角。AI 精绘可能产生局部边缘差异，遮挡与窗灯是展示近似，不是最终画面的逐像素实测深度；细小对象可能在建筑边缘整体出现或隐藏。
-
-完整方法见 [项目设计](docs/project-design.md)、[技术参照核对](docs/reference-audit.md) 和 [视觉规范](DESIGN.md)。
-
-## 更新方式
-
-- [路线图](ROADMAP.md)：每个阶段的交付物与完成条件。
-- [覆盖计划](data/coverage-plan.json)：计划范围与已交付范围分别记录。
-- [贡献说明](CONTRIBUTING.md)：修图、路线、效果和代码的提交规则。
-- [致谢](ACKNOWLEDGMENTS.md)：与纽约、温哥华及相关开源项目的联系。
-- [更新记录](CHANGELOG.md)：只记录已经交付的变化。
-
-后续每个地图版本将绑定图块清单、来源记录、坐标配置和应用提交。大型图块及原始数据采用独立版本化存储，代码仓库保留清单与可复现步骤。
-
-目前 GitHub Actions 会在 `main` 更新后检查模型、源数据准备流程和图块哈希，构建应用并部署 GitHub Pages。首版的两幅小型原图及图块随仓库保留；全市扩展时再迁移到独立资产存储。
-
-## 阅读与运行
-
-需要 Node.js 24+。运行应用不需要账号、地图 API key 或外部地图服务。首次安装依赖需要网络：
+Requires Node.js 24+. First-time dependency installation needs a network connection. The running map uses bundled local assets, without a map API key, login or external basemap service.
 
 ```powershell
 npm ci
 npm run dev
 ```
 
-打开终端显示的本地地址，默认 `http://127.0.0.1:5186/`。拖动平移、滚轮缩放；右侧控制时间、天气与交通，底部控制播放、交通速度和地名。自动昼夜约 5 分钟一循环。暂停会冻结交通、日夜与天气，仍可浏览地图。减少动态效果偏好下默认暂停。
+Open the printed address, normally `http://127.0.0.1:5186/`.
 
 ```powershell
 npm test
+node tools/audit-assets.mjs
 npm run build
 npm run preview
 ```
 
-生产预览默认 `http://127.0.0.1:4186/`。实际验证与限制见 [v0.1 验证记录](docs/VERIFICATION-v0.1.md)。
+Production preview uses `http://127.0.0.1:4186/`.
 
-## 图块与数据复现
+## Production method
 
-原始精绘 PNG、完整提示词、源派生几何与掩膜已保留。图像由内置 imagegen 生成；Python 只执行源几何栅格化、格式转换和确定性图块切分。准备依赖见 `tools/requirements.txt`。
+One fixed orthographic structure reference is built from DataSF footprints, USGS lidar and OpenStreetMap. Original illustrated appearances are prepared and repaired as registered images, then exported as multiresolution WebP/DZI pyramids. React and OpenSeadragon provide continuous navigation. A worker controls transport and independent clocks; projected world-space meshes, source-depth clipping and WebGL atmosphere use one shared transform.
+
+Vancouver's deployed traffic renderer was inspected directly: it constructs vehicle body and cabin corners in world metres, projects them through the city camera, then applies structure masks. This project implements that geometric principle with its own camera and original models. No Vancouver artwork or unverified-license code is copied. See the [reference audit](docs/v0.2-reference-audit.md).
+
+GitHub Actions verifies model/geometry tests, the source-bundle regression and asset hashes, then builds and deploys GitHub Pages when `main` changes. The `map/v2` namespace preserves the prior release assets.
+
+## Rebuild the assets
+
+Selected original PNGs, exact prompts, derived source geometry, camera metadata and masks are included. Built-in imagegen created the artwork; Python performs source rasterization, format conversion and deterministic tile packaging.
 
 ```powershell
 python -m pip install -r tools/requirements.txt
+python tools/test_source_pipeline.py
 python tools/package_tiles.py
 ```
 
-重新制作结构参照可运行 `python tools/prepare_source.py --source data/source/ferry.json`；它会同步更新 `data/source/` 中的结构图、场景与两张遮罩，再运行 `python tools/package_tiles.py`。模型生成不是确定性流程；这里保存的是选定原图与来源记录。
+To regenerate the structural reference and canonical source masks, run `python tools/prepare_source.py --source data/source/ferry.json`, then package again. Artwork generation itself is not deterministic; the selected originals and their hashes are retained.
 
-## License
+## Scope and limits
 
-本仓库原创代码与文档采用 [MIT](LICENSE)。第三方数据、图像和代码保留各自的许可及署名；参照项目的许可不自动覆盖它们引用的外部数据。详见 [资产规则](assets/README.md)。
+The sample contains 72 car instances following 22 source-directed road loops, two ferries, one cargo vessel and an occasional aircraft. Routes, lane offsets, stops, building detail, lighting and weather are illustrative. There is no full signal controller, vehicle-following model, live transport feed, airport operation or physical weather/solar simulation.
+
+The source-input extent is 1200 × 1200 m in EPSG:32610; the illustration is a cropped orthographic view. This input extent is not the finished map's land area. AI drawing can shift local edges; source-depth clipping and final-art alignment are display approximations. The wet-surface mask is an illustrative source-derived display layer, not measured imperviousness.
+
+Original application code and documentation are [MIT licensed](LICENSE). Third-party dependencies and data retain their own notices. DataSF PDDL, USGS public-domain data, and [© OpenStreetMap contributors / ODbL](https://www.openstreetmap.org/copyright) are credited separately. Read [Acknowledgments](ACKNOWLEDGMENTS.md), [asset provenance](assets/README.md) and the [coverage record](data/coverage-plan.json).

@@ -63,7 +63,24 @@
       "service": "Codex built-in imagegen",
       "modelIdentity": "not separately exposed by tool",
       "sha256": "34ce8b16d893513f823e99ca4071e715e434b2578158ae02bea1bd3e0412acaa"
+    },
+    {
+      "role": "rain-day",
+      "path": "assets/waterfront-rain-day.png",
+      "prompt": "assets/prompts/waterfront-rain-day.txt",
+      "service": "Codex built-in imagegen",
+      "modelIdentity": "not separately exposed by tool",
+      "sha256": "88705e9a01376649ccc2f41e1c0cc6df9647da1c3ace22e411616afc67e57af4"
+    },
+    {
+      "role": "rain-night",
+      "path": "assets/waterfront-rain-night.png",
+      "prompt": "assets/prompts/waterfront-rain-night.txt",
+      "service": "Codex built-in imagegen",
+      "modelIdentity": "not separately exposed by tool",
+      "sha256": "ae133d66f27aad206e78a9cc7e7d3bd139dfc1cb6f99a0de63b2538aa22aedcb"
     }
   ],
-  "packaging": "Pillow deterministic resizing, WebP conversion and DZI cutting only; no semantic image editing in Python"
+  "packaging": "Pillow deterministic resizing, WebP conversion and DZI cutting only; no semantic image editing in Python",
+  "transportProjection": "Original world-space vehicle vertices use the same metre-based orthographic camera as the map."
 }

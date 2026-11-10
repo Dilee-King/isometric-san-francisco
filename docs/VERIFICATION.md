@@ -1,4 +1,8 @@
-# Setup verification — 2026-11-10
+# Verification records
+
+Current release: [Waterfront v0.2](VERIFICATION-v0.2.md). Previous runtime: [Waterfront v0.1](VERIFICATION-v0.1.md).
+
+## Archived setup verification — 2026-11-10
 
 Scope: the initial documentation repository only.
 

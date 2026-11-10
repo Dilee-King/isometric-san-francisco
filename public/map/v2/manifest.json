@@ -1,0 +1,402 @@
+{
+  "release": "waterfront-v2",
+  "imageSize": [
+    1536,
+    1024
+  ],
+  "generation": "Original dry day/night retained; registered wet day/night edits. All vehicle vertices are projected from world ENU.",
+  "appearances": [
+    {
+      "stem": "scene",
+      "asset": "assets/waterfront-day.png",
+      "sha256": "7cc6b9f0b23941b6a299c39d98265949d162582a692880000f100d44138e4c6d",
+      "descriptor": "scene.dzi",
+      "size": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "stem": "night",
+      "asset": "assets/waterfront-night.png",
+      "sha256": "34ce8b16d893513f823e99ca4071e715e434b2578158ae02bea1bd3e0412acaa",
+      "descriptor": "night.dzi",
+      "size": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "stem": "rain-day",
+      "asset": "assets/waterfront-rain-day.png",
+      "sha256": "88705e9a01376649ccc2f41e1c0cc6df9647da1c3ace22e411616afc67e57af4",
+      "descriptor": "rain-day.dzi",
+      "size": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "stem": "rain-night",
+      "asset": "assets/waterfront-rain-night.png",
+      "sha256": "ae133d66f27aad206e78a9cc7e7d3bd139dfc1cb6f99a0de63b2538aa22aedcb",
+      "descriptor": "rain-night.dzi",
+      "size": [
+        1536,
+        1024
+      ]
+    }
+  ],
+  "nativeDetailTilesPerAppearance": 6,
+  "files": [
+    {
+      "path": "scene_files/0/0_0.webp",
+      "sha256": "be6b7237b43b92683e09aee8c133a90568ff985a07a6b4ebc3130fcab8f18c4f"
+    },
+    {
+      "path": "scene_files/1/0_0.webp",
+      "sha256": "70c64670bcd4d9093a57b6c749ac5f30184876e6264c5eacb25cea79a95fcc78"
+    },
+    {
+      "path": "scene_files/2/0_0.webp",
+      "sha256": "36c322223035a85585ca3aa25e1868fbfc9bb28b125850a762ef5224e9f81240"
+    },
+    {
+      "path": "scene_files/3/0_0.webp",
+      "sha256": "1d43c8b1169e06a78871c52fdc194aab68735ac8272aed7faae5a8375f8d0731"
+    },
+    {
+      "path": "scene_files/4/0_0.webp",
+      "sha256": "a9c15e536f2f72813c3c848e18a9fc3f82461705631ad0c42d57d8923b1286a1"
+    },
+    {
+      "path": "scene_files/5/0_0.webp",
+      "sha256": "0fd842aa5c2b7d8522664e15761a2822924c42c39c94d1a0f56e8630ff75c798"
+    },
+    {
+      "path": "scene_files/6/0_0.webp",
+      "sha256": "547e53062f0038e4115946801d95ac778d35682597ebaebeb85be7911f1ac4dd"
+    },
+    {
+      "path": "scene_files/7/0_0.webp",
+      "sha256": "d609977890370de6e2bce7d91c34a83f511314d2dcd7bf01e28a83c6ec026019"
+    },
+    {
+      "path": "scene_files/8/0_0.webp",
+      "sha256": "93a9305fac369c7f62d8890affc1400f413e19d5bcc961378b23accfdfd98658"
+    },
+    {
+      "path": "scene_files/9/0_0.webp",
+      "sha256": "1f668edccde8734ae330fe7c39373964c045878ce60e37db0a95daa067aa64f4"
+    },
+    {
+      "path": "scene_files/10/0_0.webp",
+      "sha256": "92367d27d16fbba915e88b1d38575e3fcdd26205cfd707de2effeb824ea0c82d"
+    },
+    {
+      "path": "scene_files/10/1_0.webp",
+      "sha256": "2ccbe20b0696f7bb623d31058c39c05471675df05183a41adefa0320e8cee93d"
+    },
+    {
+      "path": "scene_files/11/0_0.webp",
+      "sha256": "1acae9bc0424e40092fa432db0665175da907af220c4bfd2f9009625622097ca"
+    },
+    {
+      "path": "scene_files/11/1_0.webp",
+      "sha256": "09d49ae138f07fa7e4632dd6f90b72bfc6e6abbfdca9f40f5d0328283a6f20e7"
+    },
+    {
+      "path": "scene_files/11/2_0.webp",
+      "sha256": "15fa72fc7aaf55bbca432c79f9595bc30aad28929b71cad25d1510cd867ecf50"
+    },
+    {
+      "path": "scene_files/11/0_1.webp",
+      "sha256": "fca2d42cfcfbf3435caf46e3138b1eef899839848b799bff20585cb2bc8f3574"
+    },
+    {
+      "path": "scene_files/11/1_1.webp",
+      "sha256": "55025b8608728bfae57d873b29090b156253cdc48377fa772d2c82affba593c8"
+    },
+    {
+      "path": "scene_files/11/2_1.webp",
+      "sha256": "f42500d3d3f9b7bc73169a89b9789243a7104277d0a3926db6487a6b7cf64693"
+    },
+    {
+      "path": "night_files/0/0_0.webp",
+      "sha256": "b7123b724d479a39ec22689c9e3ccfd860635ee1815e3b3dcc42e38475db838f"
+    },
+    {
+      "path": "night_files/1/0_0.webp",
+      "sha256": "89a69021abbcead4c46b63834b22fb366ace64b2ea84234c532f223ee0fe114f"
+    },
+    {
+      "path": "night_files/2/0_0.webp",
+      "sha256": "2af594c2ea157d83da52ab7f060aa4d1d706941d16fa00d246a99ce5eaadbb5f"
+    },
+    {
+      "path": "night_files/3/0_0.webp",
+      "sha256": "366aab96870e362a99cfce2b265dce21b29668aea5867a8b67e5f8ae5f31bede"
+    },
+    {
+      "path": "night_files/4/0_0.webp",
+      "sha256": "9d2763c30bb54a7dd8917409a959f1d9229f339e6b2a836c9954afb7bd079bfb"
+    },
+    {
+      "path": "night_files/5/0_0.webp",
+      "sha256": "c9f66f05dd8a084f37bd867873ac6b1abb56f4d5b47dcbc6313f180703cc18a0"
+    },
+    {
+      "path": "night_files/6/0_0.webp",
+      "sha256": "e69ce561cc8481529d4ab55f809823c72ec68d1a0cf488bc36b04364e5b86fd3"
+    },
+    {
+      "path": "night_files/7/0_0.webp",
+      "sha256": "ca7647c5c52316e4c695a4df3385fa54ac792bdd889262d966d20a9dbe70f9d5"
+    },
+    {
+      "path": "night_files/8/0_0.webp",
+      "sha256": "0460ead1c9844201b72731c6528582ba7d24a9606c15768001e6b5aa825f38aa"
+    },
+    {
+      "path": "night_files/9/0_0.webp",
+      "sha256": "b63d2ea94d5108caa75a389e468b914db11152e5333459b04b2bcc560287b32b"
+    },
+    {
+      "path": "night_files/10/0_0.webp",
+      "sha256": "9fc4cf47f9995ad4c24b3d462472f6357a22117e7d07e2b626e792b1c8935f84"
+    },
+    {
+      "path": "night_files/10/1_0.webp",
+      "sha256": "32f8a957f759dc0fd2946355fcddda7d23e488debac0f5dc3bdddaa1e0296648"
+    },
+    {
+      "path": "night_files/11/0_0.webp",
+      "sha256": "fd177846444f588b02daeae37448e2250603bf76d422c42de8da59445e790235"
+    },
+    {
+      "path": "night_files/11/1_0.webp",
+      "sha256": "21bd5c16f42948b0f7ba1cfd47cd3f31f5d4e1ac7995738cbf679793d9df52a9"
+    },
+    {
+      "path": "night_files/11/2_0.webp",
+      "sha256": "d8d8fefdf6d4adc7fe61eab60c61ea4fbc8358bd953d83adb2a77ac73b138b8c"
+    },
+    {
+      "path": "night_files/11/0_1.webp",
+      "sha256": "2270a7d5c1069e87a4155864d82e83a83a6e86f1a1af08772640095da97d1392"
+    },
+    {
+      "path": "night_files/11/1_1.webp",
+      "sha256": "dcb3e2eadcc93914f7bc92d88d6099230f68c6ff864d1122923859c6cdbf4019"
+    },
+    {
+      "path": "night_files/11/2_1.webp",
+      "sha256": "f9121ed22f8afcd087808546607db7de67a771661322985ae85e1ea060168067"
+    },
+    {
+      "path": "rain-day_files/0/0_0.webp",
+      "sha256": "7d6eee95217469713be1a9aebc82a9584f9319352e7b67af8d9191f75b0e9290"
+    },
+    {
+      "path": "rain-day_files/1/0_0.webp",
+      "sha256": "fcbb606822b41c9c07d7de22d16a3f3dac4edafdff13048b5b436a6fb3d8f8a1"
+    },
+    {
+      "path": "rain-day_files/2/0_0.webp",
+      "sha256": "97f5c959dcabf4a3cb9d5f87219cdd426d73d39fb9e806eb9eb45207122c9db2"
+    },
+    {
+      "path": "rain-day_files/3/0_0.webp",
+      "sha256": "61cd8101b8c00c7f057f0192ab9ce2a8e6a5a395b5677128a824e69c63e19516"
+    },
+    {
+      "path": "rain-day_files/4/0_0.webp",
+      "sha256": "0c1f6d72b44a9ae36ef9ad95ea5c02ce750118496983dbf33ae18e5ddcf097f6"
+    },
+    {
+      "path": "rain-day_files/5/0_0.webp",
+      "sha256": "41ecbc602bd06a1070f171e4bf21eeddbaba8cb43dcb21e886e7321cd8367da6"
+    },
+    {
+      "path": "rain-day_files/6/0_0.webp",
+      "sha256": "7502a13ab7dd5dd970430aa07000379c1767f8133faa9964e30a7e1783da5913"
+    },
+    {
+      "path": "rain-day_files/7/0_0.webp",
+      "sha256": "b2aeb9134a6d13abfab4f9c7ddce7bd2bb927a7436e36765155093232601ba68"
+    },
+    {
+      "path": "rain-day_files/8/0_0.webp",
+      "sha256": "ac7e108e7dd309bf607724a36fa70788feb2865868719d8363a3987104bf15d8"
+    },
+    {
+      "path": "rain-day_files/9/0_0.webp",
+      "sha256": "3ade206f11129e77e5a5338d362810f8740f0048e0cd8007cb7af9b1d88fb9dc"
+    },
+    {
+      "path": "rain-day_files/10/0_0.webp",
+      "sha256": "1dcc340e225aec3b6d4572135151fdf28557496005ea82645be9c608096a8709"
+    },
+    {
+      "path": "rain-day_files/10/1_0.webp",
+      "sha256": "47bf6e35ee188c38dbac3d6a1163dcf307fd6d0fd9e8c06cb6ae084ed9e79674"
+    },
+    {
+      "path": "rain-day_files/11/0_0.webp",
+      "sha256": "36ecc882845fc05fe460337b43a7be63c46ac7b3cc193749c96196a9af4b60eb"
+    },
+    {
+      "path": "rain-day_files/11/1_0.webp",
+      "sha256": "52b4df6b19924b8f6d74c2143c9e78bbdebce62594fe71ffe01f77ae25a75b52"
+    },
+    {
+      "path": "rain-day_files/11/2_0.webp",
+      "sha256": "786401121fd98a852dcc87dea6156723ae27a47b5c611dc32a11a32cded90803"
+    },
+    {
+      "path": "rain-day_files/11/0_1.webp",
+      "sha256": "cd1465f4e97694b50502844d6d809843d9fd36db67e7e58545f5d2a4eb5aa88d"
+    },
+    {
+      "path": "rain-day_files/11/1_1.webp",
+      "sha256": "185433826fd4b1ec1ed472682260af14aa170170597c68e1c2b21a588e34ed56"
+    },
+    {
+      "path": "rain-day_files/11/2_1.webp",
+      "sha256": "d788109b92e7870b099ba090863abec619902ad890641b5b6bc8b5ea094eee44"
+    },
+    {
+      "path": "rain-night_files/0/0_0.webp",
+      "sha256": "7b8a024263eb4a7102fbc5ca6b17952fd60ee36f79edb4f75383aba7d358c129"
+    },
+    {
+      "path": "rain-night_files/1/0_0.webp",
+      "sha256": "14d1f6a4cdcb90fd23c1465b1ca2d3c7dfc5885a2a6d28e42d6e4ca8bc2bad6a"
+    },
+    {
+      "path": "rain-night_files/2/0_0.webp",
+      "sha256": "ca04164b0388be8f4a0335786eac38522f13ed999930aadeeb99f797c845a327"
+    },
+    {
+      "path": "rain-night_files/3/0_0.webp",
+      "sha256": "2fd0c1eebc76156070a0038e70dfb2af88509c52eaa25d930331ac0bcbeb14a3"
+    },
+    {
+      "path": "rain-night_files/4/0_0.webp",
+      "sha256": "25d8f6cc7a7041a732157fc629572955729349301a97a864adb0ce8d84fec71f"
+    },
+    {
+      "path": "rain-night_files/5/0_0.webp",
+      "sha256": "77cea288ea38ea5d935040c74773559c0326ed7a858bc9e92b250ce4fd38964c"
+    },
+    {
+      "path": "rain-night_files/6/0_0.webp",
+      "sha256": "3628424fe22ce983bc2ff491d1a754742869944c03b8c5137b9d3a7216515211"
+    },
+    {
+      "path": "rain-night_files/7/0_0.webp",
+      "sha256": "c951c40027a99c172dd2ddda10abc62630cf7c4a1c16325ca73ecc141dd137b1"
+    },
+    {
+      "path": "rain-night_files/8/0_0.webp",
+      "sha256": "5230dc88fad97df620f0106404e8a8c8dd37a1b4a6abdb7490e40161e5f7403b"
+    },
+    {
+      "path": "rain-night_files/9/0_0.webp",
+      "sha256": "6a0a777a49ecbc59ba4e67c08ac613198d7e0f0bf0661a84f86e46e2a27d9b2b"
+    },
+    {
+      "path": "rain-night_files/10/0_0.webp",
+      "sha256": "73287569b80c55e63878d6cd9add2c403f7832cb724fbc636d1ded9fc5793d09"
+    },
+    {
+      "path": "rain-night_files/10/1_0.webp",
+      "sha256": "2c710935b3c621803fbbe078b76e9f1f00d41f03aa8ef7c2df094f3753e92737"
+    },
+    {
+      "path": "rain-night_files/11/0_0.webp",
+      "sha256": "3adc43e11fd566c161302ec66726ce6c3a2b61a64107ff398bb8ce9b637fdbff"
+    },
+    {
+      "path": "rain-night_files/11/1_0.webp",
+      "sha256": "3f74264331f15d63278ab5d39743ab377b9e772d21b1180d996178f606f3000d"
+    },
+    {
+      "path": "rain-night_files/11/2_0.webp",
+      "sha256": "ad8270ccd6024ffecb2954d0e119ef70808ef93fb82e70439bfd3f8eb3aaa865"
+    },
+    {
+      "path": "rain-night_files/11/0_1.webp",
+      "sha256": "da5c68f806c7448bb6639165a5bad4790c264f1a88ca69379a76c814beb5d273"
+    },
+    {
+      "path": "rain-night_files/11/1_1.webp",
+      "sha256": "40b7cf848f394cb6eab06b67d5ed092040056bd3fd5a33ccaa6477f3b776c64d"
+    },
+    {
+      "path": "rain-night_files/11/2_1.webp",
+      "sha256": "bde36d3f03ec5bff4e36efd6bd996fde677499853d91d51b28a7035002963d24"
+    },
+    {
+      "path": "day.webp",
+      "sha256": "f1e501034ea860fae06a65276543bb4f41b8632375e06043db874b6619fa01dc"
+    },
+    {
+      "path": "depth.png",
+      "sha256": "184fc951014534e34bb06280098642be02de177f2d2381660d875642e569fcdc"
+    },
+    {
+      "path": "hard.png",
+      "sha256": "71afe03b13246fbe531d1428b656daccac7405fb7ea5a9713aa08b67215281bb"
+    },
+    {
+      "path": "night.dzi",
+      "sha256": "9a75091bf8f8fbe289b46437461481cbc9d940e5224689e14df5a22904484270"
+    },
+    {
+      "path": "night.webp",
+      "sha256": "d95f3fcf6b93b0adaf3e67c73ec5b41a8577b59a706753fc4656bebab40d0b31"
+    },
+    {
+      "path": "rain-day.dzi",
+      "sha256": "9a75091bf8f8fbe289b46437461481cbc9d940e5224689e14df5a22904484270"
+    },
+    {
+      "path": "rain-day.webp",
+      "sha256": "bd2e379d6861eaddf474ab3de2d2c709572a57540e0e80224df3d5359cb5f3ef"
+    },
+    {
+      "path": "rain-night.dzi",
+      "sha256": "9a75091bf8f8fbe289b46437461481cbc9d940e5224689e14df5a22904484270"
+    },
+    {
+      "path": "rain-night.webp",
+      "sha256": "4e609098ed54ce9f6b9d9344848993ab110f080ace231999d9968447ea564759"
+    },
+    {
+      "path": "scene.dzi",
+      "sha256": "9a75091bf8f8fbe289b46437461481cbc9d940e5224689e14df5a22904484270"
+    },
+    {
+      "path": "scene.json",
+      "sha256": "7087715306529d3676d47b236740cd936e13da65466e5dc29197ed3a9c3c585d"
+    },
+    {
+      "path": "water.png",
+      "sha256": "2bcb0ffcdabf7f793b4f86883f8fa0d06a273edc4847f8b28a4d05d7854a40d6"
+    }
+  ],
+  "sourceRoadCycles": 22,
+  "routeCounts": {
+    "car": 72,
+    "ferry": 2,
+    "cargo": 1,
+    "plane": 1
+  },
+  "shipClearanceMetres": {
+    "ferry": 18,
+    "cargo": 35
+  },
+  "hardSurfaceMask": "Illustrative paved ground from source land minus source greens/buildings, not measured imperviousness.",
+  "maskGeometryRepairCount": 2
+}

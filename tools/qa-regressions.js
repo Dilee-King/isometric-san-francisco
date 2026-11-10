@@ -57,18 +57,22 @@ async (page) => {
     await fallback.waitForFunction(() => window.__sf?.ready);
     if (
       !(await fallback
-        .getByText("此浏览器暂不支持天气特效。", { exact: false })
+        .getByText("Weather effects are unavailable in this browser.", { exact: false })
         .count())
     )
       failures.push("missing WebGL2 capability notice");
     if (
       !(await fallback
-        .getByRole("button", { name: "下雨", exact: true })
+        .getByRole("button", { name: "Rain", exact: true })
         .isDisabled())
     )
       failures.push("unavailable weather still enabled");
     if (await fallback.evaluate(() => window.__sf.snapshot().webgl2))
       failures.push("fallback did not disable WebGL2");
+    if (await fallback.evaluate(() => window.__sf.snapshot().vehicleRenderer) !== "canvas-world-mesh")
+      failures.push("world-space Canvas fallback unavailable");
+    await fallback.getByRole("button", { name: "Night", exact: true }).click();
+    await fallback.waitForFunction(() => window.__sf.nightLayer.getOpacity() > .99 && window.__sf.nightLayer.getFullyLoaded());
   } finally {
     await fallback.close();
     await page.bringToFront();
@@ -80,6 +84,7 @@ async (page) => {
     userPauseChoicePreserved: true,
     resume: true,
     noWebGL2NoticeAndDisabledControls: true,
+    canvasWorldMeshAndNightFallback: true,
     visibilityMethod:
       "synthetic Page Visibility event; no real OS tab-hiding claim",
   };

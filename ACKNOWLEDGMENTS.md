@@ -16,6 +16,7 @@ The initial revision contained documentation only. Version 0.1 adds original SF 
 - DataSF [Building Footprints](https://data.sf.gov/Geographic-Locations-and-Boundaries/Building-Footprints/ynuv-fyni), published as PDDL: clipped footprint geometry and source height fallback.
 - [USGS San Francisco 2023 lidar](https://www.fisheries.noaa.gov/inport/item/73386), US Government public domain: the derived roof/ground snapshot, not the raw LAZ point cloud.
 - [© OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL 1.0: 2026-11-09 streets, coast, piers and tree positions. The derived snapshot and selected road tags are available under `data/source/`; the ODbL data notice applies to those OSM-derived database portions separately from the original MIT application code.
-- Day/night illustration is original AI-generated artwork guided by the open source geometry reference; facade/window details and the heritage clock-tower supplement are illustrative.
+- Dry and wet day/night illustrations are original AI-generated artwork guided by the open source geometry reference; facade/window details and the heritage clock-tower supplement are illustrative.
+- Vancouver's deployed traffic renderer was inspected for its metric corner construction, shared projection and source-mask approach. The v0.2 vehicle geometry and renderer are independently implemented; see the [reference audit](docs/v0.2-reference-audit.md).
 
 When code or data is added, retain the exact required notices and keep a per-source record. Attribution to a software repository does not replace the terms for imagery or other external datasets used by that software.

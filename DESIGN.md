@@ -1,6 +1,6 @@
 # Isometric San Francisco — visual direction
 
-Status: proposed implementation contract, based on the scope chosen on 2026-11-10. No map application is included in this revision.
+Status: active visual contract for the working waterfront sample, revised for v0.2 on 2026-11-10. Published coverage is recorded separately in `data/coverage-plan.json`.
 
 ## 1. Visual Theme & Atmosphere
 
@@ -14,7 +14,7 @@ Map colors are independent of UI tokens: warm stone and painted facades, cool ro
 
 ## 3. Typography
 
-Use an offline system stack: `"Segoe UI", "Microsoft YaHei", Arial, sans-serif`. UI sizes: 12, 14, 16 and 20 px; weights: 400, 500 and 600. English body line-height 1.5; Chinese body 1.75 and Chinese headings 1.35. Chinese tracking is zero. Uppercase labels use .08em tracking. Map labels and interface text stay sharp at every zoom.
+Use an offline system stack: `"Segoe UI", Arial, sans-serif`. UI sizes: 12, 14, 16 and 20 px; weights: 400, 500 and 600. English body line-height is 1.5. Uppercase labels use .08em tracking. Map labels and interface text stay sharp at every zoom.
 
 ## 4. Spacing & Grid
 
@@ -32,11 +32,11 @@ Required: pan/zoom/home, pause, simulation speed, independent car/boat/plane tog
 
 Animation stays attached to map coordinates while panning or zooming. Ground traffic follows mapped directions and lanes; ships follow water routes; aircraft cross sparingly at a distinct apparent height. Scene time, transport time and weather evolution are independent clocks. Pausing freezes all three clocks while map navigation remains available. Reduced-motion preference starts the scene paused and disables automatic weather transitions until explicitly enabled.
 
-Day-to-night uses registered appearance layers with separate lights and masks. Rain is clipped and composited in scene context. Fog uses shoreline-aware fields and depth data where available. Artificially moving baked shadows is prohibited; physically changing cast shadows requires relightable geometry/buffers.
+Day-to-night uses registered appearance layers with separate lights and masks. Rain uses registered wet day/night artwork, soaked paving and roofs, reflections, streaks and surface impacts. Weather choices are Clear, Coastal Fog and Rain. Fog uses shoreline-aware fields and depth data where available. Every vehicle surface is constructed in world metres and projected through the map camera. Artificially moving baked shadows is prohibited; physically changing cast shadows requires relightable geometry/buffers.
 
 ## 8. Voice & Brand
 
-Working name: Isometric San Francisco. Chinese interface first, with an English project README summary for the reference-project community. Use plain labels: 时间 / 天气 / 交通 / 暂停 / 全景. Credits say “Inspired by Isometric NYC and Isometric Vancouver”; do not imply endorsement, affiliation or that their artwork depicts San Francisco.
+Working name: Isometric San Francisco. English interface, accessible copy, map labels and main project documentation for the GitHub audience. Use plain labels: Time / Weather / Traffic / Pause / Reset view. Credits say “Inspired by Isometric NYC and Isometric Vancouver”; do not imply endorsement, affiliation or that their artwork depicts San Francisco.
 
 ## 9. Anti-patterns
 

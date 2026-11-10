@@ -1,5 +1,5 @@
 :root {
-  font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   color: #ecede6;
   background: #102d39;
   font-synthesis: none;
@@ -196,7 +196,7 @@ button[aria-pressed="true"] {
   min-height: 26px;
 }
 .close-settings {
-  display: none;
+  display: inline-flex;
 }
 .clock-row {
   display: flex;
@@ -405,32 +405,6 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .transport-options button[aria-pressed="true"] i {
   background: #bed29f;
-}
-.location-caption {
-  position: absolute;
-  bottom: 110px;
-  left: 26px;
-  display: flex;
-  gap: 11px;
-  align-items: center;
-  pointer-events: none;
-  text-shadow: 0 1px 5px #071e29;
-}
-.location-line {
-  height: 33px;
-  width: 2px;
-  background: #d7c28f;
-}
-.location-caption p {
-  font-size: 9px;
-  letter-spacing: 0.15em;
-  margin: 0 0 6px;
-  color: #e2e4d7;
-}
-.location-caption span:not(.location-line) {
-  font-size: 16px;
-  letter-spacing: 0.08em;
-  font-weight: 400;
 }
 .map-tools {
   position: absolute;
@@ -707,19 +681,6 @@ input[type="range"]::-webkit-slider-thumb {
   .transport-label {
     padding-top: 10px;
   }
-  .location-caption {
-    bottom: 111px;
-    left: 16px;
-  }
-  .location-caption p {
-    font-size: 7px;
-  }
-  .location-caption span:not(.location-line) {
-    font-size: 14px;
-  }
-  .settings-open .location-caption {
-    display: none;
-  }
   .map-tools {
     left: 12px;
     bottom: 42px;
@@ -792,4 +753,18 @@ button:disabled,
 input:disabled {
   cursor: not-allowed;
   opacity: 0.45;
+}
+
+.vehicles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.weather-options {
+  grid-template-columns: repeat(3, 1fr);
+}
+.map-credit {
+  justify-content: flex-end;
 }

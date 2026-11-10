@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MapView } from "./MapView.ts";
+import { MAP_ROOT } from "./assets.ts";
 import { defaultControls } from "./model.ts";
 import type { Frame, SceneData, Weather } from "./types.ts";
 
@@ -86,10 +87,9 @@ function Icon({ name }: { name: string }) {
   );
 }
 const weatherNames: Record<Weather, string> = {
-  clear: "晴朗",
-  cloudy: "多云",
-  fog: "海雾",
-  rain: "下雨",
+  clear: "Clear",
+  fog: "Coastal fog",
+  rain: "Rain",
 };
 const initial: Frame = {
   clock: { transportTime: 0, environmentTime: 0, hour: 14.25 },
@@ -111,7 +111,7 @@ export default function App() {
     [labels, setLabels] = useState(false);
   useEffect(() => {
     let stopped = false;
-    fetch(`${import.meta.env.BASE_URL}map/v1/scene.json`)
+    fetch(`${MAP_ROOT}scene.json`)
       .then((r) => {
         if (!r.ok) throw new Error();
         return r.json();
@@ -130,7 +130,9 @@ export default function App() {
         );
         (window as unknown as { __sf: MapView }).__sf = map.current;
       })
-      .catch(() => setError("地图未能载入，请检查本地服务后刷新。"));
+      .catch(() =>
+        setError("The map could not load. Check the connection and reload."),
+      );
     return () => {
       stopped = true;
       map.current?.destroy();
@@ -158,9 +160,7 @@ export default function App() {
         </div>
         <div>
           <p className="eyebrow">ISOMETRIC / LIVING WATERFRONT</p>
-          <h1>
-            San Francisco<span>旧金山</span>
-          </h1>
+          <h1>San Francisco</h1>
           <p className="scope">
             Ferry Building · Financial District · Embarcadero
           </p>
@@ -169,11 +169,11 @@ export default function App() {
       <div className="top-actions">
         <span className="live-indicator">
           <i />
-          {controls.paused ? "时刻已定格" : "城市正在运行"}
+          {controls.paused ? "Paused" : "Live"}
         </span>
         <button
           className="icon-button panel"
-          aria-label="关于与来源"
+          aria-label="About and credits"
           onClick={() => setAbout(true)}
         >
           <Icon name="info" />
@@ -186,37 +186,37 @@ export default function App() {
         aria-controls="environment-panel"
       >
         <Icon name="settings" />
-        {settings ? "收起" : "环境"}
+        {settings ? "Hide" : "Environment"}
       </button>
       {settings && (
         <aside
           className="environment panel"
           id="environment-panel"
-          aria-label="时间天气与交通控制"
+          aria-label="Environment controls"
         >
           <div className="panel-title">
-            <span>海湾的此刻</span>
+            <span>Time and weather</span>
             <button
               className="close-settings"
-              aria-label="关闭环境面板"
+              aria-label="Close environment panel"
               onClick={() => setSettings(false)}
             >
               <Icon name="close" />
             </button>
           </div>
           <div className="clock-row">
-            <output aria-label="地图时间">{clockText}</output>
+            <output aria-label="Map time">{clockText}</output>
             <div>
               <span>{weatherNames[controls.weather]}</span>
-              <small>旧金山 · 演示时间</small>
+              <small>San Francisco · demo time</small>
             </div>
           </div>
-          <div className="time-presets" role="group" aria-label="时间预设">
+          <div className="time-presets" role="group" aria-label="Time presets">
             {[
-              ["清晨", 7.2],
-              ["白天", 14.25],
-              ["黄昏", 18.65],
-              ["夜晚", 22.4],
+              ["Morning", 7.2],
+              ["Day", 14.25],
+              ["Dusk", 18.65],
+              ["Night", 22.4],
             ].map(([name, h]) => (
               <button
                 key={name}
@@ -230,12 +230,12 @@ export default function App() {
             ))}
           </div>
           <label className="range-label" htmlFor="hour">
-            <span>时间</span>
+            <span>Time</span>
             <span>00:00 — 24:00</span>
           </label>
           <input
             id="hour"
-            aria-label="一天中的时间"
+            aria-label="Time of day"
             type="range"
             min="0"
             max="23.99"
@@ -245,7 +245,7 @@ export default function App() {
           />
           <label className="switch-row">
             <span>
-              自动昼夜<small>约 5 分钟一昼夜</small>
+              Auto day/night<small>5 min / cycle</small>
             </span>
             <input
               type="checkbox"
@@ -256,36 +256,38 @@ export default function App() {
             />
             <i />
           </label>
-          <div className="section-label">天气</div>
-          <div className="weather-options" role="group" aria-label="天气预设">
-            {(["clear", "cloudy", "fog", "rain"] as Weather[]).map((w) => (
+          <div className="section-label">Weather</div>
+          <div
+            className="weather-options"
+            role="group"
+            aria-label="Weather presets"
+          >
+            {(["clear", "fog", "rain"] as Weather[]).map((w) => (
               <button
                 key={w}
                 aria-pressed={controls.weather === w}
                 disabled={!weatherAvailable && w !== "clear"}
                 onClick={() => map.current?.setControls({ weather: w })}
               >
-                <Icon
-                  name={w === "clear" ? "sun" : w === "cloudy" ? "cloud" : w}
-                />
+                <Icon name={w === "clear" ? "sun" : w} />
                 <span>{weatherNames[w]}</span>
               </button>
             ))}
           </div>
           {!weatherAvailable && (
             <p className="capability-note" role="status">
-              此浏览器暂不支持天气特效。
+              Weather effects are unavailable in this browser.
               <br />
-              地图、昼夜与交通仍可使用。
+              The map, lighting and traffic still work.
             </p>
           )}
           <label className="range-label" htmlFor="intensity">
-            <span>天气强度</span>
+            <span>Weather intensity</span>
             <span>{Math.round(controls.intensity * 100)}%</span>
           </label>
           <input
             id="intensity"
-            aria-label="天气强度"
+            aria-label="Weather intensity"
             disabled={!weatherAvailable}
             type="range"
             min=".15"
@@ -297,20 +299,20 @@ export default function App() {
             }
           />
           <div className="section-label transport-label">
-            流动的城市<span>示意交通</span>
+            Traffic<span>Simulated</span>
           </div>
           <div className="transport-options">
             {(
               [
-                ["cars", "car", "车辆"],
-                ["boats", "boat", "船舶"],
-                ["planes", "plane", "飞机"],
+                ["cars", "car", "Cars"],
+                ["boats", "boat", "Boats"],
+                ["planes", "plane", "Aircraft"],
               ] as const
             ).map(([key, icon, label]) => (
               <button
                 key={key}
                 aria-pressed={controls[key]}
-                aria-label={`显示${label}`}
+                aria-label={`Show ${label}`}
                 onClick={() => toggle(key)}
               >
                 <Icon name={icon} />
@@ -324,45 +326,38 @@ export default function App() {
       {!settings && (
         <button
           className="desktop-settings panel"
-          aria-label="打开环境面板"
+          aria-label="Open environment panel"
           onClick={() => setSettings(true)}
         >
           <Icon name="settings" />
-          时间与天气
+          Time and weather
         </button>
       )}
-      <div className="location-caption">
-        <span className="location-line" />
-        <div>
-          <p>THE CITY MEETS THE BAY</p>
-          <span>沿着海湾，慢一点。</span>
-        </div>
-      </div>
-      <nav className="map-tools panel" aria-label="地图工具">
+      <nav className="map-tools panel" aria-label="Map controls">
         <button
-          aria-label="缩小地图"
+          aria-label="Zoom out"
           onClick={() => map.current?.zoom(1 / 1.35)}
         >
           <Icon name="minus" />
         </button>
-        <button aria-label="放大地图" onClick={() => map.current?.zoom(1.35)}>
+        <button aria-label="Zoom in" onClick={() => map.current?.zoom(1.35)}>
           <Icon name="plus" />
         </button>
-        <button aria-label="地图全景" onClick={() => map.current?.home()}>
+        <button aria-label="Reset view" onClick={() => map.current?.home()}>
           <Icon name="home" />
         </button>
         <span className="tool-separator" />
         <button
           className="play-control"
-          aria-label={controls.paused ? "播放城市动画" : "暂停城市动画"}
+          aria-label={controls.paused ? "Play animation" : "Pause animation"}
           onClick={() => map.current?.setControls({ paused: !controls.paused })}
         >
           <Icon name={controls.paused ? "play" : "pause"} />
-          <span>{controls.paused ? "播放" : "暂停"}</span>
+          <span>{controls.paused ? "Play" : "Pause"}</span>
         </button>
         <button
           className="speed-control"
-          aria-label="切换交通速度"
+          aria-label="Change traffic speed"
           onClick={() =>
             map.current?.setControls({
               rate: controls.rate === 1 ? 2 : controls.rate === 2 ? 4 : 1,
@@ -373,7 +368,7 @@ export default function App() {
         </button>
         <span className="tool-separator" />
         <button
-          aria-label="显示地名"
+          aria-label="Show place names"
           aria-pressed={labels}
           onClick={() => {
             const next = !labels;
@@ -385,7 +380,6 @@ export default function App() {
         </button>
       </nav>
       <footer className="map-credit">
-        <span>样区 01 · 固定视角精绘</span>
         <button onClick={() => setAbout(true)}>
           DataSF · USGS · © OpenStreetMap
         </button>
@@ -393,8 +387,8 @@ export default function App() {
       {(!ready || error) && (
         <div className="loading">
           <span className="loading-orbit" />
-          <h2>{error ? "地图暂未就绪" : "正在展开旧金山海湾"}</h2>
-          <p>{error || "载入精绘图块与城市动画…"}</p>
+          <h2>{error ? "The map is not ready" : "Opening San Francisco"}</h2>
+          <p>{error || "Loading illustrated tiles and city animation…"}</p>
         </div>
       )}
       {about && (
@@ -427,25 +421,31 @@ export default function App() {
               <span>ABOUT THE MAP</span>
               <button
                 ref={aboutClose}
-                aria-label="关闭说明"
+                aria-label="Close about"
                 onClick={() => setAbout(false)}
               >
                 <Icon name="close" />
               </button>
             </div>
-            <h2 id="about-title">一座会呼吸的海湾城市。</h2>
+            <h2 id="about-title">San Francisco, in motion.</h2>
             <p>
-              Ferry Building、Financial District 与 Embarcadero
-              的连续精绘样区。拖动浏览街区，试试不同时间与天气。
+              A continuous illustrated view of the Ferry Building, Financial
+              District and Embarcadero. Explore the streets and waterfront
+              through changing light and weather.
             </p>
-            <h3>画面与数据</h3>
+            <h3>Artwork and data</h3>
             <p>
-              由 DataSF 建筑轮廓、USGS 2023 激光雷达和 2026-11-09 OpenStreetMap
-              快照建立统一正交结构参照，再用 imagegen
-              精绘。细节与局部边缘可能偏离源几何；遮挡、窗灯与配准属于展示近似。
+              DataSF footprints, USGS 2023 lidar and a 2026-11-09 OpenStreetMap
+              snapshot provide one orthographic structure reference. Original
+              dry and wet artwork was drawn with imagegen. Every moving vehicle
+              vertex uses that same camera.
             </p>
             <p>
-              车流、渡轮、货船和飞机均为示意动画。日夜使用配准的昼夜精绘图块与独立局部灯光；天气为视觉效果。当前没有实时交通、机场地面起降或物理太阳阴影计算。
+              Traffic routes, light and weather are illustrative. Rain changes
+              the street, roof and bay appearance and adds surface impacts.
+              Source-based depth clipping and final-art registration remain
+              display approximations. This is not a live traffic feed or a
+              physical weather model.
             </p>
             <h3>Inspired by</h3>
             <p>
@@ -489,7 +489,7 @@ export default function App() {
               target="_blank"
               rel="noreferrer"
             >
-              在 GitHub 查看项目与更新 ↗
+              Project and updates on GitHub ↗
             </a>
           </section>
         </div>

@@ -14,7 +14,7 @@ async (page) => {
   const snapshot = () => page.evaluate(() => window.__sf.snapshot());
   const settle = async () => {
     await page.waitForFunction(
-      () => window.__sf?.ready && window.__sf?.nightLayer,
+      () => window.__sf?.ready && window.__sf?.rainNightLayer,
     );
   };
   const ack = async () => {
@@ -47,6 +47,13 @@ async (page) => {
   );
   const first = await snapshot();
   check(first.webgl2, "WebGL2 effects unavailable");
+  check(first.vehicleRenderer === "webgl2-world-mesh", "world-space transport unavailable");
+  check(await page.evaluate(() => !/\p{Script=Han}/u.test(document.body.innerText)), "non-English interface text");
+  check(await page.locator(".location-caption").count() === 0, "lower-left caption remains");
+  check(await page.getByRole("group", { name: "Weather presets" }).getByRole("button").count() === 3, "expected three weather modes");
+  await page.getByRole("button", { name: "Close environment panel", exact: true }).click();
+  check(await page.getByRole("complementary", { name: "Environment controls" }).count() === 0, "desktop panel did not close");
+  await page.getByRole("button", { name: "Open environment panel", exact: true }).click();
   const before = first.frame.poses;
   await page.waitForFunction(
     (t) => window.__sf.frame.clock.transportTime > t + 0.35,
@@ -66,11 +73,12 @@ async (page) => {
       ),
       kind + " did not move",
     );
-  await page.getByRole("button", { name: "暂停城市动画", exact: true }).click();
+  await page.getByRole("button", { name: "Pause animation", exact: true }).click();
   await ack();
   await frames(3);
   await page.mouse.move(1425, 945);
-  await page.screenshot({ path: "docs/screenshots/day.png" });
+  await frames(15);
+  await page.screenshot({ path: "docs/screenshots/v0.2/day.png" });
   const frozen = await snapshot();
   await frames();
   check(
@@ -81,7 +89,7 @@ async (page) => {
   await page.screenshot({ path: "output/frozen-a.png" });
   await frames();
   await page.screenshot({ path: "output/frozen-b.png" });
-  await page.getByRole("checkbox", { name: "自动昼夜", exact: false }).check();
+  await page.getByRole("checkbox", { name: "Auto day/night", exact: false }).check();
   await ack();
   await frames();
   check(
@@ -90,9 +98,9 @@ async (page) => {
     "automatic day continued while paused",
   );
   for (const [name, kind] of [
-    ["显示车辆", "car"],
-    ["显示船舶", "ferry"],
-    ["显示飞机", "plane"],
+    ["Show Cars", "car"],
+    ["Show Boats", "ferry"],
+    ["Show Aircraft", "plane"],
   ]) {
     await page.getByRole("button", { name, exact: true }).click();
     await ack();
@@ -109,7 +117,7 @@ async (page) => {
     "switch reset a clock",
   );
   const unzoomed = (await snapshot()).transform;
-  await page.getByRole("button", { name: "放大地图", exact: true }).click();
+  await page.getByRole("button", { name: "Zoom in", exact: true }).click();
   await page.waitForFunction(
     (s) => window.__sf.transform.scale > s * 1.2,
     unzoomed.scale,
@@ -121,33 +129,42 @@ async (page) => {
   await frames(15);
   const zoomed = await snapshot();
   check(zoomed.transform.scale > unzoomed.scale, "zoom failed");
-  await page.screenshot({ path: "docs/screenshots/detail.png" });
-  await page.getByRole("button", { name: "地图全景", exact: true }).click();
+  await page.screenshot({ path: "docs/screenshots/v0.2/detail.png" });
+  await page.getByRole("button", { name: "Reset view", exact: true }).click();
   await frames(20);
-  await page.getByRole("button", { name: "夜晚", exact: true }).click();
+  await page.getByRole("button", { name: "Night", exact: true }).click();
   await ack();
   await page.waitForFunction(
     () =>
       window.__sf.nightLayer.getFullyLoaded() &&
       window.__sf.nightLayer.getOpacity() > 0.99,
   );
-  await frames(5);
+  await frames(15);
   await page.mouse.move(1425, 945);
-  await page.screenshot({ path: "docs/screenshots/night.png" });
-  await page.getByRole("button", { name: "下雨", exact: true }).click();
+  await page.screenshot({ path: "docs/screenshots/v0.2/night.png" });
+  await page.getByRole("button", { name: "Rain", exact: true }).click();
   await ack();
-  await frames(5);
-  await page.screenshot({ path: "docs/screenshots/rain-night.png" });
-  await page.getByRole("button", { name: "白天", exact: true }).click();
-  await page.getByRole("button", { name: "海雾", exact: true }).click();
+  await page.waitForFunction(() => window.__sf.rainNightLayer.getFullyLoaded() && window.__sf.rainNightLayer.getOpacity() > .99);
+  await frames(15);
+  await page.screenshot({ path: "docs/screenshots/v0.2/rain-night.png" });
+  await page.getByRole("button", { name: "Day", exact: true }).click();
   await ack();
-  await frames(5);
-  await page.screenshot({ path: "docs/screenshots/fog.png" });
-  await page.getByRole("button", { name: "多云", exact: true }).click();
+  await page.waitForFunction(() => window.__sf.rainDayLayer.getFullyLoaded() && window.__sf.rainDayLayer.getOpacity() > .99 && window.__sf.rainNightLayer.getOpacity() < .01);
+  await frames(15);
+  await page.screenshot({ path: "docs/screenshots/v0.2/rain-day.png" });
+  // Rain must change the city even with its animated atmosphere hidden.
+  await page.locator(".atmosphere").evaluate(el => el.style.visibility = "hidden");
+  await page.screenshot({ path: "output/rain-surfaces.png" });
+  await page.getByRole("button", { name: "Clear", exact: true }).click();
   await ack();
-  await frames(4);
-  await page.screenshot({ path: "docs/screenshots/cloudy.png" });
-  await page.getByRole("button", { name: "关于与来源", exact: true }).click();
+  await frames(15);
+  await page.screenshot({ path: "output/dry-surfaces.png" });
+  await page.locator(".atmosphere").evaluate(el => el.style.visibility = "");
+  await page.getByRole("button", { name: "Coastal fog", exact: true }).click();
+  await ack();
+  await frames(15);
+  await page.screenshot({ path: "docs/screenshots/v0.2/fog.png" });
+  await page.getByRole("button", { name: "About and credits", exact: true }).click();
   check(await page.getByRole("dialog").isVisible(), "About did not open");
   await page.keyboard.press("Escape");
   check(!(await page.getByRole("dialog").count()), "Escape failed");
@@ -161,20 +178,20 @@ async (page) => {
     ),
     "mobile horizontal overflow",
   );
-  await page.screenshot({ path: "docs/screenshots/mobile.png" });
-  await page.getByRole("button", { name: "环境", exact: true }).click();
-  await page.getByRole("button", { name: "夜晚", exact: true }).click();
-  await page.getByRole("button", { name: "下雨", exact: true }).click();
+  await page.screenshot({ path: "docs/screenshots/v0.2/mobile.png" });
+  await page.getByRole("button", { name: "Environment", exact: true }).click();
+  await page.getByRole("button", { name: "Night", exact: true }).click();
+  await page.getByRole("button", { name: "Rain", exact: true }).click();
   await ack();
-  await page.waitForFunction(() => window.__sf.nightLayer.getFullyLoaded());
-  await frames(3);
+  await page.waitForFunction(() => window.__sf.rainNightLayer.getFullyLoaded());
+  await frames(15);
   check(
     await page
-      .getByRole("button", { name: "显示飞机", exact: true })
+      .getByRole("button", { name: "Show Aircraft", exact: true })
       .isVisible(),
     "mobile transport controls hidden",
   );
-  await page.screenshot({ path: "docs/screenshots/mobile-controls.png" });
+  await page.screenshot({ path: "docs/screenshots/v0.2/mobile-controls.png" });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.reload();
   await settle();
@@ -203,7 +220,11 @@ async (page) => {
     pauseAllClocks: true,
     toggles: true,
     zoomPan: true,
-    weather: ["clear", "cloudy", "fog", "rain"],
+    weather: ["clear", "fog", "rain"],
+    registeredWetDayAndNight: true,
+    worldSpaceTransport: first.vehicleRenderer,
+    englishInterface: true,
+    lowerLeftCaptionRemoved: true,
     authoredNight: true,
     mobile390: true,
     reducedMotion: true,

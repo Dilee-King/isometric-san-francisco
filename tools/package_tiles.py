@@ -6,12 +6,13 @@ import random
 import heapq
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image,ImageDraw
 from shapely.geometry import LineString, Polygon, Point
 from shapely.ops import unary_union
+from shapely import make_valid
 
 ROOT=Path(__file__).resolve().parents[1]
-OUT=ROOT/'public/map/v1'
+OUT=ROOT/'public/map/v2'
 
 
 def water_route(start,end,land,clearance=7,in_view=lambda p:True):
@@ -87,7 +88,7 @@ def build_routes(scene):
     ships=[('ferry-a','ferry',[[200,100,.7],[340,260,.7],[200,100,.7]],5.5,22,9),('ferry-b','ferry',[[240,-30,.7],[360,100,.7],[240,-30,.7]],5.9,50,11),('cargo-a','cargo',[[350,-75,.7],[400,210,.7],[350,-75,.7]],3.3,30,0)]
     land=unary_union([Polygon(p[0],p[1:]) for p in scene['land']])
     for name,kind,points,speed,phase,dwell in ships:
-        points=water_route(points[0][:2],points[len(points)//2][:2],land,10 if kind=='ferry' else 14,in_frame)
+        points=water_route(points[0][:2],points[len(points)//2][:2],land,18 if kind=='ferry' else 35,in_frame)
         line=LineString([p[:2] for p in points])
         if line.intersection(land).length>.25:raise ValueError(f'{name} intersects source land/pier: {line.intersection(land).length:.1f} m')
         routes.append({'id':name,'kind':kind,'points':points,'speed':speed,'phase':phase,'dwell':dwell,'color':'#ebe8d9'})
@@ -96,6 +97,7 @@ def build_routes(scene):
 
 
 def main():
+    OUT.mkdir(parents=True,exist_ok=True)
     artwork=ROOT/'assets/waterfront-day.png'
     image=Image.open(artwork).convert('RGB')
     scene=json.loads((ROOT/'data/source/scene.json').read_text())
@@ -103,19 +105,40 @@ def main():
     if abs(sx-sy)>1e-6:raise ValueError('Artwork changed aspect ratio; explicit registration required')
     scene['sourceRegistration']={'method':'same aspect frame scaling from offline geometry; local AI drawing drift remains','scale':[sx,sy],'independentAccuracy':None}
     scene['width'],scene['height']=w,h
+    scene['release']='waterfront-v2'
+    for landmark in scene['landmarks']:landmark.pop('nameZh',None)
     scene['projection']['scale']*=sx
     scene['projection']['origin']=[v*sx for v in scene['projection']['origin']]
     scene['routes'],cycles=build_routes(scene)
     for name in ['depth','water']:
         im=Image.open(ROOT/f'data/source/{name}.png')
         im.resize((w,h),Image.Resampling.NEAREST).save(OUT/f'{name}.png')
+    source=json.loads((ROOT/'data/source/ferry.json').read_text())
+    land=unary_union([Polygon(p[0],p[1:]) for p in source['land']])
+    green=unary_union([Polygon(p[0],p[1:]) for p in source['greens']])
+    footprints=[Polygon(p[0],p[1:]) for b in source['buildings'] for p in b['footprint']]
+    mask_repairs=sum(not p.is_valid for p in footprints)
+    buildings=unary_union([make_valid(p) if not p.is_valid else p for p in footprints])
+    paved=land.difference(green).difference(buildings)
+    hard=Image.new('L',(w,h));draw=ImageDraw.Draw(hard);cam=scene['projection']
+    def px(p):
+        x,n=p
+        return (cam['origin'][0]+cam['scale']*(.8*x+.6*n),cam['origin'][1]+cam['scale']*((.6*x-.8*n)*cam['sinElevation']-3*cam['cosElevation']))
+    for polygon in (list(paved.geoms) if hasattr(paved,'geoms') else [paved]):
+        if polygon.is_empty:continue
+        draw.polygon([px(p) for p in polygon.exterior.coords],fill=255)
+        for ring in polygon.interiors:draw.polygon([px(p) for p in ring.coords],fill=0)
+    hard.save(OUT/'hard.png')
     image.save(OUT/'day.webp',quality=94,method=6)
     tile_size=512;overlap=1;max_level=math.ceil(math.log2(max(w,h)))
     files=[]
-    night=Image.open(ROOT/'assets/waterfront-night.png').convert('RGB')
-    if night.size!=image.size:raise ValueError('Day/night dimensions differ')
-    night.save(OUT/'night.webp',quality=94,method=6)
-    for stem,layer in [('scene',image),('night',night)]:
+    appearances=[]
+    for stem,asset in [('scene','day'),('night','night'),('rain-day','rain-day'),('rain-night','rain-night')]:
+        asset_path=ROOT/f'assets/waterfront-{asset}.png'
+        layer=Image.open(asset_path).convert('RGB')
+        if layer.size!=image.size:raise ValueError(f'{asset} dimensions differ from the registered frame')
+        layer.save(OUT/f'{asset}.webp',quality=94,method=6)
+        appearances.append({'stem':stem,'asset':str(asset_path.relative_to(ROOT)).replace('\\','/'),'sha256':hashlib.sha256(asset_path.read_bytes()).hexdigest(),'descriptor':f'{stem}.dzi','size':[w,h]})
         for level in range(max_level+1):
             divisor=2**(max_level-level)
             size=(math.ceil(w/divisor),math.ceil(h/divisor))
@@ -128,9 +151,12 @@ def main():
                     files.append({'path':str(path.relative_to(OUT)).replace('\\','/'),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
         (OUT/f'{stem}.dzi').write_text(f'<?xml version="1.0" encoding="utf-8"?><Image TileSize="{tile_size}" Overlap="{overlap}" Format="webp" xmlns="http://schemas.microsoft.com/deepzoom/2008"><Size Width="{w}" Height="{h}"/></Image>',encoding='utf-8')
     (OUT/'scene.json').write_text(json.dumps(scene,separators=(',',':')),encoding='utf-8')
-    manifest={'release':'waterfront-v1','imageSize':[w,h],'generation':'one continuous day seed image, registered night edit; display split is deterministic, no independent tile seams','originalArtworkSHA256':hashlib.sha256(artwork.read_bytes()).hexdigest(),'nightArtworkSHA256':hashlib.sha256((ROOT/'assets/waterfront-night.png').read_bytes()).hexdigest(),'nativeDetailTilesPerAppearance':math.ceil(w/tile_size)*math.ceil(h/tile_size),'files':files,'sourceRoadCycles':cycles,'routeCounts':{k:sum(r['kind']==k for r in scene['routes']) for k in ['car','ferry','cargo','plane']}}
+    for path in sorted(OUT.iterdir()):
+        if path.is_file() and path.name!='manifest.json':files.append({'path':path.name,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+    manifest={'release':'waterfront-v2','imageSize':[w,h],'generation':'Original dry day/night retained; registered wet day/night edits. All vehicle vertices are projected from world ENU.','appearances':appearances,'nativeDetailTilesPerAppearance':math.ceil(w/tile_size)*math.ceil(h/tile_size),'files':files,'sourceRoadCycles':cycles,'routeCounts':{k:sum(r['kind']==k for r in scene['routes']) for k in ['car','ferry','cargo','plane']},'shipClearanceMetres':{'ferry':18,'cargo':35},'hardSurfaceMask':'Illustrative paved ground from source land minus source greens/buildings, not measured imperviousness.'}
+    manifest['maskGeometryRepairCount']=mask_repairs
     (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
-    print('Packaged',image.size,len(files),'DZI tiles;',cycles,'directed road cycles; ship centreline/land check PASS')
+    print('Packaged',image.size,len(files),'runtime assets /',sum('_files/' in f['path'] for f in files),'DZI tiles;',cycles,'directed road cycles; ship centreline/land check PASS')
 
 
 if __name__=='__main__':main()

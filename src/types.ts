@@ -1,5 +1,5 @@
 export type Point3 = [number, number, number];
-export type Weather = "clear" | "cloudy" | "fog" | "rain";
+export type Weather = "clear" | "fog" | "rain";
 export type Projection = {
   scale: number;
   origin: [number, number];
@@ -51,7 +51,7 @@ export type SceneData = {
   routes: Route[];
   lamps: Point3[];
   windows: { p: Point3; seed: number; angle: number }[];
-  landmarks: { name: string; nameZh: string; p: Point3 }[];
+  landmarks: { name: string; p: Point3 }[];
 };
 export type Frame = {
   clock: Clock;

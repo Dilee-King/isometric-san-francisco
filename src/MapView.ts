@@ -1,6 +1,8 @@
 import OpenSeadragon from "openseadragon";
 import { Atmosphere } from "./Atmosphere.ts";
 import { SpriteRenderer } from "./SpriteRenderer.ts";
+import { VehicleRenderer } from "./VehicleRenderer.ts";
+import { MAP_ROOT } from "./assets.ts";
 import { defaultControls, nightAmount, project } from "./model.ts";
 import type { Frame, Controls, SceneData } from "./types.ts";
 import type { ViewTransform } from "./SpriteRenderer.ts";
@@ -10,6 +12,7 @@ export class MapView {
   data: SceneData;
   viewer: OpenSeadragon.Viewer;
   sprites: SpriteRenderer;
+  vehicles: VehicleRenderer;
   atmosphere: Atmosphere;
   worker: Worker;
   frame: Frame;
@@ -20,6 +23,8 @@ export class MapView {
   labels = false;
   disposed = false;
   nightLayer: OpenSeadragon.TiledImage | null = null;
+  rainDayLayer: OpenSeadragon.TiledImage | null = null;
+  rainNightLayer: OpenSeadragon.TiledImage | null = null;
   transform: ViewTransform = {
     left: 0,
     top: 0,
@@ -53,7 +58,7 @@ export class MapView {
     host.append(base);
     this.viewer = OpenSeadragon({
       element: base,
-      tileSources: `${import.meta.env.BASE_URL}map/v1/scene.dzi`,
+      tileSources: `${MAP_ROOT}scene.dzi`,
       homeFillsViewer: true,
       showNavigationControl: false,
       showNavigator: false,
@@ -71,6 +76,7 @@ export class MapView {
       imageLoaderLimit: 6,
     });
     this.sprites = new SpriteRenderer(host, data);
+    this.vehicles = new VehicleRenderer(host, data, this.sprites);
     this.atmosphere = new Atmosphere(host, data);
     this.worker = new Worker(
       new URL("./simulation.worker.ts", import.meta.url),
@@ -85,36 +91,55 @@ export class MapView {
         this.lastUI = now;
       }
     };
-    this.worker.onerror = () => onError("交通动画未能启动，请刷新后重试。");
+    this.worker.onerror = () =>
+      onError("Traffic could not start. Please reload the map.");
     this.viewer.addHandler("open-failed", () =>
-      onError("地图图块未能载入，请检查本地服务。"),
+      onError(
+        "Map tiles could not load. Please check the connection and reload.",
+      ),
     );
     this.viewer.addHandler("open", () => {
-      this.viewer.addTiledImage({
-        tileSource: `${import.meta.env.BASE_URL}map/v1/night.dzi`,
-        x: 0,
-        y: 0,
-        width: 1,
-        opacity: 0.001,
-        success: (event) => {
-          this.nightLayer = (
-            event as unknown as { item: OpenSeadragon.TiledImage }
-          ).item;
-        },
-      });
-      Promise.all([this.sprites.ready, this.atmosphere.ready])
+      const addLayer = (name: string) =>
+        new Promise<OpenSeadragon.TiledImage>((resolve, reject) =>
+          this.viewer.addTiledImage({
+            tileSource: `${MAP_ROOT}${name}.dzi`,
+            x: 0,
+            y: 0,
+            width: 1,
+            opacity: 0.001,
+            preload: true,
+            success: (event) =>
+              resolve(
+                (event as unknown as { item: OpenSeadragon.TiledImage }).item,
+              ),
+            error: () => reject(new Error("Appearance layer could not load")),
+          }),
+        );
+      const appearances = (async () => {
+        this.nightLayer = await addLayer("night");
+        this.rainDayLayer = await addLayer("rain-day");
+        this.rainNightLayer = await addLayer("rain-night");
+      })();
+      Promise.all([
+        this.sprites.ready,
+        this.vehicles.ready,
+        this.atmosphere.ready,
+        appearances,
+      ])
         .then(() => {
           if (this.disposed) return;
           this.ready = true;
           onReady();
           this.tick();
         })
-        .catch(() => onError("场景图层未能载入，请刷新后重试。"));
+        .catch(() =>
+          onError("Scene layers could not load. Please reload the map."),
+        );
     });
     host.tabIndex = 0;
     host.setAttribute(
       "aria-label",
-      "旧金山连续地图；拖动平移，滚轮缩放，空格暂停，Home 全景",
+      "San Francisco map. Drag to pan, scroll to zoom, Space to pause, Home to reset.",
     );
     host.addEventListener("keydown", this.keydown);
     document.addEventListener("visibilitychange", this.visibility);
@@ -184,8 +209,12 @@ export class MapView {
         dusk = Math.max(0, 1 - Math.abs(this.frame.clock.hour - 18.5) / 2.5);
       const base = this.host.querySelector<HTMLElement>(".base-map")!;
       this.nightLayer?.setOpacity(night);
+      const wet = this.frame.controls.weather === "rain" ? 1 : 0;
+      this.rainDayLayer?.setOpacity(wet);
+      this.rainNightLayer?.setOpacity(wet * night);
       base.style.filter = `sepia(${dusk * 0.12}) saturate(${1 + dusk * 0.08})`;
       this.sprites.draw(this.frame, this.transform, this.labels);
+      this.vehicles.draw(this.frame, this.transform);
       this.atmosphere.draw(this.frame, this.transform);
     }
     this.raf = requestAnimationFrame(this.tick);
@@ -209,6 +238,9 @@ export class MapView {
       transform: { ...this.transform },
       landmarks: landmark,
       webgl2: !!this.atmosphere.gl,
+      vehicleRenderer: this.vehicles.gl
+        ? "webgl2-world-mesh"
+        : "canvas-world-mesh",
     };
   }
   destroy() {
@@ -217,6 +249,7 @@ export class MapView {
     this.worker.terminate();
     this.viewer.destroy();
     this.sprites.destroy();
+    this.vehicles.destroy();
     this.atmosphere.destroy();
     this.host.removeEventListener("keydown", this.keydown);
     document.removeEventListener("visibilitychange", this.visibility);

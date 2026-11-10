@@ -27,11 +27,13 @@
 - [x] Boats: water routes, docking dwell and clipped wakes.
 - [x] Aircraft: occasional registered overflights and navigation lights.
 - [x] Independent toggles, simulation worker, global pause and reduced motion.
+- [x] Project complete metric vehicle surfaces through the shared map camera, including raised cabins, hulls, wings and tails; add per-fragment source-depth clipping and a projected Canvas fallback.
 
 ## 4 — Environment
 
 - [x] Registered day/night art, blended twilight appearance and local light layers.
-- [x] Clear, cloudy, coastal fog and rain, independent of hour.
+- [x] Clear, coastal fog and rain, independent of hour; remove the redundant cloudy preset in v0.2.
+- [x] Author registered wet day/night surfaces with soaked paving, dark roofs, reflections and a disturbed bay; add layered rain streaks and surface impacts.
 - [x] Freeze weather/transport/time together and verify zoom registration.
 - [x] Record authored appearance versus any genuinely relightable shadows.
 
@@ -40,5 +42,6 @@
 - [ ] Expand contiguous city/waterfront coverage without lowering the sample quality.
 - [ ] Add meaningful code checks, versioned manifests and a measured performance budget.
 - [x] Publish the verified sample with GitHub Pages and update instructions; large-area asset storage remains future work.
+- [x] Ship an English interface and documentation, without the decorative lower-left caption.
 
 Wider Bay Area coverage, airport ground operations, live feeds and LCZ research functions have no delivery date in this initial roadmap.

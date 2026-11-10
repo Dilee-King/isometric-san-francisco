@@ -1,12 +1,12 @@
 # Isometric San Francisco — project design
 
-Date: 2026-11-10. Status: design/repository initialization; implementation pending.
+Date: 2026-11-10. This document preserves the initial planning contract. The working v0.2 sample is described in the [README](../README.md), [active visual contract](../DESIGN.md) and [verification record](VERIFICATION-v0.2.md).
 
 ## Intent
 
 Create a finely drawn, continuously browsable San Francisco map in dialogue with Isometric NYC and Isometric Vancouver. Cars, boats and aircraft share the scene while time of day and weather change independently. The user's selected first geographical target is San Francisco city and the bay waterfront, followed by wider Bay Area expansion.
 
-The current conversational phase establishes the scope and technical route and creates a repository for updates. It does not deliver or claim a finished city map. Product code and large-scale generation follow a reviewed design and implementation plan.
+The initial design phase established the scope and technical route and created a repository for updates. The implemented waterfront sample does not claim a finished city map. Large-scale expansion follows the reviewed design and implementation plan.
 
 ## Scope and spatial support
 
