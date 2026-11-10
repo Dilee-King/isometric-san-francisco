@@ -6,6 +6,8 @@ An illustrated isometric San Francisco, with a living waterfront, moving traffic
 
 **当前版本：可运行的连续滨水样区 v0.1。** 已包含车辆、两艘渡轮、一艘货船、偶发飞机飞越、昼夜精绘图块及晴／云／雾／雨。覆盖是三处地标周边的连续样区，尚未扩展至全市。
 
+**[打开在线演示](https://dilee-king.github.io/isometric-san-francisco/)** · [实际运行录屏](docs/Waterfront-actual-demo.mp4) · [验证记录](docs/VERIFICATION-v0.1.md)
+
 ![实际运行夜景](docs/screenshots/night.png)
 
 ## 方向
@@ -42,6 +44,8 @@ An illustrated isometric San Francisco, with a living waterfront, moving traffic
 - [更新记录](CHANGELOG.md)：只记录已经交付的变化。
 
 后续每个地图版本将绑定图块清单、来源记录、坐标配置和应用提交。大型图块及原始数据采用独立版本化存储，代码仓库保留清单与可复现步骤。
+
+目前 GitHub Actions 会在 `main` 更新后检查模型、源数据准备流程和图块哈希，构建应用并部署 GitHub Pages。首版的两幅小型原图及图块随仓库保留；全市扩展时再迁移到独立资产存储。
 
 ## 阅读与运行
 

@@ -33,9 +33,9 @@ Files: `tools/prepare_source.py`, `tools/package_tiles.py`, `data/source/ferry.j
 
 Interfaces: source preparation emits `scene.json` with projection, extent, roads, ships, building surfaces and source-depth/mask PNGs; packaging emits `scene.dzi` and a versioned WebP pyramid. Projection maps `(east,north,height)` to image pixels and depth.
 
-- [ ] Prepare an offline orthographic source, controls and masks from the reviewed local snapshot; inspect actual image.
-- [ ] Generate original detailed illustration with imagegen, preserve geography and camera, inspect alignment.
-- [ ] Package contiguous illustration quadrants and DZI levels; record hashes, provenance, prompt and limitations.
+- [x] Prepare an offline orthographic source, controls and masks from the reviewed local snapshot; inspect actual image.
+- [x] Generate original detailed illustration with imagegen, preserve geography and camera, inspect alignment.
+- [x] Package contiguous illustration quadrants and DZI levels; record hashes, provenance, prompt and limitations.
 
 Validation: valid metadata, matched dimensions, recognized Ferry Building, connected roads/shoreline, adjacent tile continuity; actual native-resolution image review.
 
@@ -45,8 +45,8 @@ Files: `src/model.ts`, `src/model.test.ts`, `src/simulation.worker.ts`, `src/typ
 
 Interfaces: `project(point,projection)`, `sampleRoute(route,distance)`, `advance(state,delta,controls)`, `transportFrame(state,routes)`; immutable input/output state with independent clocks and transport switches.
 
-- [ ] Write invariant tests for route wrapping, zero-length segments, freeze, negative/large delta, independent clocks and toggles; run and observe failure.
-- [ ] Implement those interfaces and worker messages; run tests to green.
+- [x] Write invariant tests for route wrapping, zero-length segments, freeze, negative/large delta, independent clocks and toggles; run and observe failure.
+- [x] Implement those interfaces and worker messages; run tests to green.
 
 Validation: `npm test` passes all specified invariants; production TypeScript accepts worker and shared model.
 
@@ -56,9 +56,9 @@ Files: `src/App.tsx`, `src/MapView.ts`, `src/SpriteRenderer.ts`, `src/Atmosphere
 
 Interfaces: OpenSeadragon owns image-to-screen transform. Sprite renderer consumes worker snapshots and metadata; atmosphere receives the same transform and frozen environment time. Controls update worker state with sequence acknowledgments.
 
-- [ ] Build the map-first viewer, compact controls, independent transport switches, pause, manual hour/automatic cycle and clear/cloudy/fog/rain modes.
-- [ ] Add illustrated sprites, source-aware occlusion, water-clipped wakes, local windows/lamps and registered WebGL2 atmosphere.
-- [ ] Exercise desktop/mobile, zoom/pan, mode toggles, reduced motion and pause in a real browser; correct observed defects.
+- [x] Build the map-first viewer, compact controls, independent transport switches, pause, manual hour/automatic cycle and clear/cloudy/fog/rain modes.
+- [x] Add illustrated sprites, source-aware occlusion, water-clipped wakes, local windows/lamps and registered WebGL2 atmosphere.
+- [x] Exercise desktop/mobile, zoom/pan, mode toggles, reduced motion and pause in a real browser; correct observed defects.
 
 Validation: `npm run build`, no runtime/asset errors, real browser interactions, movement/pause samples and captured day/night/fog/rain images.
 
@@ -66,8 +66,8 @@ Validation: `npm run build`, no runtime/asset errors, real browser interactions,
 
 Files: README, coverage/provenance, roadmap, changelog, verification, screenshots, launch instructions and GitHub workflow.
 
-- [ ] Perform a fresh whole-branch review; fix material issues and verify.
-- [ ] Capture actual application screenshots and an animation preview, open working preview for the user.
-- [ ] Commit tested source/assets and update GitHub; verify remote commit and delivery links.
+- [x] Perform a fresh whole-branch review; fix material issues and verify.
+- [x] Capture actual application screenshots and an animation preview, open working preview for the user.
+- [x] Commit tested source/assets and update GitHub; verify remote commit and delivery links.
 
 Validation: clean working tree, remote SHA matches delivery commit, reproducible `npm ci`, tests and build; distinguish source registration from artwork accuracy.

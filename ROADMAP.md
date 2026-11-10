@@ -39,6 +39,6 @@
 
 - [ ] Expand contiguous city/waterfront coverage without lowering the sample quality.
 - [ ] Add meaningful code checks, versioned manifests and a measured performance budget.
-- [ ] Choose asset storage/hosting and publish a verified map release with update instructions.
+- [x] Publish the verified sample with GitHub Pages and update instructions; large-area asset storage remains future work.
 
 Wider Bay Area coverage, airport ground operations, live feeds and LCZ research functions have no delivery date in this initial roadmap.

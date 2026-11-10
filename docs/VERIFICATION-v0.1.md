@@ -15,6 +15,15 @@ This is a working continuous sample, not a full-city map.
 
 Script: [qa-browser.js](../tools/qa-browser.js), executed through the Playwright CLI against the local production preview. Screenshots in [screenshots](screenshots/) are captures of the actual application, not generated interface mockups.
 
+## Published version
+
+- [Live demo](https://dilee-king.github.io/isometric-san-francisco/).
+- [GitHub build and Pages deployment](https://github.com/Dilee-King/isometric-san-francisco/actions/runs/42894009293): both jobs completed successfully for runtime commit `49ebff91f72ddd076602f3d9eea75047840ddf82`.
+- Real-browser HTTPS smoke check: map ready, WebGL2 available, 26 cars / 3 boats / 1 plane visible in the initial frame, authored night and rain active, zero page errors or failed resource responses. [Online capture](screenshots/online-night-rain.png).
+- [Actual running application recording](Waterfront-actual-demo.mp4): native browser video capture of daytime transport, authored night, rain and fog, transcoded to H.264 MP4. No generated interface video, synthetic camera motion or added audio.
+
+The subsequent documentation/recording commit does not alter the deployed application. It is marked to skip a redundant CI deployment.
+
 ## Spatial and rendering limits
 
 The source input extent is a 1200 × 1200 m UTM region, EPSG:32610. The displayed illustration is a cropped orthographic frame within that source view; source-input area is not the completed map's land area. The scene retains its source origin, crop, projection and dimension scaling in `public/map/v1/scene.json`.
