@@ -51,5 +51,5 @@ Interfaces: `SceneData` gains assetRoot, maskSize/depthEncoding, locations and o
 Files: browser QA/recording scripts, README, coverage/provenance/changelog, verification and actual capture artifacts.
 
 - [x] Run meaningful model/geometry/source/asset checks and production build; inspect actual effects and performance behavior.
-- [ ] Request one read-only fresh whole-branch review; fix material findings with RED→GREEN checks.
+- [x] Request one read-only fresh whole-branch review; fix material findings with RED→GREEN checks.
 - [ ] Record the real application, commit and synchronize GitHub, wait for Pages success, verify HTTPS and show the user.

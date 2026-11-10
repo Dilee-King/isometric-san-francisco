@@ -23,8 +23,8 @@ Detailed coverage runs continuously from Fisherman's Wharf to Mission Bay. The r
 
 Browser flows: [corridor](../tools/qa-corridor.js), [fallback and visibility](../tools/qa-regressions.js). Source and attribution: [provenance](../data/corridor/provenance.json), [Acknowledgments](../ACKNOWLEDGMENTS.md).
 
+A read-only reviewer repeated the 19 Node and five Python tests, both asset audits, the TypeScript check, the production build and isolated desktop/mobile browser flows. Six consecutive switches with automatic time running preserved time, weather and transport controls, with exactly one active base map. Panning and zooming from north to south preserved registration between artwork, masks and effects. The review found no issue blocking publication. At wider waterfront zooms, the outer edges of some illustrated open-water areas remain visible as tonal seams; shoreline and road continuity are intact.
+
 ## Publication
 
 The [45.6-second native browser recording](Waterfront-actual-demo-v0.3.mp4) shows the actual application: Wharf, Pier 39, fog, continuous waterfront pan, Ferry Building, Bay Bridge approach, Oracle Park in rain, Mission Bay at night and the Bay Area view. It is H.264 MP4 at 1440 × 960, 25 fps, without added audio or generated interface footage. A decoded frame was inspected after transcoding.
-
-Independent review and online deployment results are recorded when completed.
