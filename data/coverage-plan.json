@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "0.1",
+  "project": "isometric-san-francisco",
+  "status": "design-only",
+  "plannedTarget": "San Francisco urban area and northern/eastern bay waterfront",
+  "plannedSequence": [
+    "Ferry Building / Financial District / Embarcadero contiguous quality sample",
+    "Adjacent downtown neighborhoods and northern waterfront",
+    "SoMa / Mission Bay and further contiguous city neighborhoods"
+  ],
+  "futureExpansion": ["Wider San Francisco Bay Area", "East Bay", "SFO airport area"],
+  "publishedCoverage": [],
+  "publishedTileCount": 0,
+  "boundaryGeoJSON": null,
+  "cameraManifest": null,
+  "tileReleaseManifest": null,
+  "note": "Planned neighborhoods are a production proposal. No exact boundary or completed coverage is claimed."
+}

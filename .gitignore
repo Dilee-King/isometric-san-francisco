@@ -1,0 +1,38 @@
+# Dependencies and builds
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+.cache/
+.local/
+__pycache__/
+*.py[cod]
+.venv/
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+Thumbs.db
+
+# Large or unreviewed geographic/image inputs and outputs
+data/raw/
+data/cache/
+reference-cache/
+generated/
+tiles/
+tiles_files/
+models/
+output/
+*.laz
+*.las
+*.gpkg
+*.mbtiles
+*.sqlite
+*.db
+*.safetensors
+*.ckpt

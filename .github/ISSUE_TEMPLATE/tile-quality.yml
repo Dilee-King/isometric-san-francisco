@@ -1,0 +1,23 @@
+name: Tile or map quality
+description: Report a seam, roof, road, shoreline, mask or registration problem.
+title: "[Map] "
+body:
+  - type: input
+    id: tile
+    attributes:
+      label: Release, tile ID or map location
+      description: Use map coordinates or a public landmark; avoid private location information.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What looks wrong?
+      description: Describe expected and actual appearance. Add a screenshot if useful.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: View context
+      description: Zoom, time of day, weather, device and reproduction steps.

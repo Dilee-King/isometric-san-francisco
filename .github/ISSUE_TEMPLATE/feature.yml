@@ -1,0 +1,16 @@
+name: Feature or behavior
+description: Propose or report a viewer, transport, lighting or weather behavior.
+title: "[Feature] "
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Scenario and expected behavior
+      description: Explain what a map visitor should see or do.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Current behavior and evidence
+      description: Add steps, relevant code or public reference material when available.
