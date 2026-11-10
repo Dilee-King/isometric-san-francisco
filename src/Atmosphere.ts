@@ -1,5 +1,6 @@
 import { nightAmount } from "./model.ts";
-import { MAP_ROOT } from "./assets.ts";
+import { sceneRoot } from "./assets.ts";
+import { legacyDepthEncoding } from "./atlas.ts";
 import type { Frame, SceneData } from "./types.ts";
 import type { ViewTransform } from "./SpriteRenderer.ts";
 
@@ -12,6 +13,7 @@ uniform vec4 rect;
 uniform vec2 imageSize;
 uniform vec3 camera;
 uniform vec2 cameraOrigin;
+uniform vec2 depthEncoding;
 uniform float time;
 uniform float night;
 uniform float intensity;
@@ -27,7 +29,7 @@ void main(){
  if(any(lessThan(p,vec2(0.)))||any(greaterThan(p,vec2(1.)))){fragColor=vec4(0.);return;}
  float water=texture(waterTex,p).r;
  vec2 packed=texture(depthTex,p).rg;
- float depth=(packed.r*65280.+packed.g*255.)/65535.*4000.-2000.;
+ float depth=(packed.r*65280.+packed.g*255.)/65535.*depthEncoding.y-depthEncoding.x;
  float y=(p.y*imageSize.y-cameraOrigin.y)/camera.x;
  float height=clamp(depth*camera.y-y*camera.z,0.,250.);
  float swell=sin(p.x*620.+p.y*340.+time*.9)*sin(p.y*690.-time*.7);
@@ -43,7 +45,8 @@ void main(){
    color=mix(vec3(.73,.80,.79),vec3(.20,.29,.35),night);alpha=max(alpha,fog);
  }
  if(weather==2){
-   vec2 world=p*imageSize;
+   // Rain retains a readable screen-space minimum at overview zoom.
+   vec2 world=p*imageSize*max(1.,.34*resolution.y/rect.w);
    float drops=0.;
    for(int layer=0;layer<3;layer++){
      float k=float(layer),rate=180.+k*95.;
@@ -75,6 +78,7 @@ export class Atmosphere {
   uniforms: Record<string, WebGLUniformLocation | null> = {};
   data: SceneData;
   ready: Promise<void>;
+  disposed = false;
   constructor(host: HTMLElement, data: SceneData) {
     this.data = data;
     this.canvas = document.createElement("canvas");
@@ -119,6 +123,7 @@ export class Atmosphere {
       "imageSize",
       "camera",
       "cameraOrigin",
+      "depthEncoding",
       "time",
       "night",
       "intensity",
@@ -131,8 +136,9 @@ export class Atmosphere {
     this.ready = Promise.all(
       ["water", "depth", "hard"].map(async (name, index) => {
         const image = new Image();
-        image.src = `${MAP_ROOT}${name}.png`;
+        image.src = `${sceneRoot(data)}${name}.png`;
         await image.decode();
+        if (this.disposed) return;
         const tex = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0 + index);
         gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -177,6 +183,8 @@ export class Atmosphere {
     gl.uniform2f(u.imageSize, this.data.width, this.data.height);
     gl.uniform3f(u.camera, p.scale, p.sinElevation, p.cosElevation);
     gl.uniform2f(u.cameraOrigin, p.origin[0], p.origin[1]);
+    const depth = this.data.depthEncoding ?? legacyDepthEncoding;
+    gl.uniform2f(u.depthEncoding, depth.offset, depth.range);
     gl.uniform1f(u.time, frame.clock.environmentTime);
     gl.uniform1f(u.night, nightAmount(frame.clock.hour));
     gl.uniform1f(u.intensity, frame.controls.intensity);
@@ -187,6 +195,7 @@ export class Atmosphere {
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   destroy() {
+    this.disposed = true;
     this.gl?.getExtension("WEBGL_lose_context")?.loseContext();
     this.canvas.remove();
   }

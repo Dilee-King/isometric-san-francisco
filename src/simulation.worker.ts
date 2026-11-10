@@ -16,6 +16,7 @@ const emit = () =>
 self.onmessage = (
   event: MessageEvent<{
     routes?: Route[];
+    clock?: Clock;
     controls?: Partial<Controls>;
     hour?: number;
     sequence?: number;
@@ -23,6 +24,7 @@ self.onmessage = (
   }>,
 ) => {
   if (event.data.routes) routes = event.data.routes;
+  if (event.data.clock) clock = { ...event.data.clock };
   if (event.data.hidden !== undefined) hidden = event.data.hidden;
   if (event.data.controls) controls = { ...controls, ...event.data.controls };
   if (event.data.hour !== undefined)
@@ -33,7 +35,9 @@ self.onmessage = (
 };
 setInterval(() => {
   const now = performance.now();
-  clock = advance(clock, (now - last) / 1000, controls, !hidden);
+  const elapsed = (now - last) / 1000;
   last = now;
-  if (!hidden) emit();
+  if (hidden || controls.paused) return;
+  clock = advance(clock, elapsed, controls);
+  emit();
 }, 33);

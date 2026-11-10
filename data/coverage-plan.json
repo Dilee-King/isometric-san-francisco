@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "0.1",
+  "schemaVersion": "0.3",
   "project": "isometric-san-francisco",
-  "status": "working-contiguous-sample",
+  "status": "detailed-waterfront-and-regional-overview",
   "plannedTarget": "San Francisco urban area and northern/eastern bay waterfront",
   "plannedSequence": [
     "Ferry Building / Financial District / Embarcadero contiguous quality sample",
@@ -15,26 +15,41 @@
   ],
   "publishedCoverage": [
     {
-      "release": "waterfront-v2",
-      "description": "Cropped fixed-view sample around Ferry Building, Financial District and Embarcadero; not full neighborhood or city coverage",
+      "release": "waterfront-v3",
+      "role": "detailed-waterfront",
+      "description": "Fisherman's Wharf to Mission Bay, including Pier 39, Ferry Building, the Bay Bridge approach, South Beach, Oracle Park and Chase Center",
       "imageSize": [
-        1536,
-        1024
+        5372,
+        7398
       ],
       "sourceExtentMetres": [
-        -660,
-        -650,
-        540,
-        550
+        -3300,
+        -4300,
+        2150,
+        2250
       ],
-      "crs": "EPSG:32610"
+      "crs": "EPSG:32610",
+      "nativeDetailPatches": 10,
+      "contextPlates": 4,
+      "pixelsPerMetre": 1.8545454545454545,
+      "scene": "../public/map/v3/waterfront/scene.json"
+    },
+    {
+      "release": "bay-overview-v3",
+      "role": "regional-context",
+      "description": "Bay Area terrain and shoreline overview; the highlighted waterfront is the detailed coverage. This is not detailed city or nine-county coverage.",
+      "imageSize": [
+        2560,
+        1792
+      ],
+      "crs": "EPSG:32610",
+      "scene": "../public/map/v3/bay/scene.json"
     }
   ],
-  "publishedTileCount": 72,
+  "publishedTileCount": 1108,
   "boundaryGeoJSON": null,
-  "cameraManifest": "../public/map/v2/scene.json",
-  "tileReleaseManifest": "../public/map/v2/manifest.json",
-  "note": "Published coverage remains the same continuous waterfront illustration sample, with four appearances. Planned city coverage remains incomplete.",
-  "nativeDetailTilesPerAppearance": 6,
+  "cameraManifest": "../public/map/v3/atlas.json",
+  "tileReleaseManifest": "../public/map/v3/atlas.json",
+  "note": "The detailed corridor and regional context use different scales with one shared origin and camera orientation.",
   "appearanceCount": 4
 }

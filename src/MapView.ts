@@ -2,13 +2,15 @@ import OpenSeadragon from "openseadragon";
 import { Atmosphere } from "./Atmosphere.ts";
 import { SpriteRenderer } from "./SpriteRenderer.ts";
 import { VehicleRenderer } from "./VehicleRenderer.ts";
-import { MAP_ROOT } from "./assets.ts";
+import { sceneRoot } from "./assets.ts";
+import { sceneTransfer } from "./atlas.ts";
 import { defaultControls, nightAmount, project } from "./model.ts";
 import type { Frame, Controls, SceneData } from "./types.ts";
 import type { ViewTransform } from "./SpriteRenderer.ts";
 
 export class MapView {
   host: HTMLElement;
+  base: HTMLDivElement;
   data: SceneData;
   viewer: OpenSeadragon.Viewer;
   sprites: SpriteRenderer;
@@ -21,6 +23,7 @@ export class MapView {
   lastUI = 0;
   ready = false;
   labels = false;
+  location?: string;
   disposed = false;
   nightLayer: OpenSeadragon.TiledImage | null = null;
   rainDayLayer: OpenSeadragon.TiledImage | null = null;
@@ -40,6 +43,8 @@ export class MapView {
     onFrame: (frame: Frame) => void,
     onReady: () => void,
     onError: (message: string) => void,
+    savedFrame?: Frame,
+    startLocation?: string,
   ) {
     this.host = host;
     this.data = data;
@@ -47,19 +52,21 @@ export class MapView {
     const paused = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    this.frame = {
-      clock: { transportTime: 0, environmentTime: 0, hour: 14.25 },
-      controls: { ...defaultControls, paused },
-      poses: [],
-      sequence: 0,
-    };
-    const base = document.createElement("div");
-    base.className = "base-map";
-    host.append(base);
+    this.frame = savedFrame
+      ? sceneTransfer(savedFrame)
+      : {
+          clock: { transportTime: 0, environmentTime: 0, hour: 14.25 },
+          controls: { ...defaultControls, paused },
+          poses: [],
+          sequence: 0,
+        };
+    this.base = document.createElement("div");
+    this.base.className = "base-map";
+    host.append(this.base);
     this.viewer = OpenSeadragon({
-      element: base,
-      tileSources: `${MAP_ROOT}scene.dzi`,
-      homeFillsViewer: true,
+      element: this.base,
+      tileSources: `${sceneRoot(data)}scene.dzi`,
+      homeFillsViewer: data.kind !== "waterfront",
       showNavigationControl: false,
       showNavigator: false,
       showFullPageControl: false,
@@ -74,6 +81,7 @@ export class MapView {
       gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true },
       gestureSettingsTouch: { pinchToZoom: true },
       imageLoaderLimit: 6,
+      maxImageCacheCount: 180,
     });
     this.sprites = new SpriteRenderer(host, data);
     this.vehicles = new VehicleRenderer(host, data, this.sprites);
@@ -102,12 +110,12 @@ export class MapView {
       const addLayer = (name: string) =>
         new Promise<OpenSeadragon.TiledImage>((resolve, reject) =>
           this.viewer.addTiledImage({
-            tileSource: `${MAP_ROOT}${name}.dzi`,
+            tileSource: `${sceneRoot(data)}${name}.dzi`,
             x: 0,
             y: 0,
             width: 1,
-            opacity: 0.001,
-            preload: true,
+            opacity: 0,
+            preload: false,
             success: (event) =>
               resolve(
                 (event as unknown as { item: OpenSeadragon.TiledImage }).item,
@@ -117,7 +125,9 @@ export class MapView {
         );
       const appearances = (async () => {
         this.nightLayer = await addLayer("night");
+        if (this.disposed) return;
         this.rainDayLayer = await addLayer("rain-day");
+        if (this.disposed) return;
         this.rainNightLayer = await addLayer("rain-night");
       })();
       Promise.all([
@@ -128,6 +138,7 @@ export class MapView {
       ])
         .then(() => {
           if (this.disposed) return;
+          this.focusLocation(startLocation ?? data.defaultLocation, true);
           this.ready = true;
           onReady();
           this.tick();
@@ -139,12 +150,17 @@ export class MapView {
     host.tabIndex = 0;
     host.setAttribute(
       "aria-label",
-      "San Francisco map. Drag to pan, scroll to zoom, Space to pause, Home to reset.",
+      `${data.kind === "bay" ? "Bay Area overview" : "San Francisco waterfront"}. Drag to pan, scroll to zoom, Space to pause, Home to reset.`,
     );
     host.addEventListener("keydown", this.keydown);
     document.addEventListener("visibilitychange", this.visibility);
-    this.visibility();
-    this.setControls({ paused });
+    this.worker.postMessage({
+      clock: this.frame.clock,
+      controls: this.frame.controls,
+      hidden: document.hidden,
+      routes: data.routes,
+      sequence: ++this.sequence,
+    });
   }
   visibility = () => this.worker.postMessage({ hidden: document.hidden });
   setControls(partial: Partial<Controls>, hour?: number) {
@@ -158,7 +174,6 @@ export class MapView {
       controls: partial,
       hour,
       sequence: this.sequence,
-      ...(this.sequence === 1 ? { routes: this.data.routes } : {}),
     });
     this.onFrame(this.frame);
   }
@@ -170,7 +185,22 @@ export class MapView {
     this.viewer.viewport.applyConstraints();
   }
   home() {
-    this.viewer.viewport.goHome();
+    if (!this.focusLocation(this.data.defaultLocation))
+      this.viewer.viewport.goHome();
+  }
+  focusLocation(id?: string, immediate = false) {
+    const landmark = this.data.landmarks.find((l) => l.id === id);
+    if (!id || !landmark || !this.viewer.viewport) return false;
+    const p = project(landmark.p, this.data.projection),
+      w = this.data.width,
+      h = 1080 / w,
+      span = (h * this.host.clientWidth) / Math.max(1, this.host.clientHeight);
+    this.viewer.viewport.fitBoundsWithConstraints(
+      new OpenSeadragon.Rect(p.x / w - span / 2, p.y / w - h / 2, span, h),
+      immediate,
+    );
+    this.location = id;
+    return true;
   }
   keydown = (e: KeyboardEvent) => {
     if (e.key === " ") {
@@ -207,12 +237,11 @@ export class MapView {
       };
       const night = nightAmount(this.frame.clock.hour),
         dusk = Math.max(0, 1 - Math.abs(this.frame.clock.hour - 18.5) / 2.5);
-      const base = this.host.querySelector<HTMLElement>(".base-map")!;
       this.nightLayer?.setOpacity(night);
       const wet = this.frame.controls.weather === "rain" ? 1 : 0;
       this.rainDayLayer?.setOpacity(wet);
       this.rainNightLayer?.setOpacity(wet * night);
-      base.style.filter = `sepia(${dusk * 0.12}) saturate(${1 + dusk * 0.08})`;
+      this.base.style.filter = `sepia(${dusk * 0.12}) saturate(${1 + dusk * 0.08})`;
       this.sprites.draw(this.frame, this.transform, this.labels);
       this.vehicles.draw(this.frame, this.transform);
       this.atmosphere.draw(this.frame, this.transform);
@@ -233,6 +262,12 @@ export class MapView {
     });
     return {
       ready: this.ready,
+      release: this.data.release,
+      scene: this.data.kind,
+      location: this.location,
+      maskSize: [this.sprites.maskWidth, this.sprites.maskHeight],
+      vehicleVertices:
+        this.vehicles.opaqueCount + this.vehicles.transparentCount,
       frame: this.frame,
       visible: { ...this.sprites.visible },
       transform: { ...this.transform },
@@ -248,6 +283,7 @@ export class MapView {
     cancelAnimationFrame(this.raf);
     this.worker.terminate();
     this.viewer.destroy();
+    this.base.remove();
     this.sprites.destroy();
     this.vehicles.destroy();
     this.atmosphere.destroy();

@@ -1,4 +1,5 @@
-import { MAP_ROOT } from "./assets.ts";
+import { sceneRoot } from "./assets.ts";
+import { decodeSourceDepth, legacyDepthEncoding, maskIndex } from "./atlas.ts";
 import { nightAmount, project } from "./model.ts";
 import type { Frame, Point3, SceneData } from "./types.ts";
 export type ViewTransform = {
@@ -14,12 +15,18 @@ export class SpriteRenderer {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   data: SceneData;
+  maskWidth: number;
+  maskHeight: number;
   depth: Uint8ClampedArray | null = null;
   water: Uint8ClampedArray | null = null;
   ready: Promise<void>;
   visible = { cars: 0, boats: 0, planes: 0, occluded: 0 };
   constructor(host: HTMLElement, data: SceneData) {
     this.data = data;
+    [this.maskWidth, this.maskHeight] = data.maskSize ?? [
+      data.width,
+      data.height,
+    ];
     this.canvas = document.createElement("canvas");
     this.canvas.className = "sprites";
     this.canvas.setAttribute("aria-hidden", "true");
@@ -28,11 +35,11 @@ export class SpriteRenderer {
     this.ready = Promise.all(
       ["depth", "water"].map(async (name) => {
         const image = new Image();
-        image.src = `${MAP_ROOT}${name}.png`;
+        image.src = `${sceneRoot(data)}${name}.png`;
         await image.decode();
         const c = document.createElement("canvas");
-        c.width = data.width;
-        c.height = data.height;
+        c.width = this.maskWidth;
+        c.height = this.maskHeight;
         const ctx = c.getContext("2d", { willReadFrequently: true })!;
         ctx.drawImage(image, 0, 0);
         const pixels = ctx.getImageData(0, 0, c.width, c.height).data;
@@ -52,28 +59,36 @@ export class SpriteRenderer {
     };
   }
   isVisible(p: Point3, plane = false) {
-    const q = project(p, this.data.projection),
-      x = Math.round(q.x),
-      y = Math.round(q.y);
-    if (x < 0 || y < 0 || x >= this.data.width || y >= this.data.height)
-      return false;
+    const q = project(p, this.data.projection);
+    const i = maskIndex(
+      q.x,
+      q.y,
+      this.data.width,
+      this.data.height,
+      this.maskWidth,
+      this.maskHeight,
+    );
+    if (i < 0) return false;
     if (plane || !this.depth) return true;
-    const i = (y * this.data.width + x) * 4;
-    const z = ((this.depth[i] * 256 + this.depth[i + 1]) / 65535) * 4000 - 2000;
+    const z = decodeSourceDepth(
+      this.depth[i],
+      this.depth[i + 1],
+      this.data.depthEncoding ?? legacyDepthEncoding,
+    );
     return q.depth + 4.5 >= z;
   }
   isWater(p: Point3) {
     if (!this.water) return false;
-    const q = project(p, this.data.projection),
-      x = Math.round(q.x),
-      y = Math.round(q.y);
-    return (
-      x >= 0 &&
-      y >= 0 &&
-      x < this.data.width &&
-      y < this.data.height &&
-      this.water[(y * this.data.width + x) * 4] > 128
+    const q = project(p, this.data.projection);
+    const i = maskIndex(
+      q.x,
+      q.y,
+      this.data.width,
+      this.data.height,
+      this.maskWidth,
+      this.maskHeight,
     );
+    return i >= 0 && this.water[i] > 128;
   }
   draw(frame: Frame, v: ViewTransform, labels: boolean) {
     const c = this.canvas,
@@ -102,9 +117,10 @@ export class SpriteRenderer {
     if (night > 0.01) {
       ctx.globalCompositeOperation = "screen";
       for (const w of this.data.windows) {
-        if (w.seed > 62 || !this.isVisible(w.p)) continue;
+        if (w.seed > 62) continue;
         const p = this.point(w.p, v);
         if (p.x < 0 || p.x > v.width || p.y < 0 || p.y > v.height) continue;
+        if (!this.isVisible(w.p)) continue;
         ctx.fillStyle = `rgba(255,${185 + (w.seed % 50)},${95 + (w.seed % 65)},${night * (0.12 + (w.seed % 7) * 0.015)})`;
         const ww = Math.max(1.2, unit * 0.8),
           hh = Math.max(1.6, unit * 1.4);
@@ -145,7 +161,10 @@ export class SpriteRenderer {
         continue;
       if (pose.kind === "ferry" || pose.kind === "cargo") {
         if (pose.moving) {
-          const len = pose.kind === "cargo" ? 65 : 33;
+          const wakeScale = this.data.kind === "bay" ? 28 : 1,
+            len =
+              (pose.kind === "cargo" ? 65 : 33) *
+              (this.data.transportScale ?? 1);
           for (const side of [-1, 1]) {
             ctx.beginPath();
             let drawing = false;
@@ -155,13 +174,14 @@ export class SpriteRenderer {
               const wp = pose.point.map(
                 (value, i) =>
                   value -
-                  pose.direction[i] * (len * 0.5 + j) +
+                  pose.direction[i] * (len * 0.5 + j * wakeScale) +
                   (i === 0
                     ? -pose.direction[1]
                     : i === 1
                       ? pose.direction[0]
                       : 0) *
                     j *
+                    wakeScale *
                     0.16 *
                     side *
                     wobble,

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MapView } from "./MapView.ts";
-import { MAP_ROOT } from "./assets.ts";
+import { ATLAS_ROOT } from "./assets.ts";
+import type { SceneKey } from "./assets.ts";
 import { defaultControls } from "./model.ts";
 import type { Frame, SceneData, Weather } from "./types.ts";
 
@@ -101,8 +102,12 @@ const initial: Frame = {
 export default function App() {
   const host = useRef<HTMLDivElement>(null),
     map = useRef<MapView | null>(null),
+    savedFrame = useRef<Frame | undefined>(undefined),
+    savedLocation = useRef<string | undefined>(undefined),
     aboutClose = useRef<HTMLButtonElement>(null);
-  const [frame, setFrame] = useState(initial),
+  const [scene, setScene] = useState<SceneKey>("waterfront"),
+    [landmarks, setLandmarks] = useState<SceneData["landmarks"]>([]),
+    [frame, setFrame] = useState(initial),
     [ready, setReady] = useState(false),
     [weatherAvailable, setWeatherAvailable] = useState(true),
     [error, setError] = useState(""),
@@ -111,33 +116,55 @@ export default function App() {
     [labels, setLabels] = useState(false);
   useEffect(() => {
     let stopped = false;
-    fetch(`${MAP_ROOT}scene.json`)
+    let instance: MapView | undefined;
+    const abort = new AbortController();
+    setReady(false);
+    setError("");
+    fetch(`${ATLAS_ROOT}${scene}/scene.json`, { signal: abort.signal })
       .then((r) => {
         if (!r.ok) throw new Error();
         return r.json();
       })
       .then((data: SceneData) => {
         if (stopped || !host.current) return;
-        map.current = new MapView(
+        setLandmarks(data.landmarks);
+        instance = map.current = new MapView(
           host.current,
           data,
-          setFrame,
+          (next) => {
+            if (!stopped) setFrame(next);
+          },
           () => {
+            if (stopped) return;
             setReady(true);
             setWeatherAvailable(!!map.current?.atmosphere.gl);
           },
-          setError,
+          (message) => {
+            if (!stopped) setError(message);
+          },
+          savedFrame.current,
+          scene === "waterfront" ? savedLocation.current : undefined,
         );
+        instance.labels = labels;
         (window as unknown as { __sf: MapView }).__sf = map.current;
       })
-      .catch(() =>
-        setError("The map could not load. Check the connection and reload."),
-      );
+      .catch(() => {
+        if (!stopped)
+          setError("The map could not load. Check the connection and reload.");
+      });
     return () => {
       stopped = true;
-      map.current?.destroy();
+      abort.abort();
+      if (instance) {
+        savedFrame.current = instance.frame;
+        if (scene === "waterfront") savedLocation.current = instance.location;
+        instance.destroy();
+        if (map.current === instance) map.current = null;
+        const diagnostic = window as unknown as { __sf?: MapView };
+        if (diagnostic.__sf === instance) delete diagnostic.__sf;
+      }
     };
-  }, []);
+  }, [scene]);
   useEffect(() => {
     if (!about) return;
     const previous = document.activeElement as HTMLElement | null;
@@ -159,13 +186,53 @@ export default function App() {
           <span />
         </div>
         <div>
-          <p className="eyebrow">ISOMETRIC / LIVING WATERFRONT</p>
-          <h1>San Francisco</h1>
+          <p className="eyebrow">
+            ISOMETRIC /{" "}
+            {scene === "bay" ? "REGIONAL ATLAS" : "LIVING WATERFRONT"}
+          </p>
+          <h1>{scene === "bay" ? "San Francisco Bay" : "San Francisco"}</h1>
           <p className="scope">
-            Ferry Building · Financial District · Embarcadero
+            {scene === "bay"
+              ? "Bay Area overview"
+              : "Fisherman’s Wharf → Mission Bay"}
           </p>
         </div>
       </header>
+      <nav className="atlas-navigation panel" aria-label="Atlas navigation">
+        <div className="atlas-views" role="group" aria-label="Map view">
+          <button
+            aria-pressed={scene === "waterfront"}
+            onClick={() => setScene("waterfront")}
+          >
+            Waterfront
+          </button>
+          <button
+            aria-pressed={scene === "bay"}
+            onClick={() => setScene("bay")}
+          >
+            Bay Area
+          </button>
+        </div>
+        {scene === "waterfront" && (
+          <select
+            aria-label="Jump to waterfront location"
+            value=""
+            disabled={!ready}
+            onChange={(e) => map.current?.focusLocation(e.target.value)}
+          >
+            <option value="" disabled>
+              Jump to a place
+            </option>
+            {landmarks
+              .filter((l) => l.id)
+              .map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
+                </option>
+              ))}
+          </select>
+        )}
+      </nav>
       <div className="top-actions">
         <span className="live-indicator">
           <i />
@@ -381,13 +448,21 @@ export default function App() {
       </nav>
       <footer className="map-credit">
         <button onClick={() => setAbout(true)}>
-          DataSF · USGS · © OpenStreetMap
+          {scene === "bay"
+            ? "Natural Earth · USGS"
+            : "DataSF · USGS · © OpenStreetMap"}
         </button>
       </footer>
       {(!ready || error) && (
         <div className="loading">
           <span className="loading-orbit" />
-          <h2>{error ? "The map is not ready" : "Opening San Francisco"}</h2>
+          <h2>
+            {error
+              ? "The map is not ready"
+              : scene === "bay"
+                ? "Opening the Bay Area"
+                : "Opening San Francisco"}
+          </h2>
           <p>{error || "Loading illustrated tiles and city animation…"}</p>
         </div>
       )}
@@ -429,16 +504,16 @@ export default function App() {
             </div>
             <h2 id="about-title">San Francisco, in motion.</h2>
             <p>
-              A continuous illustrated view of the Ferry Building, Financial
-              District and Embarcadero. Explore the streets and waterfront
-              through changing light and weather.
+              Follow San Francisco’s waterfront from Fisherman’s Wharf to
+              Mission Bay. Switch to Bay Area for the regional view and back to
+              Waterfront for street detail.
             </p>
             <h3>Artwork and data</h3>
             <p>
-              DataSF footprints, USGS 2023 lidar and a 2026-11-09 OpenStreetMap
-              snapshot provide one orthographic structure reference. Original
-              dry and wet artwork was drawn with imagegen. Every moving vehicle
-              vertex uses that same camera.
+              DataSF footprints, USGS 2023 lidar and OpenStreetMap shape the
+              waterfront. Original dry and wet artwork shares one fixed camera.
+              The regional view uses Natural Earth geography, with transport
+              enlarged for legibility.
             </p>
             <p>
               Traffic routes, light and weather are illustrative. Rain changes
@@ -474,7 +549,7 @@ export default function App() {
               </a>
             </p>
             <p className="about-license">
-              DataSF PDDL · USGS public domain ·{" "}
+              DataSF PDDL · USGS and Natural Earth public domain ·{" "}
               <a
                 href="https://www.openstreetmap.org/copyright"
                 target="_blank"

@@ -1,4 +1,5 @@
 import { vehicleFaces } from "./VehicleGeometry.ts";
+import { legacyDepthEncoding } from "./atlas.ts";
 import type { VehicleFace } from "./VehicleGeometry.ts";
 import { nightAmount, project } from "./model.ts";
 import type { Frame, SceneData } from "./types.ts";
@@ -14,6 +15,7 @@ uniform vec2 viewport;
 uniform vec4 basis;
 uniform vec3 camera;
 uniform vec2 origin;
+uniform float clipDepth;
 out vec2 imagePoint;
 out float cameraDepth;
 out vec4 color;
@@ -24,7 +26,7 @@ void main(){
  imagePoint=origin+camera.x*vec2(u,q*camera.y-position.z*camera.z);
  cameraDepth=q*camera.z+position.z*camera.y;
  vec2 screen=view.xy+imagePoint*view.z;
- gl_Position=vec4(screen.x/viewport.x*2.-1.,1.-screen.y/viewport.y*2.,-cameraDepth/2048.,1.);
+ gl_Position=vec4(screen.x/viewport.x*2.-1.,1.-screen.y/viewport.y*2.,-cameraDepth/clipDepth,1.);
  color=paint;lit=emission;
 }`;
 const fragment = `#version 300 es
@@ -35,6 +37,7 @@ in vec4 color;
 in float lit;
 uniform sampler2D sourceDepth;
 uniform vec2 imageSize;
+uniform vec2 depthEncoding;
 uniform float night;
 uniform float time;
 out vec4 pixel;
@@ -42,7 +45,7 @@ void main(){
  vec2 uv=imagePoint/imageSize;
  if(any(lessThan(uv,vec2(0.)))||any(greaterThan(uv,vec2(1.))))discard;
  vec2 packed=texture(sourceDepth,uv).rg;
- float structure=(packed.r*65280.+packed.g*255.)/65535.*4000.-2000.;
+ float structure=(packed.r*65280.+packed.g*255.)/65535.*depthEncoding.y-depthEncoding.x;
  if(structure>cameraDepth+2.0)discard;
  vec3 paint=color.rgb*(1.-night*.48);
  if(lit>.5)paint=color.rgb;
@@ -154,6 +157,8 @@ export class VehicleRenderer {
       "basis",
       "camera",
       "origin",
+      "clipDepth",
+      "depthEncoding",
       "sourceDepth",
       "imageSize",
       "night",
@@ -174,8 +179,8 @@ export class VehicleRenderer {
         gl.TEXTURE_2D,
         0,
         gl.RGBA,
-        data.width,
-        data.height,
+        sprites.maskWidth,
+        sprites.maskHeight,
         0,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
@@ -185,10 +190,40 @@ export class VehicleRenderer {
     });
   }
   draw(frame: Frame, v: ViewTransform) {
-    const key = `${frame.clock.transportTime}/${frame.controls.cars}/${frame.controls.boats}/${frame.controls.planes}`;
+    const candidates = frame.poses.filter((pose) => {
+      const p = project(pose.point, this.data.projection),
+        x = p.x * v.scale + v.left,
+        y = p.y * v.scale + v.top,
+        margin =
+          85 +
+          40 *
+            this.data.projection.scale *
+            v.scale *
+            (this.data.transportScale ?? 1);
+      return (
+        x >= -margin &&
+        x <= v.width + margin &&
+        y >= -margin &&
+        y <= v.height + margin
+      );
+    });
+    const key = `${frame.clock.transportTime}/${candidates.map((p) => p.id).join(",")}`;
     if (key !== this.lastKey) {
       this.lastKey = key;
-      this.faces = frame.poses.flatMap(vehicleFaces);
+      const scale = this.data.transportScale ?? 1;
+      this.faces = candidates.flatMap((pose) => {
+        const faces = vehicleFaces(pose);
+        if (scale === 1) return faces;
+        return faces.map((face) => ({
+          ...face,
+          points: face.points.map(
+            (p) =>
+              p.map(
+                (v, i) => pose.point[i] + (v - pose.point[i]) * scale,
+              ) as typeof pose.point,
+          ),
+        }));
+      });
       if (this.gl) {
         const opaque: number[] = [],
           transparent: number[] = [];
@@ -303,6 +338,9 @@ export class VehicleRenderer {
     gl.uniform4f(u.basis, p.east[0], p.east[1], p.north[0], p.north[1]);
     gl.uniform3f(u.camera, p.scale, p.sinElevation, p.cosElevation);
     gl.uniform2f(u.origin, p.origin[0], p.origin[1]);
+    gl.uniform1f(u.clipDepth, this.data.clipDepth ?? 2048);
+    const depth = this.data.depthEncoding ?? legacyDepthEncoding;
+    gl.uniform2f(u.depthEncoding, depth.offset, depth.range);
     gl.uniform2f(u.imageSize, this.data.width, this.data.height);
     gl.uniform1f(u.night, night);
     gl.uniform1f(u.time, frame.clock.transportTime);
@@ -327,6 +365,7 @@ export class VehicleRenderer {
       gl.deleteTexture(this.texture);
       gl.deleteVertexArray(this.vao);
       gl.deleteProgram(this.program);
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
     }
     this.canvas.remove();
   }

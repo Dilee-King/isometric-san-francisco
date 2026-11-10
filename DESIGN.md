@@ -1,6 +1,6 @@
 # Isometric San Francisco — visual direction
 
-Status: active visual contract for the working waterfront sample, revised for v0.2 on 2026-11-10. Published coverage is recorded separately in `data/coverage-plan.json`.
+Status: active visual contract for the working waterfront atlas, revised for v0.3. Published coverage is recorded separately in `data/coverage-plan.json`; the regional/detail production design is in [waterfront corridor design](docs/waterfront-corridor-design.md).
 
 ## 1. Visual Theme & Atmosphere
 

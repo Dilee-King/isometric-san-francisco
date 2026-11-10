@@ -39,9 +39,11 @@
 
 ## 5 — Expand and release
 
-- [ ] Expand contiguous city/waterfront coverage without lowering the sample quality.
+- [x] Extend the detailed waterfront from Fisherman's Wharf to Mission Bay while retaining native patch density and four appearances.
+- [x] Add a Bay Area overview and return to the detailed corridor with preserved controls and clocks.
+- [ ] Extend detailed coverage inland and across the Bay Bridge / Oakland-Alameda waterfront.
 - [ ] Add meaningful code checks, versioned manifests and a measured performance budget.
 - [x] Publish the verified sample with GitHub Pages and update instructions; large-area asset storage remains future work.
 - [x] Ship an English interface and documentation, without the decorative lower-left caption.
 
-Wider Bay Area coverage, airport ground operations, live feeds and LCZ research functions have no delivery date in this initial roadmap.
+Wider street-level coverage, airport ground operations, live feeds and LCZ research functions have no delivery date in this roadmap.

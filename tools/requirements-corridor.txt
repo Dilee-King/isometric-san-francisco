@@ -1,0 +1,8 @@
+-r requirements.txt
+laspy[lazrs]==2.7.0
+pyproj==3.7.2
+rasterio==1.5.0
+scipy==1.17.1
+requests>=2.32,<3
+pyogrio>=0.11,<1
+geopandas>=1.0,<2

@@ -1,3 +1,4 @@
 # Playwright CLI --filename expects a function expression without a final semicolon.
 tools/qa-*.js
 tools/record-demo.js
+tools/record-corridor.js

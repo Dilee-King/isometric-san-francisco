@@ -45,13 +45,20 @@ export type SceneData = {
   width: number;
   height: number;
   release: string;
+  assetRoot?: string;
+  kind?: "waterfront" | "bay";
+  maskSize?: [number, number];
+  depthEncoding?: { offset: number; range: number };
+  clipDepth?: number;
+  transportScale?: number;
+  defaultLocation?: string;
   projection: Projection;
   extent: number[];
   sourceBuildings: number;
   routes: Route[];
   lamps: Point3[];
   windows: { p: Point3; seed: number; angle: number }[];
-  landmarks: { name: string; p: Point3 }[];
+  landmarks: { id?: string; name: string; p: Point3 }[];
 };
 export type Frame = {
   clock: Clock;

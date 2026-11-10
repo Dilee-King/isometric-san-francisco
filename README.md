@@ -1,77 +1,65 @@
 # Isometric San Francisco
 
-A living illustrated waterfront, inspired by [Isometric NYC](https://cannoneyed.com/projects/isometric-nyc) and [Isometric Vancouver](https://vancouver.isoworld.xyz/).
+A living illustrated map from Fisherman's Wharf to Mission Bay, with a regional Bay Area atlas. Inspired by [Isometric NYC](https://cannoneyed.com/projects/isometric-nyc) and [Isometric Vancouver](https://vancouver.isoworld.xyz/).
 
-**[Explore the live map](https://dilee-king.github.io/isometric-san-francisco/?v=0.2.0)** · [Actual demo video](docs/Waterfront-actual-demo-v0.2.mp4) · [Verification](docs/VERIFICATION-v0.2.md) · [Roadmap](ROADMAP.md)
+**[Explore the live atlas](https://dilee-king.github.io/isometric-san-francisco/?v=0.3.0)** · [Actual demo video](docs/Waterfront-actual-demo-v0.3.mp4) · [Verification](docs/VERIFICATION-v0.3.md) · [Roadmap](ROADMAP.md)
 
-![Rain on the San Francisco waterfront](docs/screenshots/v0.2/rain-day.png)
-
-The current release is a continuous sample around the Ferry Building, Financial District and Embarcadero. It is not a city-wide map.
-
-## What changed in v0.2
-
-- **Transport perspective:** cars, ferries, the cargo ship and aircraft are built in forward/side/up metres. Every body, cabin, hull, wing and tail vertex uses the map's orthographic camera. World-space widths, height and foreshortening replace rotated top-view icons.
-- **A visibly wet city:** Rain switches to separately authored wet daytime/nighttime tiles, with darker roofs, soaked paving, puddles, reflections and rain-disturbed water. Animated streaks, surface impacts and reduced visibility complement those surface changes.
-- **Three weather choices:** Clear, Coastal Fog and Rain. The approved dry artwork and fog treatment are retained.
-- **English throughout the current experience:** interface, accessibility text, place labels and main documentation. The decorative lower-left caption and sample label have been removed.
+![Fisherman's Wharf in the running application](docs/screenshots/v0.3/wharf-clear.jpg)
 
 ## Explore
 
-Drag to pan; scroll or use the map tools to zoom. The right panel controls time, weather and transport. On a phone, open **Environment** to reveal the controls.
+- **Waterfront:** pan continuously from Fisherman's Wharf and Pier 39 through the Embarcadero, Ferry Building, Bay Bridge approach, South Beach, Oracle Park and Mission Bay. The location selector has 12 jumps; the whole corridor is one navigable surface.
+- **Bay Area:** switch to a regional terrain atlas with coastline, 26 towns/cities, major crossings and SFO, OAK and SJC. The amber outline marks the detailed waterfront. This view is regional context; detailed city coverage remains the published waterfront.
+- **Time and weather:** Morning, Day, Dusk and Night; manual time or a five-minute cycle; Clear, Coastal Fog and Rain. Rain changes wet surfaces and reflections in addition to moving drops and impacts.
+- **Traffic:** independently show cars, vessels and aircraft. The original world-space projection remains; the regional view enlarges transport for legibility. Pausing freezes all clocks, including across map-view switches.
+- **Navigation:** drag and scroll, or use the map tools. Home returns to the default view; +/− zoom; Space plays or pauses when the map has focus. On mobile, use **Environment** to show the time/weather panel. Reduced motion starts paused. Without WebGL2, projected Canvas transport and dry lighting remain available; the unavailable effects are explained.
 
-- Choose Morning, Day, Dusk or Night, or scrub the time slider.
-- Enable **Auto day/night** for an approximately five-minute cycle.
-- Select Clear, Coastal Fog or Rain; adjust weather intensity.
-- Toggle Cars, Boats and Aircraft independently. Aircraft appear as occasional overflights.
-- Pause freezes traffic, time and weather. Map navigation stays available. Hidden tabs suspend all clocks without changing the pause setting.
-- Reduced-motion preference starts the scene paused. Without WebGL2, projected Canvas transport and the dry map/night view remain available; unavailable weather effects are explained and disabled.
-
-Keyboard: focus the map, then use Space to play/pause, Home to reset, and + / − to zoom. All controls are keyboard accessible.
+Actual captures: [Pier 39](docs/screenshots/v0.3/pier-39-clear.jpg) · [Oracle Park in rain](docs/screenshots/v0.3/oracle-rain-night.jpg) · [Mission Bay](docs/screenshots/v0.3/mission-bay-clear.jpg) · [Bay Area](docs/screenshots/v0.3/bay-overview.jpg).
 
 ## Run locally
 
-Requires Node.js 24+. First-time dependency installation needs a network connection. The running map uses bundled local assets, without a map API key, login or external basemap service.
+Requires Node.js 24+. The map uses bundled assets; runtime does not need a map API key or an external basemap.
 
 ```powershell
 npm ci
 npm run dev
 ```
 
-Open the printed address, normally `http://127.0.0.1:5186/`.
+Development: `http://127.0.0.1:5186/`. Production preview:
 
 ```powershell
 npm test
-node tools/audit-assets.mjs
+node tools/audit-atlas.mjs
 npm run build
 npm run preview
 ```
 
-Production preview uses `http://127.0.0.1:4186/`.
+The production preview runs at `http://127.0.0.1:4186/`. GitHub Actions verifies the source/mask and asset checks and deploys GitHub Pages on updates to `main`.
 
-## Production method
+## How it is made
 
-One fixed orthographic structure reference is built from DataSF footprints, USGS lidar and OpenStreetMap. Original illustrated appearances are prepared and repaired as registered images, then exported as multiresolution WebP/DZI pyramids. React and OpenSeadragon provide continuous navigation. A worker controls transport and independent clocks; projected world-space meshes, source-depth clipping and WebGL atmosphere use one shared transform.
+The waterfront is a 5372 × 7398 pixel registered atlas. Ten overlapping detailed patches share the original 39° orthographic camera and 1.854545 pixels per metre. The Ferry Building is the retained v0.2 anchor; nine new patches use original built-in imagegen artwork at 1536 × 1024 per appearance. Sixteen lower-density contextual appearances fill their margins. The dry day, dry night, wet day and wet night mosaics are packaged as WebP/DZI pyramids. No detailed patch is enlarged from a smaller generation.
 
-Vancouver's deployed traffic renderer was inspected directly: it constructs vehicle body and cabin corners in world metres, projects them through the city camera, then applies structure masks. This project implements that geometric principle with its own camera and original models. No Vancouver artwork or unverified-license code is copied. See the [reference audit](docs/v0.2-reference-audit.md).
+Source structures use [DataSF footprints](https://data.sf.gov/Geographic-Locations-and-Boundaries/Building-Footprints/ynuv-fyni), [USGS 2023 lidar](https://www.fisheries.noaa.gov/inport/item/73386) and [OpenStreetMap](https://www.openstreetmap.org/copyright). The overview uses [Natural Earth](https://www.naturalearthdata.com/) land/urban vectors and [USGS 3DEP elevation](https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer), with schematic regional connectors. Both share an EPSG:32610 origin and orientation.
 
-GitHub Actions verifies model/geometry tests, the source-bundle regression and asset hashes, then builds and deploys GitHub Pages when `main` changes. The `map/v2` namespace preserves the prior release assets.
+The viewer requests visible tiles at the needed zoom; inactive appearances load on demand. Small registered source masks drive approximate occlusion and atmosphere. React/OpenSeadragon provide the fixed-view map; a worker holds clocks and source-directed transport. The detailed corridor has 360 configured cars, five ferries, two cargo vessels and three occasional overflights. These are simulation instances, not observed traffic counts.
 
-## Rebuild the assets
+## Rebuild
 
-Selected original PNGs, exact prompts, derived source geometry, camera metadata and masks are included. Built-in imagegen created the artwork; Python performs source rasterization, format conversion and deterministic tile packaging.
+Selected artwork and exact prompts are in [assets/corridor](assets/corridor/). [Source provenance](data/corridor/provenance.json), the compressed local geometry snapshot and both runtime manifests are checked in. For data acquisition and offline production:
 
 ```powershell
-python -m pip install -r tools/requirements.txt
-python tools/test_source_pipeline.py
-python tools/package_tiles.py
+python -m pip install -r tools/requirements-corridor.txt
+python tools/corridor_inputs.py
+python tools/corridor_source.py
+python tools/render_corridor.py wharf embarcadero south-beach mission-bay
+python tools/corridor_art_targets.py
+python tools/package_corridor.py
+node tools/audit-atlas.mjs
 ```
 
-To regenerate the structural reference and canonical source masks, run `python tools/prepare_source.py --source data/source/ferry.json`, then package again. Artwork generation itself is not deterministic; the selected originals and their hashes are retained.
+Raw network inputs stay in the ignored local cache; the original source snapshot can be reused without reacquiring it for waterfront reference generation. Selected imagegen results are retained because artwork generation is not deterministic. The package rebuild uses those selected assets, not new generation. The v1/v2 assets remain available as release history.
 
-## Scope and limits
+## Scope
 
-The sample contains 72 car instances following 22 source-directed road loops, two ferries, one cargo vessel and an occasional aircraft. Routes, lane offsets, stops, building detail, lighting and weather are illustrative. There is no full signal controller, vehicle-following model, live transport feed, airport operation or physical weather/solar simulation.
-
-The source-input extent is 1200 × 1200 m in EPSG:32610; the illustration is a cropped orthographic view. This input extent is not the finished map's land area. AI drawing can shift local edges; source-depth clipping and final-art alignment are display approximations. The wet-surface mask is an illustrative source-derived display layer, not measured imperviousness.
-
-Original application code and documentation are [MIT licensed](LICENSE). Third-party dependencies and data retain their own notices. DataSF PDDL, USGS public-domain data, and [© OpenStreetMap contributors / ODbL](https://www.openstreetmap.org/copyright) are credited separately. Read [Acknowledgments](ACKNOWLEDGMENTS.md), [asset provenance](assets/README.md) and the [coverage record](data/coverage-plan.json).
+Coverage is the illustrated waterfront corridor plus a lower-detail regional overview, not full city- or nine-county street-level coverage. AI artwork can shift individual edges; lane offsets, facade details, bridge elevation, depth masks, lights and weather remain illustrative. Vehicle/ship routes are source-constrained where noted, without live trip feeds, physical weather, collision simulation or airport operations. See [coverage](data/coverage-plan.json) and [Acknowledgments](ACKNOWLEDGMENTS.md) for boundaries and licenses. Original code and documentation use the [MIT license](LICENSE); third-party data retain their respective notices.

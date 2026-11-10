@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 — Waterfront corridor and Bay Area overview
+
+- Extended continuous detailed navigation from Fisherman's Wharf to Mission Bay with 12 location jumps and four registered appearances.
+- Added a terrain-based Bay Area overview, waterfront coverage outline, regional crossings and airport markers.
+- Preserved clocks, controls and the last named waterfront location across view changes. Expanded mask/depth support and loaded only needed imagery.
+- Added source records, atlas asset checks, real browser captures and [verification](docs/VERIFICATION-v0.3.md).
+
+## 0.2.0 — Projected vehicles and wet waterfront
+
+- Rebuilt vehicles in world metres through the city camera, added wet day/night art, retained Clear and Coastal Fog, and switched the current interface and documentation to English.
+- See the [v0.2 verification record](docs/VERIFICATION-v0.2.md).
+
 ## 0.1.0 — living waterfront sample, 2026-11-10
 
 - Added a continuous original day/night illustrated Ferry Building / Financial District / Embarcadero sample, 1536 × 1024, with two DZI pyramids.
@@ -15,4 +27,4 @@
 - Specified cars, boats, aircraft, authored day/night lighting and independent weather.
 - Added a visual contract, coverage planning record, credits, roadmap and contribution templates.
 
-This revision contains documentation only. It includes no map application, generated city tiles, live deployment or completed transport/environment features.
+The initial setup revision contained documentation only.

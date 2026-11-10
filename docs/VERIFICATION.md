@@ -1,6 +1,6 @@
 # Verification records
 
-Current release: [Waterfront v0.2](VERIFICATION-v0.2.md). Previous runtime: [Waterfront v0.1](VERIFICATION-v0.1.md).
+Current release: [Waterfront corridor and Bay Area overview v0.3](VERIFICATION-v0.3.md). Previous: [v0.2](VERIFICATION-v0.2.md), [v0.1](VERIFICATION-v0.1.md).
 
 ## Archived setup verification — 2026-11-10
 
