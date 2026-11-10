@@ -52,4 +52,4 @@ Files: browser QA/recording scripts, README, coverage/provenance/changelog, veri
 
 - [x] Run meaningful model/geometry/source/asset checks and production build; inspect actual effects and performance behavior.
 - [x] Request one read-only fresh whole-branch review; fix material findings with RED→GREEN checks.
-- [ ] Record the real application, commit and synchronize GitHub, wait for Pages success, verify HTTPS and show the user.
+- [x] Record the real application, commit and synchronize GitHub, wait for Pages success, verify HTTPS and show the user.

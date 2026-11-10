@@ -28,3 +28,7 @@ A read-only reviewer repeated the 19 Node and five Python tests, both asset audi
 ## Publication
 
 The [45.6-second native browser recording](Waterfront-actual-demo-v0.3.mp4) shows the actual application: Wharf, Pier 39, fog, continuous waterfront pan, Ferry Building, Bay Bridge approach, Oracle Park in rain, Mission Bay at night and the Bay Area view. It is H.264 MP4 at 1440 × 960, 25 fps, without added audio or generated interface footage. A decoded frame was inspected after transcoding.
+
+GitHub Actions [42925359527](https://github.com/Dilee-King/isometric-san-francisco/actions/runs/42925359527) built and deployed `35697c8`. A Chromium test against the [public HTTPS app](https://dilee-king.github.io/isometric-san-francisco/?v=0.3.0) confirmed both v0.3 scenes, 12 waterfront location jumps, the English interface, the WebGL vehicle renderer, wet night artwork and an unchanged paused clock through the scene switch. The flow observed no page or console errors and no failing resource responses.
+
+Public-site captures: [Pier 39](screenshots/v0.3/online-pier-39.jpg), [Mission Bay at night in rain](screenshots/v0.3/online-mission-bay-rain-night.jpg), [Bay Area overview](screenshots/v0.3/online-bay-overview.jpg).
