@@ -11,6 +11,7 @@ const coverage = {
   "0.8.1": { scope: "City & Inner Bay", text: "Explore all of San Francisco, the Bay Bridge, the Oakland and Alameda waterfront, and the north shore from Fort Baker to Sausalito." },
   "0.9.0": { scope: "City & Inner Bay", text: "Follow the illustrated coast, shoreline and bridges around the Bay. The City view opens San Francisco and the inner Bay at street level." },
   "0.9.1": { scope: "City & Inner Bay", text: "Zoom into San Francisco and selected Bay Area places to see their street-level artwork." },
+  "0.10.0-preview": { scope: "City & Inner Bay", text: "Follow the continuous illustrated shoreline from the Port of Oakland through Emeryville to Berkeley Marina." },
 }[ATLAS_VERSION];
 
 function Icon({ name }: { name: string }) {

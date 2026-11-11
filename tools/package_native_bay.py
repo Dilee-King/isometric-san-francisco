@@ -49,13 +49,13 @@ def retained_layer(city):
                 revealScale=[.043, .095])
 
 
-def artwork_path(identifier, appearance="scene"):
+def artwork_path(identifier, appearance="scene", *, art=ART):
     suffix = "" if appearance == "scene" else f"-{appearance}"
-    return ART / "plates" / f"{identifier}{suffix}.png"
+    return art / "plates" / f"{identifier}{suffix}.png"
 
 
-def read_art(row, appearance, land, urban):
-    path = artwork_path(row["id"], appearance)
+def read_art(row, appearance, land, urban, art):
+    path = artwork_path(row["id"], appearance, art=art)
     if path.is_file() or appearance == "scene":
         with Image.open(path) as image:
             if image.size != (1536, 1024):
@@ -66,7 +66,7 @@ def read_art(row, appearance, land, urban):
     area = (x/RATIO-FRAME.x, y/RATIO-FRAME.y, (x+w)/RATIO-FRAME.x, (y+h)/RATIO-FRAME.y)
     surface = np.asarray(land.resize((w, h), Image.Resampling.NEAREST, box=area)) > 0
     city = np.asarray(urban.resize((w, h), Image.Resampling.NEAREST, box=area)) > 0
-    return appearance_image(read_art(row, "scene", land, urban), surface, city,
+    return appearance_image(read_art(row, "scene", land, urban, art), surface, city,
                             appearance, origin=(left, top), local=True)
 
 
@@ -88,7 +88,7 @@ def write_level(out, level, appearance, rows, images, pool):
         right, bottom = left + patch.width, top + patch.height
         for tile_y in range(top//TILE, math.ceil(bottom/TILE)):
             for tile_x in range(left//TILE, math.ceil(right/TILE)):
-                tiles[(tile_x, tile_y)].append((row["id"], left, top, patch))
+                tiles[(tile_x, tile_y)].append((row.get("region", row["id"]), left, top, patch))
 
     def write_tile(item):
         (col, row), patches = item
@@ -108,7 +108,7 @@ def write_level(out, level, appearance, rows, images, pool):
     return list(pool.map(write_tile, sorted(tiles.items())))
 
 
-def pack_patches(out, rows):
+def pack_patches(out, rows, *, art=ART, asset_root="map/v9-native/detail/", aerial_guides=None, finish=None):
     if not (REGIONAL_WORK / "land.png").is_file():
         regional()
     with Image.open(REGIONAL_WORK / "land.png") as source:
@@ -123,7 +123,9 @@ def pack_patches(out, rows):
         for appearance in APPEARANCES:
             images = {}
             for row in rows:
-                image = read_art(row, appearance, land, urban)
+                image = read_art(row, appearance, land, urban, art)
+                if finish:
+                    finish(image, row, appearance)
                 image.putalpha(alpha)
                 images[row["id"]] = image
             for level in range(FIRST_LEVEL, LEVEL+1):
@@ -135,16 +137,18 @@ def pack_patches(out, rows):
     revision = hashlib.sha256("".join(row["sha256"] for row in files).encode()).hexdigest()[:12]
     bounds = [[x, y, x+w, y+h] for x, y, w, h in (row["frame"] for row in rows)]
     layer = {"width": WORLD.width, "height": WORLD.height, "projection": WORLD.projection(),
-             "assetRoot": "map/v9-native/detail/", "appearanceRevision": revision,
+             "assetRoot": asset_root, "appearanceRevision": revision,
              "revealScale": [.08, .23], "bounds": bounds,
              "tileLayout": {"tileSize": TILE, "overlap": 1, "minLevel": FIRST_LEVEL,
                             "maxLevel": LEVEL, "sharedMaxLevel": 0, "fallback": "context", "regions": [],
                             "detail": {"baseLevel": 0, "tiles": index}}}
-    artwork = [dict(row, sha256=sha(artwork_path(row["id"]))) for row in rows]
-    weather = [{"id": row["id"], "appearance": key, "sha256": sha(artwork_path(row["id"], key))}
-               for row in rows for key in APPEARANCES[1:] if artwork_path(row["id"], key).is_file()]
+    artwork = [dict(row, sha256=sha(artwork_path(row["id"], art=art))) for row in rows]
+    weather = [{"id": row["id"], "appearance": key, "sha256": sha(artwork_path(row["id"], key, art=art))}
+               for row in rows for key in APPEARANCES[1:] if artwork_path(row["id"], key, art=art).is_file()]
+    if aerial_guides is None:
+        aerial_guides = read(art / "aerial-guide-sha256.json")
     dump(out / "manifest.json", {"revision": revision, "artwork": artwork, "weather": weather,
-                                  "aerialGuides": read(ART / "aerial-guide-sha256.json"), "files": files})
+                                  "aerialGuides": aerial_guides, "files": files})
     return layer
 
 

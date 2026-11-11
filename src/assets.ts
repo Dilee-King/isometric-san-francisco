@@ -2,14 +2,15 @@ import type { SceneData } from "./types.ts";
 import { version as packageVersion } from "../package.json";
 
 export type SceneKey = "waterfront" | "bay";
-const releases = ["0.5.0", "0.6.1", "0.7.1", "0.8.1", "0.9.0", "0.9.1"] as const;
+const releases = ["0.5.0", "0.6.1", "0.7.1", "0.8.1", "0.9.0", "0.9.1", "0.10.0-preview"] as const;
 const params = new URLSearchParams(window.location.search);
 const requested = params.get("v")?.replace(/^0\.([678])\.0$/, "0.$1.1");
 export const ATLAS_VERSION = releases.find(release => release === requested)
   ?? releases.find(release => release === packageVersion) ?? "0.8.1";
 const releaseFolder = ATLAS_VERSION === "0.5.0" ? "v5" :
+  ATLAS_VERSION === "0.10.0-preview" ? "v10-continuous" :
   ATLAS_VERSION === "0.9.1" ? "v9-native" : `v${ATLAS_VERSION.split(".")[1]}-art`;
-export const FULL_BAY = ATLAS_VERSION === "0.9.0" || ATLAS_VERSION === "0.9.1";
+export const FULL_BAY = ATLAS_VERSION === "0.9.0" || ATLAS_VERSION === "0.9.1" || ATLAS_VERSION === "0.10.0-preview";
 export const START_SCENE: SceneKey = FULL_BAY && params.get("view") !== "city" ? "bay" : "waterfront";
 export const START_LOCATION = params.get("p") ?? undefined;
 export const scenePath = (key: SceneKey) =>

@@ -1,0 +1,14 @@
+{
+  "area": "Oakland, Emeryville and Berkeley waterfront",
+  "crs": "EPSG:32610",
+  "plateSize": [1536, 1024],
+  "reuseCity": ["oakland-north-01", "emeryville-south-01", "emeryville-south-02", "emeryville-north-01", "emeryville-north-02", "emeryville-north-04"],
+  "columnOrigins": [13248, 14400, 15552, 16704, 17856, 19008],
+  "rows": [
+    {"name": "oakland-north", "y": 1024, "columns": [0, 1, 2, 3, 4, 5], "waves": [1, 2, 1, 2, 1, 2]},
+    {"name": "emeryville-south", "y": 256, "columns": [0, 1, 2, 3, 4, 5], "waves": [2, 3, 2, 3, 2, 3]},
+    {"name": "emeryville-north", "y": -512, "columns": [0, 1, 2, 3, 4, 5], "waves": [3, 4, 3, 4, 3, 3]},
+    {"name": "aquatic-park", "y": -1280, "columns": [4, 5], "waves": [3, 2]},
+    {"name": "berkeley-south", "y": -2048, "columns": [4, 5], "waves": [2, 1]}
+  ]
+}

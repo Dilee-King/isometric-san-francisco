@@ -1,0 +1,20 @@
+{
+  "sha256": "c89823d1f1a0d67ea911e38326e1683429ee8b14bbd4e6e85e7638fa992ed90b",
+  "bounds": [
+    557988.386124253,
+    4186180.7611100706,
+    563241.4064974526,
+    4191348.8667057096
+  ],
+  "crs": "EPSG:32610",
+  "sources": [
+    {
+      "id": "ca_m_3712214_ne_10_060_20220518",
+      "href": "https://naipeuwest.blob.core.windows.net/naip/v002/ca/2022/ca_060cm_2022/37122/m_3712214_ne_10_060_20220518.tif"
+    },
+    {
+      "id": "ca_m_3712214_nw_10_060_20220518",
+      "href": "https://naipeuwest.blob.core.windows.net/naip/v002/ca/2022/ca_060cm_2022/37122/m_3712214_nw_10_060_20220518.tif"
+    }
+  ]
+}

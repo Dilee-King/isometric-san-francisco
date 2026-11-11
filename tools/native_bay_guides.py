@@ -65,7 +65,7 @@ def detail_rows():
     return rows
 
 
-def guide(row, size):
+def guide(row, size, *, work=WORK):
     left, top, width, height = row["frame"]
     frame = PixelFrame(row["id"], left+WORLD.x, top+WORLD.y, width, height)
     bounds, _ = source_bounds(frame, SCALE)
@@ -76,9 +76,9 @@ def guide(row, size):
         "bboxSR": "32610", "imageSR": "32610",
         "size": f"{round((e-w)*density)},{round((n-s)*density)}",
         "format": "tiff", "interpolation": "RSP_BilinearInterpolation", "f": "image",
-    }, cache=WORK / "aerial")
+    }, cache=work / "aerial")
     pixels = np.stack(source_raster(source, frame, SCALE, (1, 2, 3)), axis=-1).astype("uint8")
-    destination = WORK / "guides" / row["id"]
+    destination = work / "guides" / row["id"]
     Image.fromarray(pixels).save(destination.with_suffix(".png"))
     destination.with_suffix(".sha256").write_text(sha(source) + "\n", encoding="ascii")
     return row["id"]

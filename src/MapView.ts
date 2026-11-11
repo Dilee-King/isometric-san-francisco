@@ -91,7 +91,14 @@ export class MapView {
       imageLoaderLimit: 6,
       maxImageCacheCount: 180,
     });
-    if (data.nativeDetail) this.details = new RegisteredDetails(this.viewer, data, data.nativeDetail);
+    if (data.nativeDetail) {
+      // The WebGL drawer blends premultiplied colors. Native WebP edges have straight alpha.
+      const drawer = this.viewer.drawer as typeof this.viewer.drawer & {
+        setUnpackWithPremultipliedAlpha?(enabled: boolean): void;
+      };
+      drawer.setUnpackWithPremultipliedAlpha?.(true);
+      this.details = new RegisteredDetails(this.viewer, data, data.nativeDetail);
+    }
     this.sprites = new SpriteRenderer(host, data);
     this.vehicles = new VehicleRenderer(host, data, this.sprites);
     this.atmosphere = new Atmosphere(host, data, this.sprites);

@@ -114,6 +114,17 @@ def source_mask(flags, frame):
     return crop_water(Image.fromarray(((PACKED[:, :, 2] & flags) > 0).astype("uint8") * 255), frame, outside=0)
 
 
+def sea_samples(legacy):
+    sample = (-1550, -8400, -526, -7376)
+    sx = legacy.water.width / legacy.frame.width
+    sy = legacy.water.height / legacy.frame.height
+    a = deep_zoom.local_box(legacy.frame, sample)
+    water = legacy.water.crop((round(a[0] * sx), round(a[1] * sy), round(a[2] * sx), round(a[3] * sy)))
+    if water.getextrema() != (255, 255):
+        raise ValueError("The v0.5 sea sample contains land")
+    return {appearance: legacy.crop(appearance, sample) for appearance in APPEARANCES}
+
+
 def initialize(rows, output, lamps, offshore_bridge, signature):
     global COMPOSED, LEGACY, PACKED, WATER, SEA, SHORE, ROWS, BRIDGES, LAMPS, LAMP_PIXELS, PACK_SIGNATURE
     global SOUTH, SOUTH_ALPHA
@@ -122,14 +133,7 @@ def initialize(rows, output, lamps, offshore_bridge, signature):
     LEGACY = deep_zoom.RetainedArtwork()
     PACKED = read_packed_mask()
     WATER = Image.fromarray(((PACKED[:, :, 2] & 2) > 0).astype("uint8") * 255)
-    sample = (-1550, -8400, -526, -7376)
-    sx = LEGACY.water.width / LEGACY.frame.width
-    sy = LEGACY.water.height / LEGACY.frame.height
-    a = deep_zoom.local_box(LEGACY.frame, sample)
-    water = LEGACY.water.crop((round(a[0] * sx), round(a[1] * sy), round(a[2] * sx), round(a[3] * sy)))
-    if water.getextrema() != (255, 255):
-        raise ValueError("The v0.5 sea sample contains land")
-    SEA = {appearance: LEGACY.crop(appearance, sample) for appearance in APPEARANCES}
+    SEA = sea_samples(LEGACY)
     with Image.open(PUBLISHED / "southern-context.png") as source:
         south = source.convert("RGB")
     SOUTH = south_appearances(south)

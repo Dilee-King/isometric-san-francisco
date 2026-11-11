@@ -77,3 +77,5 @@ Run `npm run tiles:bay-detail` to register the original City tiles and package t
 ## Scope
 
 Street-level coverage includes the San Francisco mainland, nearby islands, the Oakland and Alameda shoreline, the Marin shore to Sausalito and 16 named close-ups. The rest of the Bay Area uses the regional illustration. Illustrated edges, façades, traffic, light and weather use approximate registration. [Coverage](data/coverage-plan.json) · [Source credits](ACKNOWLEDGMENTS.md) · [MIT license](LICENSE)
+
+The continuous East Bay preview connects Oakland's north waterfront through Emeryville and Berkeley Aquatic Park to Berkeley Marina. It is part of the ongoing street-level expansion across the existing Bay Area frame. [Preview and coverage audit](docs/CONTINUOUS-BAY.md)
