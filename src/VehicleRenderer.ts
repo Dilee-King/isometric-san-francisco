@@ -38,6 +38,7 @@ in float lit;
 uniform sampler2D sourceDepth;
 uniform vec2 imageSize;
 uniform vec2 depthEncoding;
+uniform float depthSlope;
 uniform float night;
 uniform float time;
 out vec4 pixel;
@@ -46,6 +47,9 @@ void main(){
  if(any(lessThan(uv,vec2(0.)))||any(greaterThan(uv,vec2(1.))))discard;
  vec2 packed=texture(sourceDepth,uv).rg;
  float structure=(packed.r*65280.+packed.g*255.)/65535.*depthEncoding.y-depthEncoding.x;
+ float rows=float(textureSize(sourceDepth,0).y);
+ float cell=(floor(uv.y*rows)+.5)*imageSize.y/rows;
+ structure+=(imagePoint.y-cell)*depthSlope;
  if(structure>cameraDepth+2.0)discard;
  vec3 paint=color.rgb*(1.-night*.48);
  if(lit>.5)paint=color.rgb;
@@ -159,6 +163,7 @@ export class VehicleRenderer {
       "origin",
       "clipDepth",
       "depthEncoding",
+      "depthSlope",
       "sourceDepth",
       "imageSize",
       "night",
@@ -341,6 +346,7 @@ export class VehicleRenderer {
     gl.uniform1f(u.clipDepth, this.data.clipDepth ?? 2048);
     const depth = this.data.depthEncoding ?? legacyDepthEncoding;
     gl.uniform2f(u.depthEncoding, depth.offset, depth.range);
+    gl.uniform1f(u.depthSlope, this.data.maskBundle ? p.cosElevation / (p.scale * p.sinElevation) : 0);
     gl.uniform2f(u.imageSize, this.data.width, this.data.height);
     gl.uniform1f(u.night, night);
     gl.uniform1f(u.time, frame.clock.transportTime);

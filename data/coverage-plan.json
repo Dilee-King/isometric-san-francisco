@@ -1,66 +1,82 @@
 {
-  "schemaVersion": "0.5",
+  "schemaVersion": "0.8",
   "project": "isometric-san-francisco",
-  "status": "detailed-city-core-waterfront-and-regional-overview",
-  "plannedTarget": "San Francisco urban area and northern/eastern bay waterfront",
+  "status": "detailed-san-francisco-and-inner-bay-with-regional-overview",
+  "plannedTarget": "San Francisco and the inner Bay with a regional Bay Area atlas",
   "plannedSequence": [
     "Ferry Building / Financial District / Embarcadero contiguous quality sample",
     "Adjacent downtown neighborhoods and northern waterfront",
     "SoMa / Mission Bay and further contiguous city neighborhoods",
     "Aquatic Park / Fort Mason / Marina / Presidio / Golden Gate Bridge",
-    "Ferry Building / Financial District / Chinatown / North Beach / Fisherman's Wharf / Union Square"
+    "Ferry Building / Financial District / Chinatown / North Beach / Fisherman's Wharf / Union Square",
+    "Citywide San Francisco and both Bay Bridge spans through Yerba Buena Island",
+    "Port of Oakland / Jack London Square / Alameda ferry terminals",
+    "Golden Gate north landing / Fort Baker / Sausalito"
   ],
   "futureExpansion": [
-    "Wider San Francisco Bay Area",
-    "East Bay",
-    "SFO airport area"
+    "Peninsula and SFO",
+    "South Bay and Alviso",
+    "Further Bay Area detail"
   ],
   "publishedCoverage": [
     {
-      "release": "city-core-v5",
-      "role": "detailed-city-core-and-waterfront",
-      "description": "Ferry Building through the Financial District, Chinatown and North Beach to Fisherman's Wharf, with Union Square and the existing Golden Gate Bridge to Mission Bay waterfront",
+      "release": "inner-bay-v6",
+      "role": "detail",
+      "description": "San Francisco mainland, nearby islands, both Bay Bridge spans and Oakland touchdown",
       "imageSize": [
-        12722,
-        14408
+        55296,
+        30720
       ],
-      "sourceExtentMetres": [
-        -9800,
-        -4300,
-        2150,
-        5550
-      ],
+      "nativeBlocks": 58,
+      "locationJumps": 54,
       "crs": "EPSG:32610",
-      "nativeDetailPatches": 27,
-      "contextPlates": 10,
-      "bridge": "Continuous registered bridge including landfall connectors; illustrative geometry",
       "pixelsPerMetre": 1.8545454545454545,
-      "scene": "../public/map/v5/waterfront/scene.json",
-      "locationJumps": 30,
-      "regionalPackaging": {
-        "sharedMaxLevel": 11,
-        "regionCount": 8,
-        "tileSize": 512,
-        "overlap": 1,
-        "coordinateSystem": "one continuous image grid"
-      }
+      "scene": "../public/map/v6/waterfront/scene.json"
     },
     {
-      "release": "bay-overview-v5",
+      "release": "inner-bay-v7",
+      "role": "detail",
+      "description": "v0.6 coverage plus Port of Oakland, Jack London Square and the Alameda ferry waterfront",
+      "imageSize": [
+        55296,
+        30720
+      ],
+      "nativeBlocks": 73,
+      "locationJumps": 59,
+      "crs": "EPSG:32610",
+      "pixelsPerMetre": 1.8545454545454545,
+      "scene": "../public/map/v7/waterfront/scene.json"
+    },
+    {
+      "release": "inner-bay-v8",
+      "role": "detail",
+      "description": "v0.7 coverage plus Fort Baker and Sausalito",
+      "imageSize": [
+        55296,
+        30720
+      ],
+      "nativeBlocks": 80,
+      "locationJumps": 63,
+      "crs": "EPSG:32610",
+      "pixelsPerMetre": 1.8545454545454545,
+      "scene": "../public/map/v8/waterfront/scene.json"
+    },
+    {
+      "release": "bay-overview-v8",
       "role": "regional-context",
-      "description": "Bay Area terrain and shoreline overview, with the detailed city-core and waterfront coverage highlighted",
+      "description": "Regional terrain, shorelines, towns, major crossings and airports with detailed coverage highlighted",
       "imageSize": [
         2560,
         1792
       ],
       "crs": "EPSG:32610",
-      "scene": "../public/map/v5/bay/scene.json"
+      "scene": "../public/map/v8/bay/scene.json"
     }
   ],
-  "publishedTileCount": 4176,
+  "publishedTileCount": 16812,
   "boundaryGeoJSON": null,
-  "cameraManifest": "../public/map/v5/atlas.json",
-  "tileReleaseManifest": "../public/map/v5/atlas.json",
-  "note": "The detailed city and regional context use different scales with one shared origin and camera orientation. Visible image tiles load from regional directories. Scene metadata, masks, depth and simulation stay shared within the detailed view.",
+  "cameraManifest": "../public/map/v8/atlas.json",
+  "tileReleaseManifest": "../public/map/inner-bay/manifest.json",
+  "note": "Each detailed release uses the same fixed camera and native grid. The full regional view uses a different scale with the same orientation and world origin.",
   "appearanceCount": 4
 }

@@ -1,0 +1,32 @@
+# San Francisco and the inner Bay
+
+These cumulative releases share the 39° fixed camera, the EPSG:32610 origin and the 1.854545 pixels-per-metre native grid. The entire mainland city and nearby islands use source-rendered buildings, roads and terrain. The retained v0.5 corridor and eleven new landmark plates add illustrated detail. Jack London Square and Sausalito have paired wet-night plates.
+
+| Release | Detailed area | Location jumps | Native blocks |
+| --- | --- | ---: | ---: |
+| v0.6 | San Francisco mainland and nearby islands, both Bay Bridge spans, Yerba Buena Island and Oakland touchdown | 54 | 58 |
+| v0.7 | Port of Oakland, Jack London Square, Main Street and Seaplane Lagoon | 59 | 73 |
+| v0.8 | Golden Gate north landing, Fort Baker, Bridgeway and Sausalito | 63 | 80 |
+
+## Sources and registration
+
+- The bounded DataSF request returned 176,651 footprint candidates. The city source retained 170,358 footprint records at the mapped height or the documented fallback. The wider source adds 87,435 OSM structures, 91,235 road/path segments, 12,726 mapped trees and 255 DataSF park properties. The 12 m USGS grid supplies terrain. The mainland extent uses the retained coastline and a southern cutoff near the city limit. Lake Merced uses its OSM water multipolygon. See [source provenance](../data/inner-bay/provenance.json).
+- The west and east Bay Bridge carriageways follow directed I-80 source paths. The illustrated elevation profile supplies separate west-span decks, four west towers, a central anchorage, the east suspension tower and the eastern causeway. Vehicles preserve route distance through the hidden Yerba Buena tunnel segments. The configured crossing has 110 car instances across both directions. Heights and lane details are display approximations. [Caltrans crossing reference](https://dot.ca.gov/-/media/dot-media/district-4/documents/d4-transportation-planning-local-assistance/system-regional-planning/tcrs/f0020234_draft-final-i-80-sfobb-tcr-final-091917-a11y.pdf)
+- The four terminal routes have minimum source-land and bridge-support clearance of 18.789–21.597 m. The Oakland cargo passage clears the source obstacles by 36.128 m. Hull radii are approximately 16.14 m and 33.35 m. Terminal coordinates, simulated speeds and dwell periods are part of the illustrative route model.
+- The 55296 × 30720 detailed grid uses a shared 4608 × 2560 packed depth and surface mask. Each release enables a subset of the same native blocks. Offshore views fall back to the continuous lower pyramid. The native asset bundle has 14,400 WebP tiles in four appearances. Each release has 2,260 backdrop tiles and a 152-tile Bay Area overview.
+- An aligned overlap check sampled 104 clear-day open-water joins between native blocks. Mean absolute RGB difference was 0.623 on a 0–255 scale. The largest mean difference at a sampled join was 0.800.
+
+## Verification
+
+The TypeScript/Vite production build, 25 Node tests, 14 Python tests, original asset checks and v0.3 through v0.8 runtime audits passed. The expanded audit checks every declared tile path and checksum, the shared mask dimensions, every location's native coverage, the retained route prefix and the progressive v0.6–v0.8 entrances. See the [regional audit](../tools/audit-inner-bay.mjs).
+
+Chromium exercised the production build at 1440 × 960 and the v0.8 Sausalito view at 390 × 844. Each release requested 20 native tiles at its Ferry Building start. Oakland and Marin native tiles appeared on navigation in their respective releases. The v0.6 city test visited the western and southern neighborhoods, dragged across the bridge, and checked both spans for visible car meshes. The v0.7 and v0.8 tests checked visible ferry meshes at Jack London Square and Sausalito. Cars, ferries, cargo ships and aircraft moved with the simulation clock. Returning from Bay Area restored the City view and retained the paused clock and controls.
+
+The Jack London Square wet-day render differed from the dry render by a mean absolute RGB value of 14.67 on a 0–255 scale across a 780 × 600 map crop, with the precipitation overlay hidden for the comparison. Chromium also exercised rain at night, coastal fog, WebGL2-disabled Canvas transport, and the synthetic Page Visibility fallback. The legacy v0.5 entrance passed its city, transport, weather and mobile regression. The expanded and legacy runs recorded zero browser errors or failed HTTP responses.
+
+- [66-second recording of the running application](Inner-Bay-actual-demo.mp4)
+- [San Francisco citywide view](screenshots/v0.6/san-francisco-wide.jpg) and [Bay Bridge East Span](screenshots/v0.6/bay-bridge-east.jpg)
+- [Port of Oakland](screenshots/v0.7/oakland-port.jpg) and [Jack London Square in night rain](screenshots/v0.7/jack-london-rain-night.jpg)
+- [Fort Baker](screenshots/v0.8/fort-baker.jpg) and [Sausalito in coastal fog](screenshots/v0.8/sausalito-fog.jpg)
+
+The detailed city map ends at its bounded source area. The Bay Area view shows the continuation of the peninsula and the broader coastline.

@@ -1,4 +1,4 @@
-import { sceneRoot } from "./assets.ts";
+import { maskPath } from "./assets.ts";
 import { decodeSourceDepth, legacyDepthEncoding, maskIndex } from "./atlas.ts";
 import { nightAmount, project } from "./model.ts";
 import type { Frame, Point3, SceneData } from "./types.ts";
@@ -33,9 +33,9 @@ export class SpriteRenderer {
     host.append(this.canvas);
     this.ctx = this.canvas.getContext("2d")!;
     this.ready = Promise.all(
-      ["depth", "water"].map(async (name) => {
+      (data.maskBundle ? ["depth"] : ["depth", "water"]).map(async (name) => {
         const image = new Image();
-        image.src = `${sceneRoot(data)}${name}.png`;
+        image.src = maskPath(data, name);
         await image.decode();
         const c = document.createElement("canvas");
         c.width = this.maskWidth;
@@ -44,7 +44,7 @@ export class SpriteRenderer {
         ctx.drawImage(image, 0, 0);
         const pixels = ctx.getImageData(0, 0, c.width, c.height).data;
         if (name === "depth") this.depth = pixels;
-        else this.water = pixels;
+        if (name === "water" || data.maskBundle) this.water = pixels;
       }),
     ).then(() => {});
   }
@@ -70,11 +70,17 @@ export class SpriteRenderer {
     );
     if (i < 0) return false;
     if (plane || !this.depth) return true;
-    const z = decodeSourceDepth(
+    let z = decodeSourceDepth(
       this.depth[i],
       this.depth[i + 1],
       this.data.depthEncoding ?? legacyDepthEncoding,
     );
+    if (this.data.maskBundle) {
+      const p = this.data.projection;
+      const centre = (Math.floor(q.y / this.data.height * this.maskHeight) + .5)
+        * this.data.height / this.maskHeight;
+      z += (q.y - centre) * p.cosElevation / (p.scale * p.sinElevation);
+    }
     return q.depth + 4.5 >= z;
   }
   isWater(p: Point3) {
@@ -88,7 +94,7 @@ export class SpriteRenderer {
       this.maskWidth,
       this.maskHeight,
     );
-    return i >= 0 && this.water[i] > 128;
+    return i >= 0 && (this.data.maskBundle ? (this.water[i + 2] & 2) !== 0 : this.water[i] > 128);
   }
   draw(frame: Frame, v: ViewTransform, labels: boolean) {
     const c = this.canvas,

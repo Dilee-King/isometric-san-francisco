@@ -44,7 +44,9 @@
 - [x] Extend the waterfront through the Marina and Presidio to the Golden Gate Bridge and harmonize offshore water across tile boundaries.
 - [x] Connect Ferry Building, the Financial District, Chinatown, North Beach and Fisherman's Wharf, then extend to Union Square.
 - [x] Load visible imagery through named region packages with a shared low-zoom pyramid and continuous simulation state.
-- [ ] Extend detailed coverage across the Bay Bridge / Oakland-Alameda waterfront.
+- [x] Cover the mainland city and nearby islands, and connect both Bay Bridge spans through Yerba Buena Island.
+- [x] Add the Port of Oakland, Jack London Square, Alameda terminals and source-constrained vessels.
+- [x] Connect the Golden Gate north landing to Fort Baker and Sausalito, with a ferry to San Francisco.
 - [ ] Add meaningful code checks, versioned manifests and a measured performance budget.
 - [x] Publish the verified sample with GitHub Pages and update instructions; large-area asset storage remains future work.
 - [x] Ship an English interface and documentation, without the decorative lower-left caption.

@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { MapView } from "./MapView.ts";
-import { ATLAS_ROOT } from "./assets.ts";
-import type { SceneKey } from "./assets.ts";
+import { ATLAS_ROOT, ATLAS_VERSION, type SceneKey } from "./assets.ts";
 import { defaultControls } from "./model.ts";
 import type { Frame, SceneData, Weather } from "./types.ts";
+
+const coverage = {
+  "0.5.0": { scope: "City core & waterfront", text: "Explore downtown San Francisco and the waterfront from the Golden Gate Bridge to Mission Bay." },
+  "0.6.0": { scope: "Citywide & Bay Bridge", text: "Explore San Francisco from Ocean Beach to Hunters Point, then cross the Bay Bridge through Yerba Buena Island to Oakland." },
+  "0.7.0": { scope: "City & East Bay", text: "Explore San Francisco and the Bay Bridge, then follow the waterfront from the Port of Oakland to Jack London Square and Alameda." },
+  "0.8.0": { scope: "City & Inner Bay", text: "Explore all of San Francisco, the Bay Bridge, the Oakland and Alameda waterfront, and the north shore from Fort Baker to Sausalito." },
+}[ATLAS_VERSION];
 
 function Icon({ name }: { name: string }) {
   const paths: Record<string, React.ReactNode> = {
@@ -194,7 +200,7 @@ export default function App() {
           <p className="scope">
             {scene === "bay"
               ? "Bay Area overview"
-              : "City core & waterfront"}
+              : coverage.scope}
           </p>
         </div>
       </header>
@@ -504,14 +510,12 @@ export default function App() {
             </div>
             <h2 id="about-title">San Francisco, in motion.</h2>
             <p>
-              Explore the Financial District, Chinatown, North Beach and Union
-              Square, connected to the waterfront from the Golden Gate Bridge
-              to Mission Bay. Switch to Bay Area for the regional view.
+              {coverage.text} Switch to Bay Area for the regional view.
             </p>
             <h3>Artwork and data</h3>
             <p>
               DataSF footprints, USGS lidar and elevation, and OpenStreetMap
-              shape the waterfront. The artwork, bridge and traffic share one
+              shape the atlas. The artwork, bridges and traffic share one
               fixed camera.
               The regional view uses Natural Earth geography, with transport
               enlarged for legibility.

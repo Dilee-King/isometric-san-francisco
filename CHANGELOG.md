@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.8.0 — Marin shore and Sausalito
+
+- Connected the Golden Gate Bridge's north landing to Fort Baker, the shore road, Sausalito and its marinas.
+- Added the Ferry Building–Sausalito route, a new illustrated ferry landing and updated Bay Area coverage.
+
+## 0.7.0 — Oakland and Alameda waterfront
+
+- Added the Port of Oakland, Middle Harbor, Jack London Square, Main Street and Seaplane Lagoon.
+- Added gantry cranes, terminal art, moving ferries and a cargo passage with source shoreline and pier clearance.
+
+## 0.6.0 — Citywide San Francisco and the Bay Bridge
+
+- Extended the illustrated city to the Pacific coast and southern districts, with original-scale landmark artwork.
+- Connected both Bay Bridge spans through Yerba Buena Island with registered decks, towers and tunnel-aware traffic.
+- Added sparse regional tiles on one native grid, a packed source mask and cumulative scene entry points. See [verification](docs/VERIFICATION-v0.6-v0.8.md).
+
 ## 0.5.0 — City core and regional tiles
 
 - Connected Ferry Building through the Financial District, Chinatown and North Beach to Fisherman's Wharf, with detailed coverage to Union Square.

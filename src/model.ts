@@ -25,33 +25,46 @@ export function project([x, n, z]: Point3, p: Projection) {
     depth: q * p.cosElevation + z * p.sinElevation,
   };
 }
-export function sampleRoute(points: Point3[], distance: number) {
-  const spans = points
-    .slice(1)
-    .map((p, i) => Math.hypot(...p.map((v, j) => v - points[i][j])));
-  const length = spans.reduce((a, b) => a + b, 0);
+export function measureRoute(points: Point3[]) {
+  const spans: { start: number; end: number; segment: number }[] = [];
+  let length = 0;
+  for (let segment = 0; segment + 1 < points.length; segment++) {
+    const a = points[segment], b = points[segment + 1];
+    const size = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+    if (size > 0) {
+      spans.push({ start: length, end: length + size, segment });
+      length += size;
+    }
+  }
+  return { length, spans };
+}
+type RouteMeasure = ReturnType<typeof measureRoute>;
+
+export function sampleRoute(points: Point3[], distance: number, measure = measureRoute(points)) {
+  const { length, spans } = measure;
   if (!length)
     return {
       point: points[0] ?? ([0, 0, 0] as Point3),
       direction: [1, 0, 0] as Point3,
       length: 0,
+      segment: -1,
     };
-  let at = ((distance % length) + length) % length;
-  for (let i = 0; i < spans.length; i++) {
-    if (!spans[i]) continue;
-    if (at <= spans[i] || i === spans.length - 1) {
-      const a = points[i],
-        b = points[i + 1],
-        t = at / spans[i];
-      return {
-        point: a.map((v, j) => v + (b[j] - v) * t) as Point3,
-        direction: a.map((v, j) => (b[j] - v) / spans[i]) as Point3,
-        length,
-      };
-    }
-    at -= spans[i];
+  const at = ((distance % length) + length) % length;
+  let low = 0, high = spans.length - 1;
+  while (low < high) {
+    const middle = (low + high) >>> 1;
+    if (spans[middle].end >= at) high = middle;
+    else low = middle + 1;
   }
-  return { point: points[0], direction: [1, 0, 0] as Point3, length };
+  const { start, end, segment } = spans[low];
+  const a = points[segment], b = points[segment + 1];
+  const span = end - start, t = (at - start) / span;
+  return {
+    point: a.map((value, axis) => value + (b[axis] - value) * t) as Point3,
+    direction: a.map((value, axis) => (b[axis] - value) / span) as Point3,
+    length,
+    segment,
+  };
 }
 export function advance(
   state: Clock,
@@ -80,6 +93,7 @@ export function transportFrame(
   clock: Clock,
   routes: Route[],
   controls: Controls,
+  measures?: ReadonlyMap<Route, RouteMeasure>,
 ): Pose[] {
   const result: Pose[] = [];
   for (const route of routes) {
@@ -89,7 +103,8 @@ export function transportFrame(
       (["ferry", "cargo"].includes(route.kind) && !controls.boats)
     )
       continue;
-    const length = sampleRoute(route.points, 0).length;
+    const measure = measures?.get(route) ?? measureRoute(route.points);
+    const { length } = measure;
     if (!length) continue;
     let moving = true,
       distance = 0;
@@ -104,7 +119,8 @@ export function transportFrame(
       moving = t >= dwell;
       distance = Math.max(0, t - dwell) * route.speed;
     }
-    const sample = sampleRoute(route.points, distance);
+    const sample = sampleRoute(route.points, distance, measure);
+    if (route.hiddenSegments?.includes(sample.segment)) continue;
     result.push({
       id: route.id,
       kind: route.kind,

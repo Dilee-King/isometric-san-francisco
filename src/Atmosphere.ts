@@ -1,5 +1,5 @@
 import { nightAmount } from "./model.ts";
-import { sceneRoot } from "./assets.ts";
+import { maskPath } from "./assets.ts";
 import { legacyDepthEncoding } from "./atlas.ts";
 import type { Frame, SceneData } from "./types.ts";
 import type { ViewTransform } from "./SpriteRenderer.ts";
@@ -18,6 +18,7 @@ uniform float time;
 uniform float night;
 uniform float intensity;
 uniform int weather;
+uniform int packedSurface;
 uniform sampler2D waterTex;
 uniform sampler2D depthTex;
 uniform sampler2D hardTex;
@@ -27,8 +28,9 @@ void main(){
  vec2 screen=vec2(uv.x,1.-uv.y)*resolution;
  vec2 p=(screen-rect.xy)/rect.zw;
  if(any(lessThan(p,vec2(0.)))||any(greaterThan(p,vec2(1.)))){fragColor=vec4(0.);return;}
- float water=texture(waterTex,p).r;
- vec2 packed=texture(depthTex,p).rg;
+ vec3 packed=texture(depthTex,p).rgb;
+ int surfaceBits=int(round(packed.b*255.));
+ float water=packedSurface==1 ? float((surfaceBits & 2)!=0) : texture(waterTex,p).r;
  float depth=(packed.r*65280.+packed.g*255.)/65535.*depthEncoding.y-depthEncoding.x;
  float y=(p.y*imageSize.y-cameraOrigin.y)/camera.x;
  float height=clamp(depth*camera.y-y*camera.z,0.,250.);
@@ -60,7 +62,7 @@ void main(){
    float seed=hash(impactCell),age=fract(time*(1.2+seed)+seed*9.);
    float radial=length((impact-vec2(.2+seed*.6,.25+hash(impactCell+8.)*.5))*vec2(1.,1.65));
    float ring=(1.-smoothstep(.015,.05,abs(radial-age*.47)))*(1.-age)*step(.35,seed);
-   float hard=texture(hardTex,p).r;
+   float hard=packedSurface==1 ? float((surfaceBits & 1)!=0) : texture(hardTex,p).r;
    float surface=max(water,hard*.55);
    float impactAlpha=ring*surface*intensity*.17;
    float veil=intensity*(.035+.07*noise(p*5.+vec2(time*.01,0.)));
@@ -128,15 +130,17 @@ export class Atmosphere {
       "night",
       "intensity",
       "weather",
+      "packedSurface",
       "waterTex",
       "depthTex",
       "hardTex",
     ])
       this.uniforms[name] = gl.getUniformLocation(p, name);
+    gl.uniform1i(this.uniforms.packedSurface, data.maskBundle ? 1 : 0);
     this.ready = Promise.all(
-      ["water", "depth", "hard"].map(async (name, index) => {
+      (data.maskBundle ? ["depth"] : ["water", "depth", "hard"]).map(async (name, index) => {
         const image = new Image();
-        image.src = `${sceneRoot(data)}${name}.png`;
+        image.src = maskPath(data, name);
         await image.decode();
         if (this.disposed) return;
         const tex = gl.createTexture();

@@ -6,7 +6,17 @@ type RegionalSourceOptions = TileSourceOptions & {
   height: number;
   tileOverlap: number;
   getTileUrl(level: number, column: number, row: number): string;
+  tileExists?(level: number, column: number, row: number): boolean;
 };
+
+function sparseRegion(layout: RegionTileLayout, level: number, column: number, row: number) {
+  const sparse = layout.sparse;
+  if (!sparse) return undefined;
+  const tileWidth = layout.tileSize * 2 ** (layout.maxLevel - level);
+  const blockColumn = Math.floor(column * tileWidth / sparse.blockSize);
+  const blockRow = Math.floor(row * tileWidth / sparse.blockSize);
+  return sparse.blocks[`${blockColumn}_${blockRow}`];
+}
 
 export function regionForTile(
   layout: RegionTileLayout,
@@ -17,6 +27,7 @@ export function regionForTile(
   row: number,
 ): string {
   if (level <= layout.sharedMaxLevel) return "overview";
+  if (layout.sparse) return sparseRegion(layout, level, column, row) ?? layout.fallback;
   const divisor = 2 ** (layout.maxLevel - level);
   const levelWidth = Math.ceil(width / divisor);
   const levelHeight = Math.ceil(height / divisor);
@@ -46,9 +57,18 @@ export function regionTileSource(
     tileOverlap: layout.overlap,
     minLevel: 0,
     maxLevel: layout.maxLevel,
+    ...(layout.sparse ? {
+      tileExists(level: number, column: number, row: number) {
+        const divisor = layout.tileSize * 2 ** (layout.maxLevel - level);
+        return level >= 0 && level <= layout.maxLevel && column >= 0 && row >= 0
+          && column < Math.ceil(data.width / divisor) && row < Math.ceil(data.height / divisor)
+          && (level <= layout.sharedMaxLevel || !!sparseRegion(layout, level, column, row));
+      },
+    } : {}),
     getTileUrl(level, column, row) {
       const region = regionForTile(layout, data.width, data.height, level, column, row);
-      return `${root}regions/${region}/${appearance}_files/${level}/${column}_${row}.webp`;
+      const detail = level > layout.sharedMaxLevel ? layout.sparse?.root ?? "" : "";
+      return `${root}${detail}regions/${region}/${appearance}_files/${level}/${column}_${row}.webp`;
     },
   };
 }

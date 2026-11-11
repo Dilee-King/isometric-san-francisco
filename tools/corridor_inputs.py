@@ -31,7 +31,8 @@ TO_UTM = Transformer.from_crs(4326, 32610, always_xy=True)
 TO_GEO = Transformer.from_crs(32610, 4326, always_xy=True)
 TO_MERC = Transformer.from_crs(32610, 3857, always_xy=True)
 MERC_TO_UTM = Transformer.from_crs(3857, 32610, always_xy=True)
-HEADERS = {'User-Agent': 'IsometricSanFrancisco/0.3 (bounded open-data waterfront atlas; https://github.com/Dilee-King/isometric-san-francisco)'}
+HEADERS = {'User-Agent': 'IsometricSanFrancisco/0.3 (bounded open-data waterfront atlas; https://github.com/Dilee-King/isometric-san-francisco)',
+           'Accept-Encoding': 'gzip, deflate'}
 
 
 def sha(path):

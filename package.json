@@ -1,6 +1,6 @@
 {
   "name": "isometric-san-francisco",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -11,7 +11,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4186",
     "test": "node --experimental-strip-types --test src/model.test.ts src/VehicleGeometry.test.ts src/atlas.test.ts src/regionTiles.test.ts",
-    "tiles": "python tools/render_city_core.py && python tools/package_city_core.py"
+    "tiles": "python tools/expanded_render.py references && python tools/expanded_render.py native && python tools/expanded_render.py context && python tools/expanded_tiles.py native && python tools/expanded_tiles.py context && python tools/expanded_tiles.py backdrops && python tools/package_expanded_atlas.py"
   },
   "dependencies": {
     "openseadragon": "6.1.1",

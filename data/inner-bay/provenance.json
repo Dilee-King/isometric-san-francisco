@@ -1,0 +1,172 @@
+{
+  "inputManifest": {
+    "builtUTC": "2026-11-11T02:49:37.590864+00:00",
+    "crs": "EPSG:32610",
+    "extentLocalMetres": [
+      -14600,
+      -12300,
+      16500,
+      12200
+    ],
+    "bboxLonLat": [
+      -122.56078205057,
+      37.68353453103766,
+      -122.2057231937045,
+      37.90619275445867
+    ],
+    "inputs": {
+      "sf-footprints-00": {
+        "path": "sf-footprints/page-00.geojson",
+        "bytes": 11557808,
+        "sha256": "2dbb5293e4ed48b34e787f2d93dde25ffb5140427ba518624f0c6c9fbeaaa573"
+      },
+      "sf-footprints-01": {
+        "path": "sf-footprints/page-01.geojson",
+        "bytes": 9839519,
+        "sha256": "b258ce3d1cd3462be2808c07ce3e9438a56f2fe51e8dd2e7e498a7a31c4922dd"
+      },
+      "sf-footprints-02": {
+        "path": "sf-footprints/page-02.geojson",
+        "bytes": 9356986,
+        "sha256": "53a692b82d85575a94333499093ac9ebabb69613954637ab3d59c7361e930bac"
+      },
+      "sf-footprints-03": {
+        "path": "sf-footprints/page-03.geojson",
+        "bytes": 9203286,
+        "sha256": "e4b8a2fcce59e30733dfcf148d3a32949408d6efd5fae944f632c3ffc814a667"
+      },
+      "sf-footprints-04": {
+        "path": "sf-footprints/page-04.geojson",
+        "bytes": 8972485,
+        "sha256": "b85139c0bb89296eaf2eaaef947029535f30a6da9538b318b8ce3f0553a665b8"
+      },
+      "sf-footprints-05": {
+        "path": "sf-footprints/page-05.geojson",
+        "bytes": 8659746,
+        "sha256": "82517048189dcea0b6290a544a3fe0fee89aaf97203cbfa46a92a2e23b72875e"
+      },
+      "sf-footprints-06": {
+        "path": "sf-footprints/page-06.geojson",
+        "bytes": 8482885,
+        "sha256": "673c514cf052aefd1b11e62a9a7045dc5a6afe3799b5d0222d5952f231e05cb9"
+      },
+      "sf-footprints-07": {
+        "path": "sf-footprints/page-07.geojson",
+        "bytes": 8237159,
+        "sha256": "d1573af6bbf3c1aeec9f193caa5dab0f09a186980e8ea166689fe5a28d2543da"
+      },
+      "sf-footprints-08": {
+        "path": "sf-footprints/page-08.geojson",
+        "bytes": 8103089,
+        "sha256": "3c085abfedde7f2ef4555eebbe8dfcb6b1edd3030118369c070f9a9270f63d82"
+      },
+      "sf-footprints-09": {
+        "path": "sf-footprints/page-09.geojson",
+        "bytes": 7891118,
+        "sha256": "f7739298e731e5dfe106d47097842aefccdae4399fefa8a79c2439ede2ecf612"
+      },
+      "sf-footprints-10": {
+        "path": "sf-footprints/page-10.geojson",
+        "bytes": 7693761,
+        "sha256": "a79c6b5d5bc6d9af600f6e7bc6eb9f631cfa599d169a19ca0a28dc2b7f4e56e0"
+      },
+      "sf-footprints-11": {
+        "path": "sf-footprints/page-11.geojson",
+        "bytes": 7373499,
+        "sha256": "45ab3f5eac2d32ae881b07d386b7625812f5f154f848a9ed0ed677ff660e37d9"
+      },
+      "sf-footprints-12": {
+        "path": "sf-footprints/page-12.geojson",
+        "bytes": 7175372,
+        "sha256": "3e6e5dda62f1e1bd474e47ec610bb2de095aef4dc259cfbf735b1c59c33888c2"
+      },
+      "sf-footprints-13": {
+        "path": "sf-footprints/page-13.geojson",
+        "bytes": 6851701,
+        "sha256": "77b3bb5ef1226402b92073728e952002b46a86b4979b4ad26b53c0ba5f79a8df"
+      },
+      "sf-footprints-14": {
+        "path": "sf-footprints/page-14.geojson",
+        "bytes": 6486213,
+        "sha256": "80e7895a1ca0f6b2a68ae858b70553e53f1e65b4a4d1bddf38670a629d96f9b8"
+      },
+      "sf-footprints-15": {
+        "path": "sf-footprints/page-15.geojson",
+        "bytes": 5702682,
+        "sha256": "4f6e7c2adc7d095bc4ee428b8e9c9c31d74024ff6bd5d0fd59e6e8a0ec63f88a"
+      },
+      "sf-footprints-16": {
+        "path": "sf-footprints/page-16.geojson",
+        "bytes": 4489759,
+        "sha256": "44e4dc0bebac79c05fb9c866a02ec4eaf7c6d31181b887646eea9c4db91211bd"
+      },
+      "sf-footprints-17": {
+        "path": "sf-footprints/page-17.geojson",
+        "bytes": 2791582,
+        "sha256": "709151845f6ca1821321a1517adfbf09f01c708a47a4f140a17979201effc2fe"
+      },
+      "sf-west": {
+        "path": "sf-west/osm.json",
+        "bytes": 111359795,
+        "sha256": "f93743bb59bda371ac9fd2f5a92c1e5e7062c9903c51c70f6af0f5bf9cef0537"
+      },
+      "sf-east": {
+        "path": "sf-east/osm.json",
+        "bytes": 104151325,
+        "sha256": "d06627f0686d5b18243d5a66d6a093cfbc98a7b62da4faf6b138c672a0c11792"
+      },
+      "islands": {
+        "path": "islands/osm.json",
+        "bytes": 14336084,
+        "sha256": "686fb72efbc5e6ab37ba55560c689384659857e3f6036aa099029abfe365fdd9"
+      },
+      "east-bay": {
+        "path": "east-bay/osm.json",
+        "bytes": 66760314,
+        "sha256": "2cbb84ba7e9bc4ab59bd1d27286b6c15d5703da09a20dff2973f8baa8b441007"
+      },
+      "marin": {
+        "path": "marin/osm.json",
+        "bytes": 5642458,
+        "sha256": "fa02d2b7d80d42cfdebac5d7bad56b19bdec82aab6a21383ff9a00a773fea6ca"
+      },
+      "terrain": {
+        "path": "terrain.tif",
+        "bytes": 18353889,
+        "sha256": "ee958fc8fc701e58a260fd2933d63aff79a114196666c4999a72a31a6ab96010"
+      },
+      "coastline": {
+        "path": "coast-1.json",
+        "bytes": 833390,
+        "sha256": "046e2e72177719681f4c20176ad55ea6afc211a67da7ea2fc960b299347406fc"
+      },
+      "inlandWater": {
+        "path": "lake-merced.json",
+        "bytes": 54536,
+        "sha256": "a44566795cdd11cd46180cae7d47fb13c009437788f9ee1e8fa69c8f3455331d"
+      },
+      "parks": {
+        "path": "sf-parks.geojson",
+        "bytes": 1676854,
+        "sha256": "a8b9c2e1fbed285bb223349ac2c197017d23d243d93115730e01512d1d94c806"
+      }
+    },
+    "sources": {
+      "footprints": "https://data.sfgov.org/resource/ynuv-fyni.geojson",
+      "parks": "https://data.sfgov.org/resource/gtr9-ntp6.geojson",
+      "coastlineAndVectors": "https://www.openstreetmap.org/copyright",
+      "terrain": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage"
+    }
+  },
+  "sourceSHA256": "28bc086d2a3f7079794e0c7a4805f3f5885be99836de8a05ba3e0b1e79836821",
+  "footprintCandidates": 176651,
+  "buildings": {
+    "DataSF footprint height": 170358,
+    "OpenStreetMap height or levels": 87435
+  },
+  "roads": 91235,
+  "trees": 12726,
+  "parks": 255,
+  "areaSFMainlandKm2": 119.486,
+  "terrainSpacingMetres": 12
+}

@@ -30,6 +30,7 @@ export type Route = {
   speed: number;
   phase: number;
   dwell?: number;
+  hiddenSegments?: number[];
   color?: string;
 };
 export type Pose = {
@@ -48,6 +49,11 @@ export type RegionTileLayout = {
   sharedMaxLevel: number;
   fallback: string;
   regions: { id: string; bounds: [number, number, number, number] }[];
+  sparse?: {
+    root: string;
+    blockSize: number;
+    blocks: Record<string, string>;
+  };
 };
 export type SceneData = {
   width: number;
@@ -56,6 +62,7 @@ export type SceneData = {
   assetRoot?: string;
   kind?: "waterfront" | "bay";
   maskSize?: [number, number];
+  maskBundle?: string;
   depthEncoding?: { offset: number; range: number };
   clipDepth?: number;
   transportScale?: number;

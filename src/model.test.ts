@@ -48,6 +48,18 @@ test("pause freezes all clocks including weather and automatic hour", () => {
     s,
   );
 });
+test("a bridge car traverses its hidden tunnel without changing route distance", () => {
+  const route: Route = {
+    id: "crossing", kind: "car", speed: 10, phase: 0, dwell: 0,
+    points: [[0, 0, 0], [20, 0, 0], [40, 0, 0], [60, 0, 0]],
+    hiddenSegments: [1],
+  };
+  const frame = (transportTime: number) =>
+    transportFrame({ transportTime, environmentTime: transportTime, hour: 14 }, [route], defaultControls);
+  assert.deepEqual(frame(1)[0]?.point, [10, 0, 0]);
+  assert.deepEqual(frame(3), []);
+  assert.deepEqual(frame(5)[0]?.point, [50, 0, 0]);
+});
 test("background delay is bounded and negative/nonfinite deltas do not advance", () => {
   const s = { transportTime: 0, environmentTime: 0, hour: 12 };
   assert.equal(advance(s, 500, defaultControls).transportTime, 0.1);
