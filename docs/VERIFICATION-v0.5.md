@@ -31,3 +31,9 @@ The [45-second actual recording](City-core-actual-demo-v0.5.mp4) shows Ferry Bui
 The review rebuilt all four appearances and the Bay overview in an isolated checkout, decoded all 4,176 tiles at their expected dimensions, and repeated the city and Bay navigation in Chromium. Prepublication checks identified a staged scene that omitted the city overflight and a source refresh that could reach derivation before creating its input manifest. The updated audit checks for the city aircraft, and a browser draw confirms it is visible. The source refresh creates the input manifest before deriving geometry. A separate cache with the retained raw inputs and no manifest reproduced the same inland source SHA-256.
 
 The isolated rebuild produced 49 small wet-day encoding differences. The release uses the freshly rebuilt tiles and matches all 4,024 detailed image tile hashes from that rebuild. The regional audit, production build and browser checks passed on the updated package.
+
+## Publication
+
+GitHub Actions [42942714875](https://github.com/Dilee-King/isometric-san-francisco/actions/runs/42942714875) built and deployed `430c162`. The [public HTTPS atlas](https://dilee-king.github.io/isometric-san-francisco/?v=0.5.0) passed a fresh Chromium check with 30 city jumps and the WebGL vehicle renderer. The opening Ferry Building view requested 36 tiles from the shared overview, Embarcadero and city-core packages. Chinatown, North Beach, Union Square wet day and wet night, and the Bay Area return passed with the paused clock and controls preserved. The run observed zero page or console errors and zero failing resource responses.
+
+Public captures show [Chinatown in daylight](screenshots/v0.5/online-chinatown-clear.jpg), [Union Square in rain at night](screenshots/v0.5/online-union-square-rain-night.jpg) and the [Bay Area overview](screenshots/v0.5/online-bay-overview.jpg).
