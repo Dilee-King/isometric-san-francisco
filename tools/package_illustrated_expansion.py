@@ -8,7 +8,7 @@ from pathlib import Path
 import shutil
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 from scipy.ndimage import distance_transform_edt
 from shapely.geometry import box
 from shapely.ops import unary_union
@@ -146,16 +146,17 @@ def initialize(rows, output, lamps, offshore_bridge, signature):
     PACK_SIGNATURE = signature
 
 
-def legacy_mask(frame, fresh):
+def legacy_mask(frame, fresh, version):
     overlap = deep_zoom.intersection(frame, LEGACY.frame)
     if overlap is None:
         return None, None
     alpha = Image.new("L", (overlap[2] - overlap[0], overlap[3] - overlap[1]))
+    legacy_frame = PixelFrame("overlap", *overlap[:2], alpha.width, alpha.height)
     draw = ImageDraw.Draw(alpha)
     for old in APPROVED:
         area = deep_zoom.intersection(frame, old)
         if area is not None:
-            x0, y0, x1, y1 = deep_zoom.local_box(PixelFrame("overlap", *overlap[:2], alpha.width, alpha.height), area)
+            x0, y0, x1, y1 = deep_zoom.local_box(legacy_frame, area)
             draw.rectangle((x0, y0, x1 - 1, y1 - 1), fill=255)
     mask_box = deep_zoom.local_box(LEGACY.frame, overlap)
     sx, sy = LEGACY.water.width / LEGACY.frame.width, LEGACY.water.height / LEGACY.frame.height
@@ -167,6 +168,11 @@ def legacy_mask(frame, fresh):
     replacement = fresh[top:bottom, left:right] > .8
     weight = np.where(replacement, np.clip((distance - 110) / 30, 0, 1),
                       np.clip(distance / 44, 0, 1))
+    for row, target, area in rows_in(legacy_frame, version, "detail"):
+        if row.get("replaceLegacy"):
+            x0, y0, x1, y1 = deep_zoom.local_box(legacy_frame, area)
+            fade = np.clip((distance_to_edge(target, area) - 40) / 144, 0, 1)
+            weight[y0:y1, x0:x1] *= 1 - fade
     shore = np.clip((180 - distance_transform_edt(np.asarray(water) > 128)) / 144, 0, 1)
     return overlap, Image.fromarray(np.rint(255 * weight * shore).astype("uint8"))
 
@@ -220,7 +226,8 @@ def land_art(frame, version):
     mix = np.divide(colors, weights[..., None], out=colors, where=weights[..., None] > 0)
     alpha = coverage * 255
     artwork.paste(Image.fromarray(mix.clip(0, 255).astype("uint8")), mask=Image.fromarray(alpha.astype("uint8")))
-    for row, target, area in rows_in(frame, version, "detail"):
+    details = list(rows_in(frame, version, "detail"))
+    for row, target, area in details:
         path = plate(row)
         if path is not None:
             place_plate(artwork, frame, target, area, path)
@@ -228,6 +235,17 @@ def land_art(frame, version):
     offshore = bridge_keep(frame) > 0
     if np.any(offshore):
         shore[offshore] = land_alpha(artwork)[offshore]
+    # Keep the painted crane booms and boarding float above the offshore water field.
+    for row, target, _ in details:
+        for left, top, right, bottom in row.get("overwater", ()):
+            feature = PixelFrame(row["id"], target.x + left, target.y + top, right - left, bottom - top)
+            overlap = deep_zoom.intersection(frame, feature)
+            if overlap is None:
+                continue
+            bounds = deep_zoom.local_box(frame, overlap)
+            alpha = Image.fromarray(land_alpha(artwork.crop(bounds))).filter(ImageFilter.MaxFilter(3))
+            x0, y0, x1, y1 = bounds
+            shore[y0:y1, x0:x1] = np.maximum(shore[y0:y1, x0:x1], np.asarray(alpha))
     keep = (shore * coverage).astype("uint8")
     return artwork, keep, coverage
 
@@ -243,7 +261,7 @@ def place_plate(image, frame, target, area, path, keep=None, transition=48):
 def compose(frame, version, folder):
     extended = padded(frame)
     day, keep, coverage = land_art(extended, version)
-    old, old_alpha = legacy_mask(extended, coverage)
+    old, old_alpha = legacy_mask(extended, coverage, version)
     water = crop_water(WATER, extended)
     hard = source_mask(1, extended)
     buildings = np.asarray(source_mask(128, extended)) > 0

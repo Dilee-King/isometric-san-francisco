@@ -1,5 +1,11 @@
 # Changelog
 
+## Landmark detail repairs for v0.6.1–v0.8.1
+
+- Refined the Steiner Street Painted Ladies and the Twin Peaks summit roads and reservoir.
+- Clarified the Oakland container wharf and the Seaplane Lagoon canopy, gangway and boarding float.
+- Refined the Fort Baker fishing pier and boat ramp, and the Sausalito marina dock connections. [Browser comparison](docs/screenshots/detail-repairs.jpg)
+
 ## Night and rain alignment for v0.6.1–v0.8.1
 
 - Restored v0.5 window and streetlight visibility using the original depth mask at build time.

@@ -50,7 +50,7 @@ export function regionTileSource(
 ): string | RegionalSourceOptions {
   const layout = data.tileLayout;
   if (!layout) return `${root}${appearance}.dzi`;
-  const revision = appearance !== "scene" && data.appearanceRevision ? `?rev=${data.appearanceRevision}` : "";
+  const revision = data.appearanceRevision ? `?rev=${data.appearanceRevision}` : "";
   const backdropOverrides = new Set(layout.sparse?.backdropOverrides);
   return {
     width: data.width,

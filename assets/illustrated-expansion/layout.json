@@ -1958,6 +1958,14 @@
       ],
       "label": "Alameda Seaplane Lagoon",
       "kind": "detail",
+      "overwater": [
+        [
+          618,
+          451,
+          893,
+          586
+        ]
+      ],
       "wave": 8
     },
     {
@@ -1997,6 +2005,20 @@
       ],
       "label": "Port of Oakland",
       "kind": "detail",
+      "overwater": [
+        [
+          740,
+          144,
+          969,
+          342
+        ],
+        [
+          1105,
+          325,
+          1343,
+          551
+        ]
+      ],
       "wave": 8
     },
     {
@@ -2010,6 +2032,7 @@
       ],
       "label": "Fort Baker / Horseshoe Cove",
       "kind": "detail",
+      "replaceLegacy": true,
       "wave": 8
     },
     {

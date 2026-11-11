@@ -127,7 +127,7 @@ for (const stage of [6, 7, 8]) {
         for (let col = 0; col < Math.ceil(scene.width / divisor); col++) {
           if (!source.tileExists(level, col, row)) continue;
           const [path, query] = source.getTileUrl(level, col, row).split("?");
-          assert.equal(query, appearance === "scene" ? undefined : `rev=${scene.appearanceRevision}`);
+          assert.equal(query, `rev=${scene.appearanceRevision}`);
           if (level <= layoutForStage.sharedMaxLevel) {
             if (sharedBackdropRoot && path.startsWith(sharedBackdropRoot)) {
               assert.ok(latestBackdrop.has(path.slice(sharedBackdropRoot.length)), path);

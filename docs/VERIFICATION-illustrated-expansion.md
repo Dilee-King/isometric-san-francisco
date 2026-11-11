@@ -37,3 +37,19 @@ Six ImageGen variants match the v0.5 Wharf clear-night and rainy-day plates at C
 At distant zoom, the atlas equalizes rainy-day exposure and tapers amber light where the original and expanded artwork meet. The opacity of the retained lamp sprites follows zoom to keep closely spaced lights legible.
 
 Chromium compared the Union Square lighting overlay at the same camera and time in all four versions. Each produced 8,293 lit pixels and the same summed alpha in the measured crop. The comparison also includes the three weather states at the Wharf and the three new locations. The daytime material changed in each location with the rain animation hidden. [Browser comparison](screenshots/weather-alignment.jpg) · [Browser verification script](../tools/qa-weather-alignment.js)
+
+## Landmark detail repairs
+
+The visual review covered 35 browser views across the three cumulative releases. The independent Illustrated map was used to compare landmark scale, road hierarchy and streetscape detail. [Union Square reference](https://isometricsanfrancisco.com/#m=illustration&x=67292&y=26745&s=0.908&p=union_square)
+
+| Release | Selected edits | Location references |
+| --- | --- | --- |
+| v0.6.1 | Distinct Queen Anne rooflines along Steiner Street, and a more legible Twin Peaks access road, lookout and firefighting reservoir | [San Francisco Planning](https://default.sfplanning.org/Preservation/walking_tours/Walking_Tour_ALAMO_SQUARE.pdf) · [Twin Peaks topographic plan](https://sfrecpark.org/DocumentCenter/View/19817/2022-Twin-Peaks-Map) |
+| v0.7.1 | Ship-to-shore gantries and container handling lanes in Oakland, and the covered passenger pier, gangway and floating berth at Seaplane Lagoon | [Port of Oakland](https://www.portofoakland.com/port-oakland-begins-project-raise-height-four-cranes) · [Alameda terminal plan](https://alameda.legistar.com/View.ashx?GUID=D6328AA8-B0ED-48BA-A04F-4F9B0FBFD692&ID=6199148&M=F) |
+| v0.8.1 | Clearer separation of the Fort Baker launch ramp, fishing pier and marina, and more legible shore connections and working sheds in Sausalito | [National Park Service](https://www.nps.gov/goga/planyourvisit/fort-baker.htm) · [City of Sausalito](https://www.sausalito.gov/community/transportation/harbors_and_marinas.php) |
+
+The six registered ImageGen edits use the original 1536 × 1024 frame. The full-frame edge-correlation peak was within one pixel for each edit. Small offshore paint masks keep the Oakland crane arms and the Seaplane boarding platform visible above the shared water texture. [Before-and-after browser captures](screenshots/detail-repairs.jpg)
+
+The Fort Baker detail takes precedence inside a feathered part of the v0.8.1 plate. This exposes the cove repair while joining the retained bridge artwork at the perimeter. A tonal transition is still visible on the eastern bluff.
+
+Chromium visited all six views and used pointer drags to cross their surrounding tile edges. It loaded the daytime rain, dry night and rainy night layers in each release with no page or HTTP errors. A separate regional regression checked the startup requests, bridge cars and ferry rendering. Tile manifests and scene data were checked against the previous releases for coverage, route coordinates, surface masks and the earlier paired weather illustrations.

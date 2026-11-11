@@ -22,6 +22,10 @@ PILOTS = {
 DETAIL_FOCUS = {"bay-bridge-east": (7228, 212), "middle-harbor": (10147, 3478),
                 "sausalito-marinas": (-4412, -13018)}
 TERMINAL_PLATES = {"alameda-main": (12570, 6540), "alameda-seaplane": (10242, 7705)}
+OVERWATER_DETAILS = {
+    "oakland-port": [[740, 144, 969, 342], [1105, 325, 1343, 551]],
+    "alameda-seaplane": [[618, 451, 893, 586]],
+}
 
 
 def map_geometry(rings):
@@ -100,6 +104,10 @@ def make_layout():
         y = min(max(WORLD.y, round(y) - 512), WORLD.bottom - 1024)
         frames.append({"id": point["id"], "stage": stage, "frame": [x, y, 1536, 1024],
                        "label": point["name"], "kind": "detail"})
+        if point["id"] in OVERWATER_DETAILS:
+            frames[-1]["overwater"] = OVERWATER_DETAILS[point["id"]]
+        if point["id"] == "fort-baker":
+            frames[-1]["replaceLegacy"] = True
     pending = [row for row in frames if "wave" not in row and row["kind"] == "area"]
     painted = [(0, original)] + [(row["stage"], rectangle(row["frame"])) for row in frames if "wave" in row]
     wave = 1
