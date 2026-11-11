@@ -24,4 +24,4 @@
 
 - [x] Exercise desktop/mobile, pan/zoom, projected vehicles, fog/rain/night, reduced motion, scene switch and the existing east. Inspect matched wide-water before/after captures.
 - [x] Review, verify and show a real browser recording and captures before synchronizing.
-- [ ] Publish the tested commit to GitHub, confirm Pages and smoke-test the public HTTPS map.
+- [x] Publish the tested commit to GitHub, confirm Pages and smoke-test the public HTTPS map.

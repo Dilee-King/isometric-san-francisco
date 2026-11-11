@@ -25,3 +25,9 @@ Browser flows: [waterfront](../tools/qa-golden-gate.js), [water comparison](../t
 The reviewer independently repeated the runtime audits, tests, production build and a Chromium route through Fort Point, wet night and the Bay Area view. The review found a south approach that missed the painted highway, and a clean-checkout failure when Natural Earth files were absent. The shared south connector now follows the painted lane center and tangent. Its endpoint test failed by 194 native pixels before the correction and passed afterward. The rebuilt [Fort Point browser view](screenshots/v0.4/fort-point-clear.jpg) shows the corrected join. Both Natural Earth layers were fetched and opened from an empty cache. The active `npm run tiles` command now packages v0.4.
 
 The smaller arc at Aquatic Park is the separately mapped [Hyde Street Breakwater](https://parkplanning.nps.gov/projectHome.cfm?ProjectID=42980), and is retained alongside Municipal Pier. Survey-grade alignment and performance on physical mobile devices were outside the review scope.
+
+## Publication
+
+GitHub Actions [42934464036](https://github.com/Dilee-King/isometric-san-francisco/actions/runs/42934464036) built and deployed `ceaab30`. The [public HTTPS app](https://dilee-king.github.io/isometric-san-francisco/?v=0.4.0) passed a Chromium check of both v0.4 views, 22 jumps, the WebGL vehicle renderer, wet night and the unchanged paused clock across views. The run observed no page or console errors and no failing resource responses.
+
+Public-site captures: [Golden Gate Bridge](screenshots/v0.4/online-bridge-clear.jpg), [coastal fog](screenshots/v0.4/online-bridge-coastal-fog.jpg), [Marina rain at night](screenshots/v0.4/online-marina-rain-night.jpg), and [Bay Area overview](screenshots/v0.4/online-bay-overview.jpg).
