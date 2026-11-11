@@ -84,19 +84,26 @@ def mask(geom):
     return np.asarray(im)>0
 
 
-def build(out):
-    out.mkdir(parents=True,exist_ok=True)
+def regional_dem():
     corners=[ground_point(x,y,0,SCALE) for x in (BAY.x,BAY.right) for y in (BAY.y,BAY.bottom)]
     e,n=zip(*corners)
+    bbox=[min(e)+ORIGIN_UTM[0]-900,min(n)+ORIGIN_UTM[1]-900,max(e)+ORIGIN_UTM[0]+900,max(n)+ORIGIN_UTM[1]+900]
+    path=fetch(DEM_URL,'bay-dem.tif',{'bbox':','.join(map(str,bbox)),'bboxSR':'32610','imageSR':'32610',
+               'size':'1600,1600','format':'tiff','pixelType':'F32','interpolation':'RSP_BilinearInterpolation','f':'image'},retries=1)
+    return path,bbox
+
+
+def build(out, *, detail_frames=ART_FRAMES, extra_coverage=None,
+          release='bay-overview-v3', asset_root='map/v3/bay/'):
+    out.mkdir(parents=True,exist_ok=True)
+    corners=[ground_point(x,y,0,SCALE) for x in (BAY.x,BAY.right) for y in (BAY.y,BAY.bottom)]
     geo=[TO_GEO.transform(x+ORIGIN_UTM[0],y+ORIGIN_UTM[1]) for x,y in corners]
     lons,lats=zip(*geo);bounds=(min(lons)-.025,min(lats)-.025,max(lons)+.025,max(lats)+.025)
     land_geo=earth_geometry('land',bounds);urban_geo=earth_geometry('urban',bounds)
     land=mask(land_geo);urban=mask(urban_geo)&land
     if land.mean()<.25 or land.mean()>.95 or land_geo.covers(Point(*point(-122.32,37.84)[:2])):
         raise ValueError('Regional land/water geometry failed a Bay control point')
-    bbox=[min(e)+ORIGIN_UTM[0]-900,min(n)+ORIGIN_UTM[1]-900,max(e)+ORIGIN_UTM[0]+900,max(n)+ORIGIN_UTM[1]+900]
-    dem_path=fetch(DEM_URL,'bay-dem.tif',{'bbox':','.join(map(str,bbox)),'bboxSR':'32610','imageSR':'32610',
-                    'size':'1600,1600','format':'tiff','pixelType':'F32','interpolation':'RSP_BilinearInterpolation','f':'image'},retries=1)
+    dem_path,bbox=regional_dem()
     x=(np.arange(BAY.width,dtype='float32')+BAY.x)[None,:]
     y=(np.arange(BAY.height,dtype='float32')+BAY.y)[:,None]
     u,q=x/SCALE,y/(SCALE*SE)
@@ -123,7 +130,9 @@ def build(out):
     day_land=np.where(urban[...,None],city,terrain)
     labels=[{'id':name.lower().replace(' ','-'),'name':name,'p':point(lon,lat,0)} for name,lon,lat in CITIES]
     bridge_names={name:[pixel(point(lon,lat,0)) for lon,lat in coords] for name,coords in BRIDGES}
-    footprint=unary_union([box(f.x,f.y,f.right,f.bottom) for f in ART_FRAMES])
+    footprint=unary_union([box(f.x,f.y,f.right,f.bottom) for f in detail_frames])
+    if extra_coverage is not None:
+        footprint=footprint.union(extra_coverage)
     factor=SCALE/(2.55*1536/2112)
     coverage=[[(x*factor-BAY.x,y*factor-BAY.y) for x,y in p.exterior.coords] for p in polygons(footprint)]
     routes=[]
@@ -194,7 +203,7 @@ def build(out):
     Image.fromarray(pack_depth(d,np.zeros_like(h,dtype='uint8'),DEPTH)).resize((1280,896),Image.Resampling.NEAREST).save(out/'depth.png')
     Image.fromarray((~land).astype('uint8')*255).resize((1280,896),Image.Resampling.NEAREST).save(out/'water.png')
     Image.fromarray(urban.astype('uint8')*255).resize((1280,896),Image.Resampling.NEAREST).save(out/'hard.png')
-    scene={'release':'bay-overview-v3','kind':'bay','assetRoot':'map/v3/bay/','width':BAY.width,'height':BAY.height,
+    scene={'release':release,'kind':'bay','assetRoot':asset_root,'width':BAY.width,'height':BAY.height,
            'projection':BAY.projection(SCALE),'maskSize':[1280,896],'depthEncoding':DEPTH,
            'clipDepth':262144,'transportScale':38,'extent':bbox,'sourceBuildings':0,'routes':routes,'landmarks':labels,
            'lamps':[],'windows':[],'overviewCoverage':coverage,'originUTM':list(ORIGIN_UTM),'crs':'EPSG:32610',

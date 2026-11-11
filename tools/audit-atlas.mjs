@@ -3,7 +3,10 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const root = "public/map/v3";
+const revision = process.argv[2] ?? "v4";
+assert.ok(["v3", "v4"].includes(revision), "unsupported atlas revision");
+const latest = revision === "v4";
+const root = `public/map/${revision}`;
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const pngSize = (bytes) => {
@@ -11,7 +14,7 @@ const pngSize = (bytes) => {
   return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)];
 };
 const atlas = json(join(root, "atlas.json"));
-assert.equal(atlas.version, json("package.json").version);
+assert.equal(atlas.version, latest ? json("package.json").version : "0.3.0");
 assert.equal(atlas.defaultScene, "waterfront");
 assert.deepEqual(
   atlas.scenes.map((s) => s.id),
@@ -30,7 +33,7 @@ for (const entry of atlas.scenes) {
   assert.deepEqual(scene.projection.north, [0.6, -0.8]);
   assert.deepEqual([scene.width, scene.height], entry.size);
   assert.deepEqual(scene.maskSize, manifest.maskSize);
-  assert.ok(scene.maskSize.every((x) => x <= 2048));
+  assert.ok(scene.maskSize.every((x) => x <= (latest ? 4096 : 2048)));
   const actual = new Set();
   for (const file of manifest.files) {
     assert.ok(!actual.has(file.path), "duplicate manifest entry");
@@ -73,14 +76,26 @@ for (const entry of atlas.scenes) {
   if (entry.id === "waterfront") {
     assert.equal(manifest.artwork.length, 40);
     assert.equal(manifest.contextArtwork.length, 16);
-    for (const art of [...manifest.artwork, ...manifest.contextArtwork]) {
+    for (const art of [...manifest.artwork, ...manifest.contextArtwork,
+      ...(manifest.westernArtwork ?? []), ...(manifest.westernContextArtwork ?? [])]) {
       const original = readFileSync(art.path);
       assert.equal(hash(original), art.sha256);
       assert.deepEqual(pngSize(original), [1536, 1024], art.path);
     }
     for (const row of manifest.shipClearance)
       assert.ok(row.minSourceLandMetres > row.hullRadiusMetres);
-    assert.equal(scene.detailFrames.length, 10);
+    assert.equal(scene.detailFrames.length, latest ? 21 : 10);
+    if (latest) {
+      assert.equal(manifest.westernArtwork.filter((a) => a.appearance === "day").length, 10);
+      assert.equal(manifest.westernContextArtwork.length, 4);
+      assert.equal(scene.landmarks.length, 22);
+      assert.equal(scene.routes.filter((r) => r.id.startsWith("golden-gate-car-")).length, 48);
+      assert.equal(manifest.shipClearance.length, 9);
+      assert.equal(manifest.bridgeProfile.end - manifest.bridgeProfile.start, 2737);
+      assert.ok(manifest.waterBlend.nearPx < manifest.waterBlend.farPx);
+      const source = json("data/golden-gate/provenance.json");
+      assert.equal(hash(readFileSync("data/golden-gate/source.json.gz")), source.sourceSHA256);
+    }
     for (const landmark of scene.landmarks) {
       const [e, n, z] = landmark.p,
         p = scene.projection;
@@ -102,5 +117,5 @@ for (const entry of atlas.scenes) {
   );
 }
 console.log(
-  `Atlas audit passed: ${totalTiles} DZI tiles; 40 native-detail and 16 contextual waterfront appearances.`,
+  `Atlas ${revision} audit passed: ${totalTiles} DZI tiles, registered artwork, masks, routes and landmarks.`,
 );

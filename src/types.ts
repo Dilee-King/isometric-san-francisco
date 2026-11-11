@@ -58,7 +58,13 @@ export type SceneData = {
   routes: Route[];
   lamps: Point3[];
   windows: { p: Point3; seed: number; angle: number }[];
-  landmarks: { id?: string; name: string; p: Point3 }[];
+  landmarks: {
+    id?: string;
+    name: string;
+    p: Point3;
+    viewHeight?: number;
+    viewWidth?: number;
+  }[];
 };
 export type Frame = {
   clock: Clock;

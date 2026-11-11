@@ -1,0 +1,65 @@
+{
+  "crs": "EPSG:32610",
+  "originUTM": [
+    553326.4257226175,
+    4183298.4609667137
+  ],
+  "extentLocalMetres": [
+    -9800.0,
+    -4300.0,
+    2150.0,
+    5550.0
+  ],
+  "inputManifest": {
+    "retrievedUTC": "2026-11-10T23:59:55.730408+00:00",
+    "bboxLonLat": [
+      -122.50575463412181,
+      37.773538935931256,
+      -122.4177585658852,
+      37.84604092403981
+    ],
+    "extentLocalMetres": [
+      -9800.0,
+      -2450.0,
+      -2100.0,
+      5550.0
+    ],
+    "inputs": {
+      "footprints": {
+        "name": "western-footprints.geojson",
+        "bytes": 61387007,
+        "sha256": "47035535f06a29a69b73a0b86cc6ee8525a145a8f4dc77e08b2467a1bf3f651a"
+      },
+      "osm": {
+        "name": "osm.json",
+        "bytes": 40325130,
+        "sha256": "369ab6faae4791b75f710a1f82f9b82394fc7cc2a65b97805581664f26514f60"
+      },
+      "terrain": {
+        "name": "terrain.tif",
+        "bytes": 3212777,
+        "sha256": "925bc46afdd7fab4b7ddf2413b9d574b0bf24e868c903ca162521b6e5d20b6f6"
+      }
+    },
+    "sources": {
+      "footprints": "https://data.sfgov.org/resource/ynuv-fyni.geojson",
+      "terrain": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage"
+    }
+  },
+  "osmAcquisition": {
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "query": "[out:json][timeout:55];(way[\"natural\"~\"^(coastline|water|wood|scrub)$\"](37.773538935931256,-122.50575463412181,37.84604092403981,-122.4177585658852);way[\"man_made\"~\"^(pier|breakwater|groyne)$\"](37.773538935931256,-122.50575463412181,37.84604092403981,-122.4177585658852);way[\"highway\"](37.773538935931256,-122.50575463412181,37.84604092403981,-122.4177585658852);way[\"railway\"~\"^(rail|tram|light_rail)$\"](37.773538935931256,-122.50575463412181,37.84604092403981,-122.4177585658852);way[\"leisure\"~\"^(park|pitch|stadium|marina|garden)$\"](37.773538935931256,-122.50575463412181,37.84604092403981,-122.4177585658852);way[\"landuse\"~\"^(grass|forest|meadow|recreation_ground|village_green|brownfield)$\"](37.773538935931256,-122.50575463412181,37.84604092403981,-122.4177585658852);way[\"building\"](37.773538935931256,-122.50575463412181,37.84604092403981,-122.4177585658852);node[\"natural\"=\"tree\"](37.773538935931256,-122.50575463412181,37.84604092403981,-122.4177585658852););out geom;"
+  },
+  "osmBase": "2026-11-10T23:56:57Z",
+  "easternSourceSHA256": "0f64f40c76e4ebca5a1fe8c933bb436d0e6cf52e5d4dee4d0842dd91ec4d1434",
+  "sourceSHA256": "94c62cb21da852774759353721a014c7d655ccb989211ce2888dd115b591c6aa",
+  "counts": {
+    "repairedDataSF": 3,
+    "westFootprintCandidates": 31416,
+    "newBuildings": 2021,
+    "newRoads": 2520,
+    "newTrees": 1756,
+    "landmarks": 22
+  },
+  "notes": "3DEP interpolated onto 15 m grid; v3 eastern structures retained. Natural Earth fills unillustrated margins."
+}

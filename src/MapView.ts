@@ -193,8 +193,9 @@ export class MapView {
     if (!id || !landmark || !this.viewer.viewport) return false;
     const p = project(landmark.p, this.data.projection),
       w = this.data.width,
-      h = 1080 / w,
-      span = (h * this.host.clientWidth) / Math.max(1, this.host.clientHeight);
+      aspect = Math.max(1, this.host.clientWidth) / Math.max(1, this.host.clientHeight),
+      h = Math.max(landmark.viewHeight ?? 1080, (landmark.viewWidth ?? 0) / aspect) / w,
+      span = h * aspect;
     this.viewer.viewport.fitBoundsWithConstraints(
       new OpenSeadragon.Rect(p.x / w - span / 2, p.y / w - h / 2, span, h),
       immediate,

@@ -1,20 +1,20 @@
 # Isometric San Francisco
 
-A living illustrated map from Fisherman's Wharf to Mission Bay, with a regional Bay Area atlas. Inspired by [Isometric NYC](https://cannoneyed.com/projects/isometric-nyc) and [Isometric Vancouver](https://vancouver.isoworld.xyz/).
+A living illustrated map from the Golden Gate Bridge to Mission Bay, with a regional Bay Area atlas. Inspired by [Isometric NYC](https://cannoneyed.com/projects/isometric-nyc) and [Isometric Vancouver](https://vancouver.isoworld.xyz/).
 
-**[Explore the live atlas](https://dilee-king.github.io/isometric-san-francisco/?v=0.3.0)** · [Actual demo video](docs/Waterfront-actual-demo-v0.3.mp4) · [Verification](docs/VERIFICATION-v0.3.md) · [Roadmap](ROADMAP.md)
+**[Explore the live atlas](https://dilee-king.github.io/isometric-san-francisco/?v=0.4.0)** · [Actual demo video](docs/Waterfront-actual-demo-v0.4.mp4) · [Verification](docs/VERIFICATION-v0.4.md) · [Roadmap](ROADMAP.md)
 
-![Fisherman's Wharf in the running application](docs/screenshots/v0.3/wharf-clear.jpg)
+![The Golden Gate Bridge in the running application](docs/screenshots/v0.4/bridge-clear.jpg)
 
 ## Explore
 
-- **Waterfront:** pan continuously from Fisherman's Wharf and Pier 39 through the Embarcadero, Ferry Building, Bay Bridge approach, South Beach, Oracle Park and Mission Bay. The location selector has 12 jumps; the whole corridor is one navigable surface.
+- **Waterfront:** pan continuously from the Golden Gate Bridge through Fort Point, Crissy Field, the Presidio, Marina Green, Fort Mason and Fisherman's Wharf, then along the Embarcadero to Mission Bay. The location selector has 22 jumps. The bridge jump frames both towers.
 - **Bay Area:** switch to a regional terrain atlas with coastline, 26 towns/cities, major crossings and SFO, OAK and SJC. The amber outline marks the detailed waterfront. This view is regional context; detailed city coverage remains the published waterfront.
 - **Time and weather:** Morning, Day, Dusk and Night; manual time or a five-minute cycle; Clear, Coastal Fog and Rain. Rain changes wet surfaces and reflections in addition to moving drops and impacts.
 - **Traffic:** independently show cars, vessels and aircraft. The original world-space projection remains; the regional view enlarges transport for legibility. Pausing freezes all clocks, including across map-view switches.
 - **Navigation:** drag and scroll, or use the map tools. Home returns to the default view; +/− zoom; Space plays or pauses when the map has focus. On mobile, use **Environment** to show the time/weather panel. Reduced motion starts paused. Without WebGL2, projected Canvas transport and dry lighting remain available; the unavailable effects are explained.
 
-Actual captures: [Pier 39](docs/screenshots/v0.3/pier-39-clear.jpg) · [Oracle Park in rain](docs/screenshots/v0.3/oracle-rain-night.jpg) · [Mission Bay](docs/screenshots/v0.3/mission-bay-clear.jpg) · [Bay Area](docs/screenshots/v0.3/bay-overview.jpg).
+Actual captures: [Fort Mason](docs/screenshots/v0.4/fort-mason-clear.jpg) · [Crissy Field](docs/screenshots/v0.4/crissy-field-clear.jpg) · [Bridge in coastal fog](docs/screenshots/v0.4/bridge-coastal-fog.jpg) · [Marina in rain](docs/screenshots/v0.4/marina-rain-night.jpg) · [Offshore comparison](docs/screenshots/v0.4/offshore-comparison.jpg) · [Bay Area](docs/screenshots/v0.4/bay-overview.jpg).
 
 ## Run locally
 
@@ -38,27 +38,26 @@ The production preview runs at `http://127.0.0.1:4186/`. GitHub Actions verifies
 
 ## How it is made
 
-The waterfront is a 5372 × 7398 pixel registered atlas. Ten overlapping detailed patches share the original 39° orthographic camera and 1.854545 pixels per metre. The Ferry Building is the retained v0.2 anchor; nine new patches use original built-in imagegen artwork at 1536 × 1024 per appearance. Sixteen lower-density contextual appearances fill their margins. The dry day, dry night, wet day and wet night mosaics are packaged as WebP/DZI pyramids. No detailed patch is enlarged from a smaller generation.
+The waterfront is a 12722 × 14408 pixel registered atlas. Twenty overlapping detail patches share the original 39° orthographic camera and 1.854545 pixels per metre. The ten new western plates use native 1536 × 1024 imagegen artwork, with four new plates for lower-density context. The bridge is drawn continuously with its towers, cables, deck and approach lanes in the same camera. Four western wet-night plates are authored edits; the remaining western variants use registered lights and wet materials. A continuous offshore water field replaces tile-specific tones away from the shore. The four appearances are packaged as WebP/DZI pyramids.
 
-Source structures use [DataSF footprints](https://data.sf.gov/Geographic-Locations-and-Boundaries/Building-Footprints/ynuv-fyni), [USGS 2023 lidar](https://www.fisheries.noaa.gov/inport/item/73386) and [OpenStreetMap](https://www.openstreetmap.org/copyright). The overview uses [Natural Earth](https://www.naturalearthdata.com/) land/urban vectors and [USGS 3DEP elevation](https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer), with schematic regional connectors. Both share an EPSG:32610 origin and orientation.
+Source structures use [DataSF footprints](https://data.sf.gov/Geographic-Locations-and-Boundaries/Building-Footprints/ynuv-fyni), [USGS 2023 lidar](https://www.fisheries.noaa.gov/inport/item/73386), [USGS 3DEP elevation](https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer) and [OpenStreetMap](https://www.openstreetmap.org/copyright). The bridge proportions follow the [district's published dimensions](https://www.goldengate.org/bridge/history-research/statistics-data/design-construction-stats/). The regional view uses [Natural Earth](https://www.naturalearthdata.com/) land/urban vectors, 3DEP terrain and schematic connectors. Both views share an EPSG:32610 origin and orientation.
 
-The viewer requests visible tiles at the needed zoom; inactive appearances load on demand. Small registered source masks drive approximate occlusion and atmosphere. React/OpenSeadragon provide the fixed-view map; a worker holds clocks and source-directed transport. The detailed corridor has 360 configured cars, five ferries, two cargo vessels and three occasional overflights. These are simulation instances, not observed traffic counts.
+The viewer requests visible tiles at the needed zoom; inactive appearances load on demand. Registered source masks drive approximate occlusion and atmosphere. React/OpenSeadragon provide the fixed-view map; a worker holds clocks and source-directed transport. The detailed corridor has 559 configured cars (including 48 on the bridge), six ferries, three cargo vessels and four occasional overflights. These are simulation instances, not observed traffic counts.
 
 ## Rebuild
 
-Selected artwork and exact prompts are in [assets/corridor](assets/corridor/). [Source provenance](data/corridor/provenance.json), the compressed local geometry snapshot and both runtime manifests are checked in. For data acquisition and offline production:
+Selected artwork and exact prompts are in [assets/golden-gate](assets/golden-gate/) and [assets/corridor](assets/corridor/). The [western source provenance](data/golden-gate/provenance.json), compressed local geometry and runtime manifests are checked in. To refresh the western source and package the atlas:
 
 ```powershell
 python -m pip install -r tools/requirements-corridor.txt
-python tools/corridor_inputs.py
-python tools/corridor_source.py
-python tools/render_corridor.py wharf embarcadero south-beach mission-bay
-python tools/corridor_art_targets.py
-python tools/package_corridor.py
+python tools/golden_gate_inputs.py
+python tools/golden_gate_source.py
+python tools/render_golden_gate.py
+python tools/package_golden_gate.py
 node tools/audit-atlas.mjs
 ```
 
-Raw network inputs stay in the ignored local cache; the original source snapshot can be reused without reacquiring it for waterfront reference generation. Selected imagegen results are retained because artwork generation is not deterministic. The package rebuild uses those selected assets, not new generation. The v1/v2 assets remain available as release history.
+Raw network inputs stay in the ignored local cache. Skip acquisition and source derivation to repackage the checked-in geometry and selected artwork. The package rebuild does not require new artwork generation. The v1–v3 tiles remain available as release history.
 
 ## Scope
 

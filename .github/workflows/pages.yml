@@ -23,7 +23,9 @@ jobs:
       - run: python -m pip install -r tools/requirements.txt
       - run: python tools/test_source_pipeline.py
       - run: python tools/test_atlas_geometry.py
+      - run: python tools/test_golden_gate.py
       - run: node tools/audit-assets.mjs
+      - run: node tools/audit-atlas.mjs v3
       - run: node tools/audit-atlas.mjs
       - run: npm run build
       - uses: actions/configure-pages@v6.0.0

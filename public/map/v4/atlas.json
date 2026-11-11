@@ -1,0 +1,1 @@
+{"version":"0.4.0","defaultScene":"waterfront","scenes":[{"id":"waterfront","release":"waterfront-v4","path":"waterfront/scene.json","manifest":"waterfront/manifest.json","size":[12722,14408],"tileCount":4024,"bytes":108898560},{"id":"bay","release":"bay-overview-v4","path":"bay/scene.json","manifest":"bay/manifest.json","size":[2560,1792],"tileCount":152,"bytes":4070440}]}

@@ -38,8 +38,8 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def fetch(url, name, params=None, retries=2):
-    path = CACHE / name
+def fetch(url, name, params=None, retries=2, *, cache=CACHE):
+    path = cache / name
     if path.is_file():
         return path
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -63,17 +63,17 @@ def local_xy(lon, lat, _z=None):
     return np.asarray(x)-ORIGIN_UTM[0], np.asarray(y)-ORIGIN_UTM[1]
 
 
-def geographic_bbox(transformer=TO_GEO):
+def geographic_bbox(transformer=TO_GEO, *, extent=EXTENT):
     points = [transformer.transform(ORIGIN_UTM[0]+x, ORIGIN_UTM[1]+y)
-              for x in EXTENT[::2] for y in EXTENT[1::2]]
+              for x in extent[::2] for y in extent[1::2]]
     xs, ys = zip(*points)
     return min(xs), min(ys), max(xs), max(ys)
 
 
-def footprints():
-    w, s, e, n = geographic_bbox()
+def footprints(*, cache=CACHE, extent=EXTENT):
+    w, s, e, n = geographic_bbox(extent=extent)
     p = fetch(FOOTPRINTS, 'footprints.geojson',
-              {'$where': f'within_box(shape,{n},{w},{s},{e})', '$limit': 30000, '$order': 'sf16_bldgid'})
+              {'$where': f'within_box(shape,{n},{w},{s},{e})', '$limit': 30000, '$order': 'sf16_bldgid'}, cache=cache)
     data = json.loads(p.read_text(encoding='utf-8'))
     if data.get('type') != 'FeatureCollection' or not data['features'] or len(data['features']) >= 30000:
         raise ValueError('Unexpected or truncated DataSF footprint response')
@@ -81,8 +81,8 @@ def footprints():
     return p
 
 
-def map_subset(w, s, e, n, suffix):
-    path = fetch(OSM_MAP, f'osm/{suffix}.xml', {'bbox': f'{w},{s},{e},{n}'})
+def map_subset(w, s, e, n, suffix, *, cache=CACHE):
+    path = fetch(OSM_MAP, f'osm/{suffix}.xml', {'bbox': f'{w},{s},{e},{n}'}, cache=cache)
     root = ET.parse(path).getroot()
     nodes = {n.attrib['id']: n for n in root.findall('node')}
     result = []
@@ -103,10 +103,10 @@ def map_subset(w, s, e, n, suffix):
     return result
 
 
-def osm_vectors():
-    dest = CACHE / 'osm.json'
+def osm_vectors(*, cache=CACHE, extent=EXTENT):
+    dest = cache / 'osm.json'
     if not dest.is_file():
-        w, s, e, n = geographic_bbox()
+        w, s, e, n = geographic_bbox(extent=extent)
         bbox = f'({s},{w},{n},{e})'
         query = ('[out:json][timeout:55];('
                  + ''.join(f'way{tag}{bbox};' for tag in (
@@ -119,7 +119,7 @@ def osm_vectors():
                  + f'node["natural"="tree"]{bbox};);out geom;')
         for k, server in enumerate(OVERPASS):
             try:
-                raw = fetch(server, f'overpass-{k}.json', {'data': query}, retries=1)
+                raw = fetch(server, f'overpass-{k}.json', {'data': query}, retries=1, cache=cache)
                 data = json.loads(raw.read_text(encoding='utf-8'))
                 if len(data.get('elements', [])) > 100 and 'remark' not in data:
                     data['acquisition'] = {'endpoint': server, 'query': query}
@@ -135,7 +135,7 @@ def osm_vectors():
                 for col in range(4):
                     for item in map_subset(w+(e-w)*col/4, s+(n-s)*row/4,
                                            w+(e-w)*(col+1)/4, s+(n-s)*(row+1)/4,
-                                           f'{col}-{row}'):
+                                           f'{col}-{row}', cache=cache):
                         elements[(item['type'], item['id'])] = item
             data = {'elements': list(elements.values()), 'acquisition': {'endpoint': OSM_MAP, 'bbox': [w, s, e, n]}}
             dest.write_text(json.dumps(data, separators=(',', ':')), encoding='utf-8')

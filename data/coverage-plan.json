@@ -1,12 +1,13 @@
 {
-  "schemaVersion": "0.3",
+  "schemaVersion": "0.4",
   "project": "isometric-san-francisco",
   "status": "detailed-waterfront-and-regional-overview",
   "plannedTarget": "San Francisco urban area and northern/eastern bay waterfront",
   "plannedSequence": [
     "Ferry Building / Financial District / Embarcadero contiguous quality sample",
     "Adjacent downtown neighborhoods and northern waterfront",
-    "SoMa / Mission Bay and further contiguous city neighborhoods"
+    "SoMa / Mission Bay and further contiguous city neighborhoods",
+    "Aquatic Park / Fort Mason / Marina / Presidio / Golden Gate Bridge"
   ],
   "futureExpansion": [
     "Wider San Francisco Bay Area",
@@ -15,27 +16,28 @@
   ],
   "publishedCoverage": [
     {
-      "release": "waterfront-v3",
+      "release": "waterfront-v4",
       "role": "detailed-waterfront",
-      "description": "Fisherman's Wharf to Mission Bay, including Pier 39, Ferry Building, the Bay Bridge approach, South Beach, Oracle Park and Chase Center",
+      "description": "Golden Gate Bridge to Mission Bay, including Fort Point, Crissy Field, the Marina, Fort Mason, Fisherman's Wharf, Ferry Building, the Bay Bridge approach and Oracle Park",
       "imageSize": [
-        5372,
-        7398
+        12722,
+        14408
       ],
       "sourceExtentMetres": [
-        -3300,
+        -9800,
         -4300,
         2150,
-        2250
+        5550
       ],
       "crs": "EPSG:32610",
-      "nativeDetailPatches": 10,
-      "contextPlates": 4,
+      "nativeDetailPatches": 20,
+      "contextPlates": 8,
+      "bridge": "Continuous registered bridge including landfall connectors; illustrative geometry",
       "pixelsPerMetre": 1.8545454545454545,
-      "scene": "../public/map/v3/waterfront/scene.json"
+      "scene": "../public/map/v4/waterfront/scene.json"
     },
     {
-      "release": "bay-overview-v3",
+      "release": "bay-overview-v4",
       "role": "regional-context",
       "description": "Bay Area terrain and shoreline overview; the highlighted waterfront is the detailed coverage. This is not detailed city or nine-county coverage.",
       "imageSize": [
@@ -43,13 +45,13 @@
         1792
       ],
       "crs": "EPSG:32610",
-      "scene": "../public/map/v3/bay/scene.json"
+      "scene": "../public/map/v4/bay/scene.json"
     }
   ],
-  "publishedTileCount": 1108,
+  "publishedTileCount": 4176,
   "boundaryGeoJSON": null,
-  "cameraManifest": "../public/map/v3/atlas.json",
-  "tileReleaseManifest": "../public/map/v3/atlas.json",
+  "cameraManifest": "../public/map/v4/atlas.json",
+  "tileReleaseManifest": "../public/map/v4/atlas.json",
   "note": "The detailed corridor and regional context use different scales with one shared origin and camera orientation.",
   "appearanceCount": 4
 }

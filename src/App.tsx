@@ -194,7 +194,7 @@ export default function App() {
           <p className="scope">
             {scene === "bay"
               ? "Bay Area overview"
-              : "Fisherman’s Wharf → Mission Bay"}
+              : "Golden Gate Bridge → Mission Bay"}
           </p>
         </div>
       </header>
@@ -504,14 +504,15 @@ export default function App() {
             </div>
             <h2 id="about-title">San Francisco, in motion.</h2>
             <p>
-              Follow San Francisco’s waterfront from Fisherman’s Wharf to
-              Mission Bay. Switch to Bay Area for the regional view and back to
-              Waterfront for street detail.
+              Follow San Francisco’s waterfront from the Golden Gate Bridge
+              through the Presidio, Marina, and Fisherman’s Wharf to Mission
+              Bay. Switch to Bay Area for the regional view.
             </p>
             <h3>Artwork and data</h3>
             <p>
-              DataSF footprints, USGS 2023 lidar and OpenStreetMap shape the
-              waterfront. Original dry and wet artwork shares one fixed camera.
+              DataSF footprints, USGS lidar and elevation, and OpenStreetMap
+              shape the waterfront. The artwork, bridge and traffic share one
+              fixed camera.
               The regional view uses Natural Earth geography, with transport
               enlarged for legibility.
             </p>

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — Golden Gate waterfront extension
+
+- Connected Fisherman's Wharf to the Golden Gate Bridge through the Marina and Presidio, using the existing native detail scale.
+- Added both bridge towers, the continuous deck and projected bridge traffic, a strait passage and a western overflight.
+- Harmonized distant water across all four appearances while retaining coastal textures and reflections.
+- Updated the Bay Area outline and added 10 location jumps. See [verification](docs/VERIFICATION-v0.4.md).
+
 ## 0.3.0 — Waterfront corridor and Bay Area overview
 
 - Extended continuous detailed navigation from Fisherman's Wharf to Mission Bay with 12 location jumps and four registered appearances.
