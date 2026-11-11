@@ -7,7 +7,7 @@ async page => {
   page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
   page.on("response", response => { if (response.status() >= 400) failures.push([response.status(), response.url()]); });
   page.on("request", request => {
-    const match = request.url().match(/\/map\/inner-bay\/regions\/([^/]+)\/([^/]+)_files\//);
+    const match = request.url().match(/\/map\/illustrated-bay\/regions\/([^/]+)\/([^/]+)_files\//);
     if (match) requests.push([match[1], match[2]]);
   });
   const check = (ok, message) => { if (!ok) throw new Error(message); };
@@ -31,7 +31,7 @@ async page => {
   const shot = async (version, name) => {
     const size = page.viewportSize();
     await page.mouse.move(size.width - 3, size.height - 3);
-    await page.screenshot({ path: `docs/screenshots/v0.${version}/${online ? "online-" : ""}${name}.jpg`, quality: 93 });
+    await page.screenshot({ path: `docs/screenshots/v0.${version}.1/${online ? "online-" : ""}${name}.jpg`, quality: 93 });
   };
   const jump = async (version, identity) => {
     await page.getByRole("combobox", { name: "Jump to a place" }).selectOption(identity);
@@ -66,7 +66,7 @@ async page => {
   }, prefix);
   const open = async (version, places) => {
     const start = requests.length;
-    await page.goto(`${base}?v=0.${version}.0`);
+    await page.goto(`${base}?v=0.${version}.1`);
     await settle(`inner-bay-v${version}`);
     const initial = requests.slice(start);
     check(initial.length > 0, "No visible native tiles at Ferry Building");
@@ -92,6 +92,18 @@ async page => {
   const startup6 = await open(6, 54);
   const clock6 = (await state()).frame.clock;
   await page.evaluate(() => { window.__innerBayWorker = window.__sf.worker; });
+  await jump(6, "union-square");
+  const cityStart = (await state()).transform;
+  for (let pass = 0; pass < 4; pass++) {
+    await page.mouse.move(420, 520);
+    await page.mouse.down();
+    await page.mouse.move(1050, 473, { steps: 26 });
+    await page.mouse.up();
+    await settle("inner-bay-v6");
+  }
+  check((await state()).transform.left - cityStart.left > 1900, "Union Square drag did not cross into the extended city");
+  check(await page.evaluate(() => window.__sf.worker === window.__innerBayWorker), "City drag restarted the worker");
+  await shot(6, "union-square-to-civic-center");
   for (const identity of ["ocean-beach", "golden-gate-park", "alamo-square", "mission-dolores", "lake-merced", "bayview", "hunters-point"]) {
     await jump(6, identity);
     check(JSON.stringify((await state()).frame.clock) === JSON.stringify(clock6), "City navigation changed the paused clock");
@@ -118,11 +130,12 @@ async page => {
   await jump(6, "bay-bridge-east");
   const eastCars = await painted("bay-bridge-");
   check(eastCars > 50, "East span has no visible bridge cars");
+  check(await page.evaluate(() => window.__sf.frame.poses.some(pose => window.__sf.vehicles.imageOffsetY(pose) > 15)),
+    "The animated bridge cars have no illustrated deck alignment");
   await shot(6, "bay-bridge-east");
   await jump(6, "oakland-touchdown");
   check(requests.some(([region]) => region === "bay-bridge"), "No bridge tiles requested on crossing");
   await inspectArea(6, 9230, 1910, 1515, 1010);
-  check(requests.some(([region]) => region === "through-v6"), "The v0.6 Oakland context did not use its pre-port appearance");
   check(!requests.some(([region]) => region === "east-bay-waterfront" || region === "sausalito-shore"), "Future detail was requested by v0.6");
   await button("Bay Area").click();
   await settle("bay-overview-v6");
@@ -156,7 +169,6 @@ async page => {
   check(requests.some(([region, appearance]) => region === "east-bay-waterfront" && appearance === "rain-night"), "East Bay night rain tiles were not requested");
   await inspectArea(7, -7000, -9700, 1515, 1010);
   await layer("rainNightLayer");
-  check(requests.some(([region, appearance]) => region === "through-v7" && appearance === "rain-night"), "The v0.7 Marin context did not use its pre-Fort Baker appearance");
 
   const startup8 = await open(8, 63);
   await jump(8, "golden-gate-bridge");

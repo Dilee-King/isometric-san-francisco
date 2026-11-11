@@ -1,8 +1,9 @@
 import { vehicleFaces } from "./VehicleGeometry.ts";
-import { legacyDepthEncoding } from "./atlas.ts";
+import { interpolateImageOffset, legacyDepthEncoding } from "./atlas.ts";
+import bridgeOffsets from "../data/illustrated-expansion/bridge-image-offsets.json";
 import type { VehicleFace } from "./VehicleGeometry.ts";
 import { nightAmount, project } from "./model.ts";
-import type { Frame, SceneData } from "./types.ts";
+import type { Frame, Pose, SceneData } from "./types.ts";
 import type { SpriteRenderer, ViewTransform } from "./SpriteRenderer.ts";
 
 const vertex = `#version 300 es
@@ -10,6 +11,7 @@ precision highp float;
 in vec3 position;
 in vec4 paint;
 in float emission;
+in float imageOffsetY;
 uniform vec4 view;
 uniform vec2 viewport;
 uniform vec4 basis;
@@ -25,7 +27,7 @@ void main(){
  float q=position.x*basis.y+position.y*basis.w;
  imagePoint=origin+camera.x*vec2(u,q*camera.y-position.z*camera.z);
  cameraDepth=q*camera.z+position.z*camera.y;
- vec2 screen=view.xy+imagePoint*view.z;
+ vec2 screen=view.xy+(imagePoint+vec2(0.,imageOffsetY))*view.z;
  gl_Position=vec4(screen.x/viewport.x*2.-1.,1.-screen.y/viewport.y*2.,-cameraDepth/clipDepth,1.);
  color=paint;lit=emission;
 }`;
@@ -85,6 +87,7 @@ function rgba(face: VehicleFace): number[] {
 }
 
 /** Each hull/body/wing vertex shares the city's world-to-image camera. */
+const floatsPerVertex = 9;
 export class VehicleRenderer {
   canvas: HTMLCanvasElement;
   gl: WebGL2RenderingContext | null;
@@ -101,7 +104,7 @@ export class VehicleRenderer {
   lastKey = "";
   opaqueCount = 0;
   transparentCount = 0;
-  faces: VehicleFace[] = [];
+  faces: (VehicleFace & { imageOffsetY?: number })[] = [];
   constructor(host: HTMLElement, data: SceneData, sprites: SpriteRenderer) {
     this.data = data;
     this.sprites = sprites;
@@ -153,10 +156,11 @@ export class VehicleRenderer {
       ["position", 3, 0],
       ["paint", 4, 12],
       ["emission", 1, 28],
+      ["imageOffsetY", 1, 32],
     ] as const) {
       const location = gl.getAttribLocation(program, name);
       gl.enableVertexAttribArray(location);
-      gl.vertexAttribPointer(location, size, gl.FLOAT, false, 32, offset);
+      gl.vertexAttribPointer(location, size, gl.FLOAT, false, floatsPerVertex * 4, offset);
     }
     for (const name of [
       "view",
@@ -200,6 +204,16 @@ export class VehicleRenderer {
       gl.uniform1f(this.uniforms.sourceRows, sprites.maskHeight);
     });
   }
+  imageOffsetY(pose: Pose) {
+    if (this.data.maskBundle !== "map/illustrated-bay/masks.png") return 0;
+    const direction = pose.id.startsWith("bay-bridge-westbound-") ? "westbound"
+      : pose.id.startsWith("bay-bridge-eastbound-") ? "eastbound" : undefined;
+    if (!direction) return 0;
+    const projection = this.data.projection;
+    const x = project(pose.point, projection).x - projection.origin[0];
+    // Shift the painted position while keeping the registered source-depth sample.
+    return interpolateImageOffset(bridgeOffsets[direction], x);
+  }
   draw(frame: Frame, v: ViewTransform) {
     const candidates = frame.poses.filter((pose) => {
       const p = project(pose.point, this.data.projection),
@@ -224,10 +238,12 @@ export class VehicleRenderer {
       const scale = this.data.transportScale ?? 1;
       this.faces = candidates.flatMap((pose) => {
         const faces = vehicleFaces(pose);
-        if (scale === 1) return faces;
+        const imageOffsetY = this.imageOffsetY(pose);
+        if (scale === 1 && imageOffsetY === 0) return faces;
         return faces.map((face) => ({
           ...face,
-          points: face.points.map(
+          imageOffsetY,
+          points: scale === 1 ? face.points : face.points.map(
             (p) =>
               p.map(
                 (v, i) => pose.point[i] + (v - pose.point[i]) * scale,
@@ -249,10 +265,10 @@ export class VehicleRenderer {
               face.points[i],
               face.points[i + 1],
             ])
-              target.push(...point, ...color, flag);
+              target.push(...point, ...color, flag, face.imageOffsetY ?? 0);
         }
-        this.opaqueCount = opaque.length / 8;
-        this.transparentCount = transparent.length / 8;
+        this.opaqueCount = opaque.length / floatsPerVertex;
+        this.transparentCount = transparent.length / floatsPerVertex;
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
         this.gl.bufferData(
           this.gl.ARRAY_BUFFER,
@@ -322,8 +338,10 @@ export class VehicleRenderer {
         ctx.beginPath();
         face.points.forEach((p, i) => {
           const q = project(p, this.data.projection);
-          if (i) ctx.lineTo(q.x * v.scale + v.left, q.y * v.scale + v.top);
-          else ctx.moveTo(q.x * v.scale + v.left, q.y * v.scale + v.top);
+          const x = q.x * v.scale + v.left;
+          const y = (q.y + (face.imageOffsetY ?? 0)) * v.scale + v.top;
+          if (i) ctx.lineTo(x, y);
+          else ctx.moveTo(x, y);
         });
         ctx.closePath();
         ctx.fill();

@@ -28,6 +28,14 @@ export function maskIndex(
   );
 }
 
+export function interpolateImageOffset(samples: number[][], x: number) {
+  const next = samples.findIndex(([at]) => at > x);
+  if (next < 1) return 0;
+  const [start, from] = samples[next - 1];
+  const [end, to] = samples[next];
+  return from + (to - from) * (x - start) / (end - start);
+}
+
 /** Resize to the GPU limit without interpolating the packed depth and surface bytes. */
 export function fitMaskTexture(
   pixels: Uint8ClampedArray,

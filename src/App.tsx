@@ -6,9 +6,9 @@ import type { Frame, SceneData, Weather } from "./types.ts";
 
 const coverage = {
   "0.5.0": { scope: "City core & waterfront", text: "Explore downtown San Francisco and the waterfront from the Golden Gate Bridge to Mission Bay." },
-  "0.6.0": { scope: "Citywide & Bay Bridge", text: "Explore San Francisco from Ocean Beach to Hunters Point, then cross the Bay Bridge through Yerba Buena Island to Oakland." },
-  "0.7.0": { scope: "City & East Bay", text: "Explore San Francisco and the Bay Bridge, then follow the waterfront from the Port of Oakland to Jack London Square and Alameda." },
-  "0.8.0": { scope: "City & Inner Bay", text: "Explore all of San Francisco, the Bay Bridge, the Oakland and Alameda waterfront, and the north shore from Fort Baker to Sausalito." },
+  "0.6.1": { scope: "Citywide & Bay Bridge", text: "Explore San Francisco from Ocean Beach to Hunters Point, then cross the Bay Bridge through Yerba Buena Island to Oakland." },
+  "0.7.1": { scope: "City & East Bay", text: "Explore San Francisco and the Bay Bridge, then follow the waterfront from the Port of Oakland to Jack London Square and Alameda." },
+  "0.8.1": { scope: "City & Inner Bay", text: "Explore all of San Francisco, the Bay Bridge, the Oakland and Alameda waterfront, and the north shore from Fort Baker to Sausalito." },
 }[ATLAS_VERSION];
 
 function Icon({ name }: { name: string }) {

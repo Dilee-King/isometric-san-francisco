@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "0.8",
+  "schemaVersion": "0.8.1",
   "project": "isometric-san-francisco",
-  "status": "detailed-san-francisco-and-inner-bay-with-regional-overview",
+  "status": "continuous-imagegen-san-francisco-and-inner-bay",
   "plannedTarget": "San Francisco and the inner Bay with a regional Bay Area atlas",
   "plannedSequence": [
     "Ferry Building / Financial District / Embarcadero contiguous quality sample",
@@ -27,11 +27,12 @@
         55296,
         30720
       ],
-      "nativeBlocks": 58,
+      "nativeBlocks": 78,
       "locationJumps": 54,
       "crs": "EPSG:32610",
       "pixelsPerMetre": 1.8545454545454545,
-      "scene": "../public/map/v6/waterfront/scene.json"
+      "scene": "../public/map/v6-art/waterfront/scene.json",
+      "version": "0.6.1"
     },
     {
       "release": "inner-bay-v7",
@@ -41,11 +42,12 @@
         55296,
         30720
       ],
-      "nativeBlocks": 73,
+      "nativeBlocks": 93,
       "locationJumps": 59,
       "crs": "EPSG:32610",
       "pixelsPerMetre": 1.8545454545454545,
-      "scene": "../public/map/v7/waterfront/scene.json"
+      "scene": "../public/map/v7-art/waterfront/scene.json",
+      "version": "0.7.1"
     },
     {
       "release": "inner-bay-v8",
@@ -55,11 +57,12 @@
         55296,
         30720
       ],
-      "nativeBlocks": 80,
+      "nativeBlocks": 97,
       "locationJumps": 63,
       "crs": "EPSG:32610",
       "pixelsPerMetre": 1.8545454545454545,
-      "scene": "../public/map/v8/waterfront/scene.json"
+      "scene": "../public/map/v8-art/waterfront/scene.json",
+      "version": "0.8.1"
     },
     {
       "release": "bay-overview-v8",
@@ -70,13 +73,13 @@
         1792
       ],
       "crs": "EPSG:32610",
-      "scene": "../public/map/v8/bay/scene.json"
+      "scene": "../public/map/v8-art/bay/scene.json"
     }
   ],
-  "publishedTileCount": 16812,
+  "publishedTileCount": 19872,
   "boundaryGeoJSON": null,
-  "cameraManifest": "../public/map/v8/atlas.json",
-  "tileReleaseManifest": "../public/map/inner-bay/manifest.json",
-  "note": "Each detailed release uses the same fixed camera and native grid. The full regional view uses a different scale with the same orientation and world origin.",
+  "cameraManifest": "../public/map/v8-art/atlas.json",
+  "tileReleaseManifest": "../public/map/illustrated-bay/manifest.json",
+  "note": "The detail releases extend v0.5 with overlapping ImageGen plates on the same camera grid. Named detail plates use the original pixel scale. The regional view uses its existing lower scale.",
   "appearanceCount": 4
 }

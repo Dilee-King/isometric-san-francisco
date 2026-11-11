@@ -50,6 +50,7 @@ export function regionTileSource(
 ): string | RegionalSourceOptions {
   const layout = data.tileLayout;
   if (!layout) return `${root}${appearance}.dzi`;
+  const backdropOverrides = new Set(layout.sparse?.backdropOverrides);
   return {
     width: data.width,
     height: data.height,
@@ -66,10 +67,12 @@ export function regionTileSource(
       },
     } : {}),
     getTileUrl(level, column, row) {
-      const region = layout.sparse?.appearanceOverrides?.[`${appearance}/${level}/${column}_${row}`]
+      const key = `${appearance}/${level}/${column}_${row}`;
+      const region = layout.sparse?.appearanceOverrides?.[key]
         ?? regionForTile(layout, data.width, data.height, level, column, row);
-      const detail = level > layout.sharedMaxLevel ? layout.sparse?.root ?? "" : "";
-      return `${root}${detail}regions/${region}/${appearance}_files/${level}/${column}_${row}.webp`;
+      const tileRoot = level > layout.sharedMaxLevel ? layout.sparse?.root
+        : backdropOverrides.has(key) ? undefined : layout.sparse?.backdropRoot;
+      return `${root}${tileRoot ?? ""}regions/${region}/${appearance}_files/${level}/${column}_${row}.webp`;
     },
   };
 }

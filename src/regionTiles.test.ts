@@ -68,3 +68,20 @@ test("sparse atlases keep lower levels and request native tiles only inside acti
   assert.equal(source.getTileUrl(16, 25, 12), "/map/v6/waterfront/../../inner-bay/regions/through-v6/scene_files/16/25_12.webp");
   assert.equal(source.getTileUrl(14, 7, 3), "/map/v6/waterfront/regions/overview/scene_files/14/7_3.webp");
 });
+
+test("cumulative releases share matching backdrops and keep different tiles", () => {
+  const tileLayout = {
+    ...layout,
+    sparse: {
+      root: "../../illustrated-bay/",
+      blockSize: 3072,
+      blocks: {},
+      backdropRoot: "../../v8-art/waterfront/",
+      backdropOverrides: ["night/11/1_1"],
+    },
+  };
+  const source = regionTileSource({ width: 12000, height: 9000, tileLayout }, "/map/v6-art/waterfront/", "night");
+  if (typeof source === "string") throw new Error("Expected regional source");
+  assert.equal(source.getTileUrl(11, 0, 0), "/map/v6-art/waterfront/../../v8-art/waterfront/regions/overview/night_files/11/0_0.webp");
+  assert.equal(source.getTileUrl(11, 1, 1), "/map/v6-art/waterfront/regions/overview/night_files/11/1_1.webp");
+});

@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.8.1 — Illustrated Marin waterfront
+
+- Extended the approved Golden Gate illustration through Fort Baker, Bridgeway and Sausalito with overlapping ImageGen plates.
+- Added registered wet-night art at Sausalito Ferry Landing.
+
+## 0.7.1 — Illustrated Oakland and Alameda waterfront
+
+- Extended the Bay Bridge artwork into the port and along the Oakland Estuary to both Alameda ferry terminals.
+- Added wet-night art at Jack London Square and aligned the shoreline mask to mapped islands and Lake Merritt.
+
+## 0.6.1 — Illustrated San Francisco and Bay Bridge
+
+- Extended the v0.5 artwork across San Francisco, through Yerba Buena Island and across both Bay Bridge spans.
+- Added original-scale detail at the new location jumps and illustrated context between them.
+- Retained the projected vehicle simulation, regional loading, wet materials and the four appearances. [Verification](docs/VERIFICATION-illustrated-expansion.md)
+
 ## 0.8.0 — Marin shore and Sausalito
 
 - Connected the Golden Gate Bridge's north landing to Fort Baker, the shore road, Sausalito and its marinas.

@@ -1,0 +1,2055 @@
+{
+  "camera": {
+    "scale": 1.8545454545454545,
+    "origin": [
+      27648,
+      15360
+    ],
+    "sinElevation": 0.6293203910498374,
+    "cosElevation": 0.7771459614569709,
+    "east": [
+      0.8,
+      0.6
+    ],
+    "north": [
+      0.6,
+      -0.8
+    ]
+  },
+  "world": [
+    -27648,
+    -15360,
+    55296,
+    30720
+  ],
+  "frames": [
+    {
+      "id": "civic-center-link",
+      "stage": 6,
+      "frame": [
+        -5900,
+        -1160,
+        3072,
+        2048
+      ],
+      "label": "Civic Center from Union Square",
+      "kind": "area",
+      "wave": 0
+    },
+    {
+      "id": "fort-baker-link",
+      "stage": 8,
+      "frame": [
+        -7050,
+        -10060,
+        3072,
+        2048
+      ],
+      "label": "Golden Gate north landing and Fort Baker",
+      "kind": "area",
+      "wave": 0
+    },
+    {
+      "id": "v6-area-11-12",
+      "stage": 6,
+      "frame": [
+        -13632,
+        -7072,
+        3072,
+        2048
+      ],
+      "label": "Richmond District",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-11-13",
+      "stage": 6,
+      "frame": [
+        -13632,
+        -5344,
+        3072,
+        2048
+      ],
+      "label": "Richmond District",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-12-12",
+      "stage": 6,
+      "frame": [
+        -10944,
+        -7072,
+        3072,
+        2048
+      ],
+      "label": "Richmond District",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-12-13",
+      "stage": 6,
+      "frame": [
+        -10944,
+        -5344,
+        3072,
+        2048
+      ],
+      "label": "Richmond District",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-13-13",
+      "stage": 6,
+      "frame": [
+        -8256,
+        -5344,
+        3072,
+        2048
+      ],
+      "label": "Alamo Square / Painted Ladies",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-13-14",
+      "stage": 6,
+      "frame": [
+        -8256,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Alamo Square / Painted Ladies",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-13-15",
+      "stage": 6,
+      "frame": [
+        -8256,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Alamo Square / Painted Ladies",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-13-16",
+      "stage": 6,
+      "frame": [
+        -8256,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Civic Center",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-14-14",
+      "stage": 6,
+      "frame": [
+        -5568,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Civic Center",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-14-15",
+      "stage": 6,
+      "frame": [
+        -5568,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Civic Center",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-14-16",
+      "stage": 6,
+      "frame": [
+        -5568,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Civic Center",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-14-17",
+      "stage": 6,
+      "frame": [
+        -5568,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Civic Center",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-14-18",
+      "stage": 6,
+      "frame": [
+        -5568,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Hunters Point",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-15-12",
+      "stage": 6,
+      "frame": [
+        -2880,
+        -7072,
+        3072,
+        2048
+      ],
+      "label": "Alcatraz Island",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-15-13",
+      "stage": 6,
+      "frame": [
+        -2880,
+        -5344,
+        3072,
+        2048
+      ],
+      "label": "Alcatraz Island",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-15-14",
+      "stage": 6,
+      "frame": [
+        -2880,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Alcatraz Island",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-15-15",
+      "stage": 6,
+      "frame": [
+        -2880,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Alcatraz Island",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-15-16",
+      "stage": 6,
+      "frame": [
+        -2880,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Civic Center",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-15-17",
+      "stage": 6,
+      "frame": [
+        -2880,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Civic Center",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-15-18",
+      "stage": 6,
+      "frame": [
+        -2880,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Hunters Point",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-16-14",
+      "stage": 6,
+      "frame": [
+        -192,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Alcatraz Island",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-16-16",
+      "stage": 6,
+      "frame": [
+        -192,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge / West Span",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v8-area-13-10",
+      "stage": 8,
+      "frame": [
+        -8256,
+        -10528,
+        3072,
+        2048
+      ],
+      "label": "Fort Baker / Horseshoe Cove",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v8-area-14-10",
+      "stage": 8,
+      "frame": [
+        -5568,
+        -10528,
+        3072,
+        2048
+      ],
+      "label": "Sausalito / Bridgeway",
+      "kind": "area",
+      "wave": 1
+    },
+    {
+      "id": "v6-area-10-12",
+      "stage": 6,
+      "frame": [
+        -16320,
+        -7072,
+        3072,
+        2048
+      ],
+      "label": "Lands End",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-10-13",
+      "stage": 6,
+      "frame": [
+        -16320,
+        -5344,
+        3072,
+        2048
+      ],
+      "label": "Lands End",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-10-14",
+      "stage": 6,
+      "frame": [
+        -16320,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Golden Gate Park",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-11-14",
+      "stage": 6,
+      "frame": [
+        -13632,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Golden Gate Park",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-12-14",
+      "stage": 6,
+      "frame": [
+        -10944,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Haight-Ashbury",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-12-15",
+      "stage": 6,
+      "frame": [
+        -10944,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Haight-Ashbury",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-12-16",
+      "stage": 6,
+      "frame": [
+        -10944,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "The Castro",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-12-17",
+      "stage": 6,
+      "frame": [
+        -10944,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Mission District",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-13-17",
+      "stage": 6,
+      "frame": [
+        -8256,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Mission District",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-13-18",
+      "stage": 6,
+      "frame": [
+        -8256,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Mission District",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-13-19",
+      "stage": 6,
+      "frame": [
+        -8256,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Bayview",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-14-19",
+      "stage": 6,
+      "frame": [
+        -5568,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Hunters Point",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-16-12",
+      "stage": 6,
+      "frame": [
+        -192,
+        -7072,
+        3072,
+        2048
+      ],
+      "label": "Alcatraz Island",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-16-13",
+      "stage": 6,
+      "frame": [
+        -192,
+        -5344,
+        3072,
+        2048
+      ],
+      "label": "Alcatraz Island",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-17-15",
+      "stage": 6,
+      "frame": [
+        2496,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Yerba Buena Island",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-17-16",
+      "stage": 6,
+      "frame": [
+        2496,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Bay Bridge / West Span",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v8-area-13-09",
+      "stage": 8,
+      "frame": [
+        -8256,
+        -12256,
+        3072,
+        2048
+      ],
+      "label": "Sausalito / Bridgeway",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v8-area-14-09",
+      "stage": 8,
+      "frame": [
+        -5568,
+        -12256,
+        3072,
+        2048
+      ],
+      "label": "Sausalito / Bridgeway",
+      "kind": "area",
+      "wave": 2
+    },
+    {
+      "id": "v6-area-09-12",
+      "stage": 6,
+      "frame": [
+        -19008,
+        -7072,
+        3072,
+        2048
+      ],
+      "label": "Lands End",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-09-13",
+      "stage": 6,
+      "frame": [
+        -19008,
+        -5344,
+        3072,
+        2048
+      ],
+      "label": "Lands End",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-09-14",
+      "stage": 6,
+      "frame": [
+        -19008,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Sunset District",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-09-15",
+      "stage": 6,
+      "frame": [
+        -19008,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Sunset District",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-10-15",
+      "stage": 6,
+      "frame": [
+        -16320,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Sunset District",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-11-15",
+      "stage": 6,
+      "frame": [
+        -13632,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Golden Gate Park",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-11-16",
+      "stage": 6,
+      "frame": [
+        -13632,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Twin Peaks",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-11-17",
+      "stage": 6,
+      "frame": [
+        -13632,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Glen Park",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-11-18",
+      "stage": 6,
+      "frame": [
+        -13632,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Glen Park",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-12-18",
+      "stage": 6,
+      "frame": [
+        -10944,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Mission District",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-12-19",
+      "stage": 6,
+      "frame": [
+        -10944,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Bayview",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-12-20",
+      "stage": 6,
+      "frame": [
+        -10944,
+        6752,
+        3072,
+        2048
+      ],
+      "label": "Bayview",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-13-20",
+      "stage": 6,
+      "frame": [
+        -8256,
+        6752,
+        3072,
+        2048
+      ],
+      "label": "Bayview",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-14-20",
+      "stage": 6,
+      "frame": [
+        -5568,
+        6752,
+        3072,
+        2048
+      ],
+      "label": "Hunters Point",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-18-14",
+      "stage": 6,
+      "frame": [
+        5184,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Treasure Island",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-18-15",
+      "stage": 6,
+      "frame": [
+        5184,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Treasure Island",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-18-16",
+      "stage": 6,
+      "frame": [
+        5184,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Yerba Buena Island",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v7-area-18-17",
+      "stage": 7,
+      "frame": [
+        5184,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Middle Harbor Shoreline Park",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v8-area-13-08",
+      "stage": 8,
+      "frame": [
+        -8256,
+        -13984,
+        3072,
+        2048
+      ],
+      "label": "Sausalito Marinas",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v8-area-14-08",
+      "stage": 8,
+      "frame": [
+        -5568,
+        -13984,
+        3072,
+        2048
+      ],
+      "label": "Sausalito Marinas",
+      "kind": "area",
+      "wave": 3
+    },
+    {
+      "id": "v6-area-08-13",
+      "stage": 6,
+      "frame": [
+        -21696,
+        -5344,
+        3072,
+        2048
+      ],
+      "label": "Ocean Beach",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-08-14",
+      "stage": 6,
+      "frame": [
+        -21696,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Ocean Beach",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-08-15",
+      "stage": 6,
+      "frame": [
+        -21696,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Ocean Beach",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-08-16",
+      "stage": 6,
+      "frame": [
+        -21696,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-09-16",
+      "stage": 6,
+      "frame": [
+        -19008,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Sunset District",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-10-16",
+      "stage": 6,
+      "frame": [
+        -16320,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Sunset District",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-10-17",
+      "stage": 6,
+      "frame": [
+        -16320,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Glen Park",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-10-18",
+      "stage": 6,
+      "frame": [
+        -16320,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Excelsior",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-10-19",
+      "stage": 6,
+      "frame": [
+        -16320,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Excelsior",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-11-19",
+      "stage": 6,
+      "frame": [
+        -13632,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Excelsior",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-11-20",
+      "stage": 6,
+      "frame": [
+        -13632,
+        6752,
+        3072,
+        2048
+      ],
+      "label": "Excelsior",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-11-21",
+      "stage": 6,
+      "frame": [
+        -13632,
+        8480,
+        3072,
+        2048
+      ],
+      "label": "Bayview",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-12-21",
+      "stage": 6,
+      "frame": [
+        -10944,
+        8480,
+        3072,
+        2048
+      ],
+      "label": "Bayview",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-13-21",
+      "stage": 6,
+      "frame": [
+        -8256,
+        8480,
+        3072,
+        2048
+      ],
+      "label": "Hunters Point",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-14-21",
+      "stage": 6,
+      "frame": [
+        -5568,
+        8480,
+        3072,
+        2048
+      ],
+      "label": "Hunters Point",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-19-15",
+      "stage": 6,
+      "frame": [
+        7872,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Bay Bridge / East Span",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-19-16",
+      "stage": 6,
+      "frame": [
+        7872,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Bay Bridge / East Span",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v7-area-18-18",
+      "stage": 7,
+      "frame": [
+        5184,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Middle Harbor Shoreline Park",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v7-area-19-17",
+      "stage": 7,
+      "frame": [
+        7872,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Port of Oakland",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v7-area-19-18",
+      "stage": 7,
+      "frame": [
+        7872,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Middle Harbor Shoreline Park",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v8-area-13-07",
+      "stage": 8,
+      "frame": [
+        -8256,
+        -15360,
+        3072,
+        2048
+      ],
+      "label": "Sausalito Marinas",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v8-area-14-07",
+      "stage": 8,
+      "frame": [
+        -5568,
+        -15360,
+        3072,
+        2048
+      ],
+      "label": "Sausalito Marinas",
+      "kind": "area",
+      "wave": 4
+    },
+    {
+      "id": "v6-area-07-14",
+      "stage": 6,
+      "frame": [
+        -24384,
+        -3616,
+        3072,
+        2048
+      ],
+      "label": "Ocean Beach",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-07-15",
+      "stage": 6,
+      "frame": [
+        -24384,
+        -1888,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-07-16",
+      "stage": 6,
+      "frame": [
+        -24384,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-07-17",
+      "stage": 6,
+      "frame": [
+        -24384,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-08-17",
+      "stage": 6,
+      "frame": [
+        -21696,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-09-17",
+      "stage": 6,
+      "frame": [
+        -19008,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Sunset District",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-09-18",
+      "stage": 6,
+      "frame": [
+        -19008,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Excelsior",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-09-19",
+      "stage": 6,
+      "frame": [
+        -19008,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Excelsior",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-10-20",
+      "stage": 6,
+      "frame": [
+        -16320,
+        6752,
+        3072,
+        2048
+      ],
+      "label": "Excelsior",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-20-16",
+      "stage": 6,
+      "frame": [
+        10560,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Port of Oakland",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-20-17",
+      "stage": 6,
+      "frame": [
+        10560,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Oakland Bridge Landing",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v7-area-18-19",
+      "stage": 7,
+      "frame": [
+        5184,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Middle Harbor Shoreline Park",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v7-area-19-19",
+      "stage": 7,
+      "frame": [
+        7872,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Alameda Seaplane Lagoon",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v7-area-20-17",
+      "stage": 7,
+      "frame": [
+        10560,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Port of Oakland",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v7-area-20-18",
+      "stage": 7,
+      "frame": [
+        10560,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Alameda Main Street Ferry",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v7-area-20-19",
+      "stage": 7,
+      "frame": [
+        10560,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Alameda Main Street Ferry",
+      "kind": "area",
+      "wave": 5
+    },
+    {
+      "id": "v6-area-06-16",
+      "stage": 6,
+      "frame": [
+        -27072,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v6-area-06-17",
+      "stage": 6,
+      "frame": [
+        -27072,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v6-area-08-18",
+      "stage": 6,
+      "frame": [
+        -21696,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v6-area-08-19",
+      "stage": 6,
+      "frame": [
+        -21696,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v6-area-21-16",
+      "stage": 6,
+      "frame": [
+        13248,
+        -160,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Oakland Bridge Landing",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v6-area-21-17",
+      "stage": 6,
+      "frame": [
+        13248,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Bay Bridge crossing near Oakland Bridge Landing",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v7-area-19-20",
+      "stage": 7,
+      "frame": [
+        7872,
+        6752,
+        3072,
+        2048
+      ],
+      "label": "Alameda Seaplane Lagoon",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v7-area-20-20",
+      "stage": 7,
+      "frame": [
+        10560,
+        6752,
+        3072,
+        2048
+      ],
+      "label": "Alameda Main Street Ferry",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v7-area-21-17",
+      "stage": 7,
+      "frame": [
+        13248,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Oakland Bridge Landing",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v7-area-21-18",
+      "stage": 7,
+      "frame": [
+        13248,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Oakland Bridge Landing",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v7-area-21-19",
+      "stage": 7,
+      "frame": [
+        13248,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Jack London Square",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v7-area-21-20",
+      "stage": 7,
+      "frame": [
+        13248,
+        6752,
+        3072,
+        2048
+      ],
+      "label": "Jack London Square",
+      "kind": "area",
+      "wave": 6
+    },
+    {
+      "id": "v6-area-07-18",
+      "stage": 6,
+      "frame": [
+        -24384,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Lake Merced",
+      "kind": "area",
+      "wave": 7
+    },
+    {
+      "id": "v7-area-19-21",
+      "stage": 7,
+      "frame": [
+        7872,
+        8480,
+        3072,
+        2048
+      ],
+      "label": "Alameda Seaplane Lagoon",
+      "kind": "area",
+      "wave": 7
+    },
+    {
+      "id": "v7-area-20-21",
+      "stage": 7,
+      "frame": [
+        10560,
+        8480,
+        3072,
+        2048
+      ],
+      "label": "Alameda Seaplane Lagoon",
+      "kind": "area",
+      "wave": 7
+    },
+    {
+      "id": "v7-area-21-21",
+      "stage": 7,
+      "frame": [
+        13248,
+        8480,
+        3072,
+        2048
+      ],
+      "label": "Jack London Square",
+      "kind": "area",
+      "wave": 7
+    },
+    {
+      "id": "v7-area-22-17",
+      "stage": 7,
+      "frame": [
+        15936,
+        1568,
+        3072,
+        2048
+      ],
+      "label": "Oakland Bridge Landing",
+      "kind": "area",
+      "wave": 7
+    },
+    {
+      "id": "v7-area-22-18",
+      "stage": 7,
+      "frame": [
+        15936,
+        3296,
+        3072,
+        2048
+      ],
+      "label": "Oakland Bridge Landing",
+      "kind": "area",
+      "wave": 7
+    },
+    {
+      "id": "v7-area-22-19",
+      "stage": 7,
+      "frame": [
+        15936,
+        5024,
+        3072,
+        2048
+      ],
+      "label": "Jack London Square",
+      "kind": "area",
+      "wave": 7
+    },
+    {
+      "id": "v7-area-22-20",
+      "stage": 7,
+      "frame": [
+        15936,
+        6752,
+        3072,
+        2048
+      ],
+      "label": "Jack London Square",
+      "kind": "area",
+      "wave": 7
+    },
+    {
+      "id": "v7-area-22-21",
+      "stage": 7,
+      "frame": [
+        15936,
+        8480,
+        3072,
+        2048
+      ],
+      "label": "Jack London Square",
+      "kind": "area",
+      "wave": 7
+    },
+    {
+      "id": "alamo-square",
+      "stage": 6,
+      "frame": [
+        -8237,
+        -990,
+        1536,
+        1024
+      ],
+      "label": "Alamo Square / Painted Ladies",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "alcatraz",
+      "stage": 6,
+      "frame": [
+        -714,
+        -5544,
+        1536,
+        1024
+      ],
+      "label": "Alcatraz Island",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "bay-bridge-east",
+      "stage": 6,
+      "frame": [
+        6460,
+        -300,
+        1536,
+        1024
+      ],
+      "label": "Bay Bridge / East Span",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "bay-bridge-west",
+      "stage": 6,
+      "frame": [
+        2659,
+        -201,
+        1536,
+        1024
+      ],
+      "label": "Bay Bridge / West Span",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "bayview",
+      "stage": 6,
+      "frame": [
+        -8141,
+        6341,
+        1536,
+        1024
+      ],
+      "label": "Bayview",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "castro",
+      "stage": 6,
+      "frame": [
+        -10384,
+        562,
+        1536,
+        1024
+      ],
+      "label": "The Castro",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "civic-center",
+      "stage": 6,
+      "frame": [
+        -5980,
+        -364,
+        1536,
+        1024
+      ],
+      "label": "Civic Center",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "excelsior",
+      "stage": 6,
+      "frame": [
+        -13996,
+        4525,
+        1536,
+        1024
+      ],
+      "label": "Excelsior",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "glen-park",
+      "stage": 6,
+      "frame": [
+        -13541,
+        3237,
+        1536,
+        1024
+      ],
+      "label": "Glen Park",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "golden-gate-park",
+      "stage": 6,
+      "frame": [
+        -13715,
+        -2443,
+        1536,
+        1024
+      ],
+      "label": "Golden Gate Park",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "haight",
+      "stage": 6,
+      "frame": [
+        -10840,
+        -1100,
+        1536,
+        1024
+      ],
+      "label": "Haight-Ashbury",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "hunters-point",
+      "stage": 6,
+      "frame": [
+        -5694,
+        7764,
+        1536,
+        1024
+      ],
+      "label": "Hunters Point",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "lake-merced",
+      "stage": 6,
+      "frame": [
+        -22784,
+        955,
+        1536,
+        1024
+      ],
+      "label": "Lake Merced",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "lands-end",
+      "stage": 6,
+      "frame": [
+        -17114,
+        -5991,
+        1536,
+        1024
+      ],
+      "label": "Lands End",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "mission",
+      "stage": 6,
+      "frame": [
+        -9187,
+        2390,
+        1536,
+        1024
+      ],
+      "label": "Mission District",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "mission-dolores",
+      "stage": 6,
+      "frame": [
+        -9441,
+        1193,
+        1536,
+        1024
+      ],
+      "label": "Mission Dolores Park",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "noe-valley",
+      "stage": 6,
+      "frame": [
+        -11351,
+        1594,
+        1536,
+        1024
+      ],
+      "label": "Noe Valley",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "oakland-touchdown",
+      "stage": 6,
+      "frame": [
+        13834,
+        1620,
+        1536,
+        1024
+      ],
+      "label": "Oakland Bridge Landing",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "ocean-beach",
+      "stage": 6,
+      "frame": [
+        -20390,
+        -3935,
+        1536,
+        1024
+      ],
+      "label": "Ocean Beach",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "richmond",
+      "stage": 6,
+      "frame": [
+        -13717,
+        -4145,
+        1536,
+        1024
+      ],
+      "label": "Richmond District",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "sunset",
+      "stage": 6,
+      "frame": [
+        -17187,
+        -1521,
+        1536,
+        1024
+      ],
+      "label": "Sunset District",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "treasure-island",
+      "stage": 6,
+      "frame": [
+        5826,
+        -2114,
+        1536,
+        1024
+      ],
+      "label": "Treasure Island",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "twin-peaks",
+      "stage": 6,
+      "frame": [
+        -12785,
+        85,
+        1536,
+        1024
+      ],
+      "label": "Twin Peaks",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "yerba-buena",
+      "stage": 6,
+      "frame": [
+        4605,
+        -373,
+        1536,
+        1024
+      ],
+      "label": "Yerba Buena Island",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "alameda-main",
+      "stage": 7,
+      "frame": [
+        11802,
+        6028,
+        1536,
+        1024
+      ],
+      "label": "Alameda Main Street Ferry",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "alameda-seaplane",
+      "stage": 7,
+      "frame": [
+        9474,
+        7193,
+        1536,
+        1024
+      ],
+      "label": "Alameda Seaplane Lagoon",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "jack-london",
+      "stage": 7,
+      "frame": [
+        14319,
+        6696,
+        1536,
+        1024
+      ],
+      "label": "Jack London Square",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "middle-harbor",
+      "stage": 7,
+      "frame": [
+        9379,
+        2966,
+        1536,
+        1024
+      ],
+      "label": "Middle Harbor Shoreline Park",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "oakland-port",
+      "stage": 7,
+      "frame": [
+        9219,
+        1917,
+        1536,
+        1024
+      ],
+      "label": "Port of Oakland",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "fort-baker",
+      "stage": 8,
+      "frame": [
+        -6782,
+        -9512,
+        1536,
+        1024
+      ],
+      "label": "Fort Baker / Horseshoe Cove",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "sausalito",
+      "stage": 8,
+      "frame": [
+        -4325,
+        -11952,
+        1536,
+        1024
+      ],
+      "label": "Sausalito Ferry Landing",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "sausalito-marinas",
+      "stage": 8,
+      "frame": [
+        -5180,
+        -13530,
+        1536,
+        1024
+      ],
+      "label": "Sausalito Marinas",
+      "kind": "detail",
+      "wave": 8
+    },
+    {
+      "id": "sausalito-shore",
+      "stage": 8,
+      "frame": [
+        -5676,
+        -11124,
+        1536,
+        1024
+      ],
+      "label": "Sausalito / Bridgeway",
+      "kind": "detail",
+      "wave": 8
+    }
+  ]
+}

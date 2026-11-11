@@ -54,6 +54,8 @@ export type RegionTileLayout = {
     blockSize: number;
     blocks: Record<string, string>;
     appearanceOverrides?: Record<string, string>;
+    backdropRoot?: string;
+    backdropOverrides?: string[];
   };
 };
 export type SceneData = {

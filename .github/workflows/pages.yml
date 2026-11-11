@@ -29,8 +29,20 @@ jobs:
       - run: node tools/audit-atlas.mjs v3
       - run: node tools/audit-atlas.mjs
       - run: node --experimental-strip-types tools/audit-city-core.mjs
-      - run: node --experimental-strip-types tools/audit-inner-bay.mjs
+      - run: node --experimental-strip-types tools/audit-illustrated-expansion.mjs
       - run: npm run build
+      - name: Size the Pages artifact for the current viewer
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+
+          archive = Path("dist/map")
+          for name in ("v1", "v2", "v6", "v7", "v8"):
+              path = archive / name
+              if path.is_dir():
+                  shutil.rmtree(path)
+          PY
       - uses: actions/configure-pages@v6.0.0
       - uses: actions/upload-pages-artifact@v5.0.0
         with:

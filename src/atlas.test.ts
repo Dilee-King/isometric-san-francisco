@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { decodeSourceDepth, fitMaskTexture, maskIndex, sceneTransfer } from "./atlas.ts";
+import { decodeSourceDepth, fitMaskTexture, interpolateImageOffset, maskIndex, sceneTransfer } from "./atlas.ts";
 import { defaultControls } from "./model.ts";
 import type { Frame } from "./types.ts";
 
@@ -67,4 +67,13 @@ test("texture fitting preserves complete depth and surface samples", () => {
   const fitted = fitMaskTexture(pixels, 4, 2, 2);
   assert.deepEqual([fitted.width, fitted.height], [2, 1]);
   assert.deepEqual([...fitted.pixels], [6, 2, 1, 255, 8, 4, 3, 255]);
+});
+
+test("the illustrated bridge alignment tapers to the original approach", () => {
+  const samples = [[100, 0], [200, 24], [260, 0]];
+  assert.equal(interpolateImageOffset(samples, 60), 0);
+  assert.equal(interpolateImageOffset(samples, 150), 12);
+  assert.equal(interpolateImageOffset(samples, 200), 24);
+  assert.equal(interpolateImageOffset(samples, 230), 12);
+  assert.equal(interpolateImageOffset(samples, 290), 0);
 });
