@@ -41,6 +41,14 @@ export type Pose = {
   moving: boolean;
   color: string;
 };
+export type RegionTileLayout = {
+  tileSize: number;
+  overlap: number;
+  maxLevel: number;
+  sharedMaxLevel: number;
+  fallback: string;
+  regions: { id: string; bounds: [number, number, number, number] }[];
+};
 export type SceneData = {
   width: number;
   height: number;
@@ -52,6 +60,7 @@ export type SceneData = {
   clipDepth?: number;
   transportScale?: number;
   defaultLocation?: string;
+  tileLayout?: RegionTileLayout;
   projection: Projection;
   extent: number[];
   sourceBuildings: number;

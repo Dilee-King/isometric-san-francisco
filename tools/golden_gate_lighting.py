@@ -18,10 +18,10 @@ LIT_ROADS = ('Beach Street','North Point','Van Ness','Marina Boulevard','Mason S
              'Municipal Pier','Fort Mason','Yacht Road')
 
 
-def lamps_for(data):
+def lamps_for(data, lit_roads=LIT_ROADS):
     lamps={}
     for road in data['roads']:
-        if road['tunnel'] or not any(name in road['name'] for name in LIT_ROADS):
+        if road['tunnel'] or not any(name in road['name'] for name in lit_roads):
             continue
         identity=zlib.crc32(road['id'].encode())
         for a,b in zip(road['points'],road['points'][1:]):
@@ -39,7 +39,7 @@ def lamps_for(data):
     return list(lamps.values())
 
 
-def tone(day, appearance, frame, lamps):
+def tone(day, appearance, frame, lamps, *, work=WORK):
     """The four appearances keep precisely the same native pixels and silhouettes."""
     if appearance=='day':
         return day
@@ -48,8 +48,8 @@ def tone(day, appearance, frame, lamps):
     w,h=day.size
     scale=frame.width/w
     day=np.asarray(day,dtype='float32')
-    hard=np.asarray(Image.open(WORK/f'{frame.key}-hard.png'))>0
-    coast=np.asarray(Image.open(WORK/f'{frame.key}-water.png'))>0
+    hard=np.asarray(Image.open(work/f'{frame.key}-hard.png'))>0
+    coast=np.asarray(Image.open(work/f'{frame.key}-water.png'))>0
     water=coast & (day[...,2]>day[...,1]*1.035)&(day[...,2]>day[...,0]*1.08)
     vegetation=(day[...,1]>day[...,0]*1.03)&(day[...,1]>day[...,2]*1.18)&~water
     y=(frame.y+np.arange(h,dtype='float32')*scale)[:,None]
@@ -75,7 +75,7 @@ def tone(day, appearance, frame, lamps):
     ds,dp,dr=(ImageDraw.Draw(m) for m in (sharp,soft,reflection))
     # A source sample can move to the nearest dark window in the illustration.
     # A maximum offset of three pixels avoids glowing dots over empty roofs.
-    windows=json.loads((WORK/f'{frame.key}-windows.json').read_text(encoding='utf-8'))
+    windows=json.loads((work/f'{frame.key}-windows.json').read_text(encoding='utf-8'))
     for row in windows:
         if row['seed']%5 in (2,4):
             continue

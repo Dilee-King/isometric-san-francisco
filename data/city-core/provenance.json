@@ -1,0 +1,107 @@
+{
+  "crs": "EPSG:32610",
+  "originLonLat": [
+    -122.3943,
+    37.7955
+  ],
+  "originUTM": [
+    553326.4257226175,
+    4183298.4609667137
+  ],
+  "extentLocalMetres": [
+    -3300.0,
+    -4300.0,
+    2150.0,
+    2250.0
+  ],
+  "builtUTC": "2026-11-11T01:09:48.498540+00:00",
+  "inputManifest": {
+    "retrievedUTC": "2026-11-10T22:18:38.343215+00:00",
+    "bboxLonLat": [
+      -122.4320773503946,
+      37.75661732516288,
+      -122.36970855783485,
+      37.815965429824324
+    ],
+    "inputs": {
+      "footprints": {
+        "name": "footprints.geojson",
+        "bytes": 45200024,
+        "sha256": "497d9d34b57fa55fc9c820ab226df8b8402affc0c81cc3c6ddf83da1adb71d1c"
+      },
+      "osm": {
+        "name": "osm.json",
+        "bytes": 32598904,
+        "sha256": "99050f33ca91b23abf05c4d782d3b4ce831915ff3d04dd59ad252d61865fe359"
+      },
+      "lidar": {
+        "name": "corridor-lidar-d6.npz",
+        "bytes": 280671089,
+        "sha256": "f3f76ea666449ccba931e6517dbaae7772b94421601db78dfde0ccf9d0e7b427"
+      },
+      "land": {
+        "name": "ne-land.zip",
+        "bytes": 3269070,
+        "sha256": "e547d749445eaa0964aba76738090ec88f5e63c4585122170f98c67a7ea922dc"
+      },
+      "urban": {
+        "name": "ne-urban.zip",
+        "bytes": 13097698,
+        "sha256": "2c593114e954ce1adb297ddee5465f05d9e81fa0a26deb13f8500d58a00d7051"
+      }
+    },
+    "sources": {
+      "footprints": "https://data.sfgov.org/resource/ynuv-fyni.geojson",
+      "lidar": "https://s3-us-west-2.amazonaws.com/usgs-lidar-public/CA_SanFrancisco_1_B23/",
+      "land": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_land.zip",
+      "urban": "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_urban_areas.zip"
+    }
+  },
+  "osmAcquisition": {
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "query": "[out:json][timeout:55];(way[\"natural\"~\"^(coastline|water|wood|scrub)$\"](37.75661732516288,-122.4320773503946,37.815965429824324,-122.36970855783485);way[\"man_made\"~\"^(pier|breakwater|groyne)$\"](37.75661732516288,-122.4320773503946,37.815965429824324,-122.36970855783485);way[\"highway\"](37.75661732516288,-122.4320773503946,37.815965429824324,-122.36970855783485);way[\"railway\"~\"^(rail|tram|light_rail)$\"](37.75661732516288,-122.4320773503946,37.815965429824324,-122.36970855783485);way[\"leisure\"~\"^(park|pitch|stadium|marina|garden)$\"](37.75661732516288,-122.4320773503946,37.815965429824324,-122.36970855783485);way[\"landuse\"~\"^(grass|forest|meadow|recreation_ground|village_green|brownfield)$\"](37.75661732516288,-122.4320773503946,37.815965429824324,-122.36970855783485);way[\"building\"](37.75661732516288,-122.4320773503946,37.815965429824324,-122.36970855783485);node[\"natural\"=\"tree\"](37.75661732516288,-122.4320773503946,37.815965429824324,-122.36970855783485););out geom;"
+  },
+  "osmBase": "2026-11-10T22:17:28Z",
+  "lidar": {
+    "nodes": 652,
+    "nodeBytes": 228474511,
+    "points": 21589939,
+    "classCounts": {
+      "1": 16593180,
+      "2": 3227278,
+      "9": 1610093,
+      "17": 155288,
+      "20": 4100
+    },
+    "maxEptDepth": 6,
+    "sourceHorizontalCRS": "EPSG:3857",
+    "horizontalCRS": "EPSG:32610",
+    "verticalDatum": "NAVD88 metres; Z not reprojected",
+    "roofClass": 1,
+    "roofMethod": "class-filtered points inside footprints; median envelope, 94th percentile upper height"
+  },
+  "counts": {
+    "buildings": 8580,
+    "roads": 7641,
+    "trees": 4171,
+    "sourceFootprintRecords": 23564,
+    "buildingSupport": {
+      "DataSF / lidar envelope": 8148,
+      "v0.2 calibrated source": 319,
+      "DataSF / height fallback": 15,
+      "OSM supplement / lidar envelope": 98
+    },
+    "landPolygons": 83,
+    "pierPolygons": 657,
+    "landmarkPins": 12
+  },
+  "sourceValidityRepairs": {},
+  "landAreaM2": 21643621.5,
+  "licenses": {
+    "DataSF": "PDDL",
+    "USGS": "US Government public domain",
+    "OSM": "ODbL 1.0",
+    "NaturalEarth": "public domain"
+  },
+  "derivedSourceSHA256": "673b7e5b20f140d93590deda5ea8f408bc4ed97f5d542ccb68e486fe29a9b4e9"
+}

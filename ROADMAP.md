@@ -42,7 +42,9 @@
 - [x] Extend the detailed waterfront from Fisherman's Wharf to Mission Bay while retaining native patch density and four appearances.
 - [x] Add a Bay Area overview and return to the detailed corridor with preserved controls and clocks.
 - [x] Extend the waterfront through the Marina and Presidio to the Golden Gate Bridge and harmonize offshore water across tile boundaries.
-- [ ] Extend detailed coverage inland and across the Bay Bridge / Oakland-Alameda waterfront.
+- [x] Connect Ferry Building, the Financial District, Chinatown, North Beach and Fisherman's Wharf, then extend to Union Square.
+- [x] Load visible imagery through named region packages with a shared low-zoom pyramid and continuous simulation state.
+- [ ] Extend detailed coverage across the Bay Bridge / Oakland-Alameda waterfront.
 - [ ] Add meaningful code checks, versioned manifests and a measured performance budget.
 - [x] Publish the verified sample with GitHub Pages and update instructions; large-area asset storage remains future work.
 - [x] Ship an English interface and documentation, without the decorative lower-left caption.

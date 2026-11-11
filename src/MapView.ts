@@ -4,6 +4,7 @@ import { SpriteRenderer } from "./SpriteRenderer.ts";
 import { VehicleRenderer } from "./VehicleRenderer.ts";
 import { sceneRoot } from "./assets.ts";
 import { sceneTransfer } from "./atlas.ts";
+import { regionTileSource } from "./regionTiles.ts";
 import { defaultControls, nightAmount, project } from "./model.ts";
 import type { Frame, Controls, SceneData } from "./types.ts";
 import type { ViewTransform } from "./SpriteRenderer.ts";
@@ -65,7 +66,7 @@ export class MapView {
     host.append(this.base);
     this.viewer = OpenSeadragon({
       element: this.base,
-      tileSources: `${sceneRoot(data)}scene.dzi`,
+      tileSources: regionTileSource(data, sceneRoot(data), "scene"),
       homeFillsViewer: data.kind !== "waterfront",
       showNavigationControl: false,
       showNavigator: false,
@@ -110,7 +111,7 @@ export class MapView {
       const addLayer = (name: string) =>
         new Promise<OpenSeadragon.TiledImage>((resolve, reject) =>
           this.viewer.addTiledImage({
-            tileSource: `${sceneRoot(data)}${name}.dzi`,
+            tileSource: regionTileSource(data, sceneRoot(data), name),
             x: 0,
             y: 0,
             width: 1,
@@ -150,7 +151,7 @@ export class MapView {
     host.tabIndex = 0;
     host.setAttribute(
       "aria-label",
-      `${data.kind === "bay" ? "Bay Area overview" : "San Francisco waterfront"}. Drag to pan, scroll to zoom, Space to pause, Home to reset.`,
+      `${data.kind === "bay" ? "Bay Area overview" : "San Francisco city and waterfront"}. Drag to pan, scroll to zoom, Space to pause, Home to reset.`,
     );
     host.addEventListener("keydown", this.keydown);
     document.addEventListener("visibilitychange", this.visibility);

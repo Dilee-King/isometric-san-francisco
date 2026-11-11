@@ -69,11 +69,11 @@ def number(value, default):
         return default
 
 
-def intersects_frame(geom, h=240):
+def intersects_frame(geom, h=240, frames=FRAMES):
     x0, y0, x1, y1 = geom.bounds
     xy = [camera_point((x, y, z)) for x in (x0, x1) for y in (y0, y1) for z in (0, h)]
     xs, ys = [p[0] for p in xy], [p[1] for p in xy]
-    return any(max(xs) >= f.x and min(xs) <= f.right and max(ys) >= f.y and min(ys) <= f.bottom for f in FRAMES)
+    return any(max(xs) >= f.x and min(xs) <= f.right and max(ys) >= f.y and min(ys) <= f.bottom for f in frames)
 
 
 def terrain_from_lidar(ground):
@@ -95,8 +95,10 @@ def terrain_from_lidar(ground):
     return {'x': gx.tolist(), 'n': gy.tolist(), 'z': np.round(grid, 2).tolist()}, elevation
 
 
-def derive():
-    OUT.mkdir(parents=True, exist_ok=True)
+def derive(*, out=OUT, frames=FRAMES):
+    out.mkdir(parents=True, exist_ok=True)
+    def retained(geom, height=240):
+        return intersects_frame(geom, height, frames)
     original = json.loads((ROOT/'data/source/ferry.json').read_text(encoding='utf-8'))
     former = {b['id']: b for b in original['buildings']}
     raw_osm = json.loads((CACHE/'osm.json').read_text(encoding='utf-8'))
@@ -148,7 +150,7 @@ def derive():
             green.extend(polygons(polygon.intersection(ROI)))
             if tags.get('sport') == 'baseball':
                 parks.extend(polygons(polygon.intersection(ROI)))
-        if polygon is not None and tags.get('building') and intersects_frame(polygon):
+        if polygon is not None and tags.get('building') and retained(polygon):
             supplements.append((item['id'], polygon.intersection(ROI), tags))
         kind = tags.get('highway') or (tags.get('railway') if tags.get('railway') in ('tram','rail','light_rail') else None)
         if kind and kind not in ('construction', 'proposed', 'razed', 'abandoned'):
@@ -156,7 +158,7 @@ def derive():
             bridge = tags.get('bridge') not in (None, 'no')
             bridge_height = 42. if bridge and (tags.get('ref') == 'I 80' or 'Bay Bridge' in tags.get('name','')) else 0.
             for segment in lines(line.intersection(ROI)):
-                if segment.length < 2 or not intersects_frame(segment, 55):
+                if segment.length < 2 or not retained(segment, 55):
                     continue
                 a = np.array(segment.coords)
                 zs = np.asarray(elevation(a[:,0], a[:,1])).clip(1.7) + .18
@@ -180,7 +182,7 @@ def derive():
 
     buildings, footprints = [], []
     def add_building(identity, geom, prop, source):
-        if geom.is_empty or geom.area < 20 or not intersects_frame(geom, 260):
+        if geom.is_empty or geom.area < 20 or not retained(geom, 260):
             return
         # Keep existing calibrated geometry where its Ferry reference applies.
         if identity in former:
@@ -243,10 +245,10 @@ def derive():
               'extent':list(EXTENT),'terrain':terrain,'land':rings(land),'piers':rings(unary_union(piers)),
               'greens':rings(greens),'ballfields':rings(unary_union(parks)), 'buildings':buildings,
               'roads':roads,'trees':trees,'landmarks':landmarks}
-    path = OUT/'source.json.gz'
+    path = out/'source.json.gz'
     path.write_bytes(gzip.compress(json.dumps(result,separators=(',',':'),allow_nan=False).encode(),mtime=0))
     audit['derivedSourceSHA256'] = sha(path)
-    (OUT/'provenance.json').write_text(json.dumps(audit,indent=2),encoding='utf-8')
+    (out/'provenance.json').write_text(json.dumps(audit,indent=2),encoding='utf-8')
     print(json.dumps({**audit['counts'],'derivedBytes':path.stat().st_size,'repairs':dict(repairs)},indent=2))
 
 

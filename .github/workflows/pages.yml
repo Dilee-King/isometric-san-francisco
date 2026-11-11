@@ -24,9 +24,11 @@ jobs:
       - run: python tools/test_source_pipeline.py
       - run: python tools/test_atlas_geometry.py
       - run: python tools/test_golden_gate.py
+      - run: python tools/test_city_core.py
       - run: node tools/audit-assets.mjs
       - run: node tools/audit-atlas.mjs v3
       - run: node tools/audit-atlas.mjs
+      - run: node --experimental-strip-types tools/audit-city-core.mjs
       - run: npm run build
       - uses: actions/configure-pages@v6.0.0
       - uses: actions/upload-pages-artifact@v5.0.0

@@ -1,13 +1,14 @@
 {
-  "schemaVersion": "0.4",
+  "schemaVersion": "0.5",
   "project": "isometric-san-francisco",
-  "status": "detailed-waterfront-and-regional-overview",
+  "status": "detailed-city-core-waterfront-and-regional-overview",
   "plannedTarget": "San Francisco urban area and northern/eastern bay waterfront",
   "plannedSequence": [
     "Ferry Building / Financial District / Embarcadero contiguous quality sample",
     "Adjacent downtown neighborhoods and northern waterfront",
     "SoMa / Mission Bay and further contiguous city neighborhoods",
-    "Aquatic Park / Fort Mason / Marina / Presidio / Golden Gate Bridge"
+    "Aquatic Park / Fort Mason / Marina / Presidio / Golden Gate Bridge",
+    "Ferry Building / Financial District / Chinatown / North Beach / Fisherman's Wharf / Union Square"
   ],
   "futureExpansion": [
     "Wider San Francisco Bay Area",
@@ -16,9 +17,9 @@
   ],
   "publishedCoverage": [
     {
-      "release": "waterfront-v4",
-      "role": "detailed-waterfront",
-      "description": "Golden Gate Bridge to Mission Bay, including Fort Point, Crissy Field, the Marina, Fort Mason, Fisherman's Wharf, Ferry Building, the Bay Bridge approach and Oracle Park",
+      "release": "city-core-v5",
+      "role": "detailed-city-core-and-waterfront",
+      "description": "Ferry Building through the Financial District, Chinatown and North Beach to Fisherman's Wharf, with Union Square and the existing Golden Gate Bridge to Mission Bay waterfront",
       "imageSize": [
         12722,
         14408
@@ -30,28 +31,36 @@
         5550
       ],
       "crs": "EPSG:32610",
-      "nativeDetailPatches": 20,
-      "contextPlates": 8,
+      "nativeDetailPatches": 27,
+      "contextPlates": 10,
       "bridge": "Continuous registered bridge including landfall connectors; illustrative geometry",
       "pixelsPerMetre": 1.8545454545454545,
-      "scene": "../public/map/v4/waterfront/scene.json"
+      "scene": "../public/map/v5/waterfront/scene.json",
+      "locationJumps": 30,
+      "regionalPackaging": {
+        "sharedMaxLevel": 11,
+        "regionCount": 8,
+        "tileSize": 512,
+        "overlap": 1,
+        "coordinateSystem": "one continuous image grid"
+      }
     },
     {
-      "release": "bay-overview-v4",
+      "release": "bay-overview-v5",
       "role": "regional-context",
-      "description": "Bay Area terrain and shoreline overview; the highlighted waterfront is the detailed coverage. This is not detailed city or nine-county coverage.",
+      "description": "Bay Area terrain and shoreline overview, with the detailed city-core and waterfront coverage highlighted",
       "imageSize": [
         2560,
         1792
       ],
       "crs": "EPSG:32610",
-      "scene": "../public/map/v4/bay/scene.json"
+      "scene": "../public/map/v5/bay/scene.json"
     }
   ],
   "publishedTileCount": 4176,
   "boundaryGeoJSON": null,
-  "cameraManifest": "../public/map/v4/atlas.json",
-  "tileReleaseManifest": "../public/map/v4/atlas.json",
-  "note": "The detailed corridor and regional context use different scales with one shared origin and camera orientation.",
+  "cameraManifest": "../public/map/v5/atlas.json",
+  "tileReleaseManifest": "../public/map/v5/atlas.json",
+  "note": "The detailed city and regional context use different scales with one shared origin and camera orientation. Visible image tiles load from regional directories. Scene metadata, masks, depth and simulation stay shared within the detailed view.",
   "appearanceCount": 4
 }

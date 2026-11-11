@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 — City core and regional tiles
+
+- Connected Ferry Building through the Financial District, Chinatown and North Beach to Fisherman's Wharf, with detailed coverage to Union Square.
+- Added seven native detail plates, two inland context plates, 140 source-directed cars, a city overflight and eight location jumps.
+- Packaged the imagery into named regional directories with a shared low-zoom pyramid. A single coordinate system and simulation worker preserve continuous navigation, time and weather.
+- Added registered city lighting and wet surfaces, regional tile audits and actual browser captures. See [verification](docs/VERIFICATION-v0.5.md).
+
 ## 0.4.0 — Golden Gate waterfront extension
 
 - Connected Fisherman's Wharf to the Golden Gate Bridge through the Marina and Presidio, using the existing native detail scale.

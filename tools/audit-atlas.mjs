@@ -14,7 +14,7 @@ const pngSize = (bytes) => {
   return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)];
 };
 const atlas = json(join(root, "atlas.json"));
-assert.equal(atlas.version, latest ? json("package.json").version : "0.3.0");
+assert.equal(atlas.version, latest ? "0.4.0" : "0.3.0");
 assert.equal(atlas.defaultScene, "waterfront");
 assert.deepEqual(
   atlas.scenes.map((s) => s.id),

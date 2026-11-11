@@ -25,7 +25,7 @@ def side_lane(points,offset=1.35):
     return result
 
 
-def west_cars(data):
+def west_cars(data, *, frames=WEST_ART, prefix="west"):
     graph=defaultdict(set)
     two_way=[]
     for r in data['roads']:
@@ -47,7 +47,7 @@ def west_cars(data):
     rng=random.Random(20261110)
     routes=[]
     report={}
-    for f in WEST_ART:
+    for f in frames:
         if f.key=='marin-landing':
             continue
         def inside(p):
@@ -84,7 +84,7 @@ def west_cars(data):
             loop=loops[i%len(loops)]
             lane=side_lane(loop)
             lane[-1]=lane[0]
-            routes.append({'id':f'west-{f.key}-car-{i}','kind':'car','points':lane,
+            routes.append({'id':f'{prefix}-{f.key}-car-{i}','kind':'car','points':lane,
                            'speed':4.8+(i%4)*.73,'phase':rng.random()*130,'dwell':1.4+(i%3)*.37,
                            'color':CAR_COLORS[i%len(CAR_COLORS)]})
     return routes,report

@@ -194,7 +194,7 @@ export default function App() {
           <p className="scope">
             {scene === "bay"
               ? "Bay Area overview"
-              : "Golden Gate Bridge → Mission Bay"}
+              : "City core & waterfront"}
           </p>
         </div>
       </header>
@@ -204,7 +204,7 @@ export default function App() {
             aria-pressed={scene === "waterfront"}
             onClick={() => setScene("waterfront")}
           >
-            Waterfront
+            City
           </button>
           <button
             aria-pressed={scene === "bay"}
@@ -215,7 +215,7 @@ export default function App() {
         </div>
         {scene === "waterfront" && (
           <select
-            aria-label="Jump to waterfront location"
+            aria-label="Jump to a place"
             value=""
             disabled={!ready}
             onChange={(e) => map.current?.focusLocation(e.target.value)}
@@ -504,9 +504,9 @@ export default function App() {
             </div>
             <h2 id="about-title">San Francisco, in motion.</h2>
             <p>
-              Follow San Francisco’s waterfront from the Golden Gate Bridge
-              through the Presidio, Marina, and Fisherman’s Wharf to Mission
-              Bay. Switch to Bay Area for the regional view.
+              Explore the Financial District, Chinatown, North Beach and Union
+              Square, connected to the waterfront from the Golden Gate Bridge
+              to Mission Bay. Switch to Bay Area for the regional view.
             </p>
             <h3>Artwork and data</h3>
             <p>

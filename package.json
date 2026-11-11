@@ -1,6 +1,6 @@
 {
   "name": "isometric-san-francisco",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -10,8 +10,8 @@
     "dev": "vite --host 127.0.0.1 --port 5186",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4186",
-    "test": "node --experimental-strip-types --test src/model.test.ts src/VehicleGeometry.test.ts src/atlas.test.ts",
-    "tiles": "python tools/render_golden_gate.py && python tools/package_golden_gate.py"
+    "test": "node --experimental-strip-types --test src/model.test.ts src/VehicleGeometry.test.ts src/atlas.test.ts src/regionTiles.test.ts",
+    "tiles": "python tools/render_city_core.py && python tools/package_city_core.py"
   },
   "dependencies": {
     "openseadragon": "6.1.1",

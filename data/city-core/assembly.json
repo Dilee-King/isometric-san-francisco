@@ -1,0 +1,8 @@
+{
+  "baseSourceSHA256": "94c62cb21da852774759353721a014c7d655ccb989211ce2888dd115b591c6aa",
+  "inlandSourceSHA256": "673b7e5b20f140d93590deda5ea8f408bc4ed97f5d542ccb68e486fe29a9b4e9",
+  "buildings": 11360,
+  "roads": 13925,
+  "landmarks": 30,
+  "sourceCRS": "EPSG:32610"
+}
