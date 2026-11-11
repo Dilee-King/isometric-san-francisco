@@ -32,3 +32,11 @@ The Jack London Square wet-day render differed from the dry render by a mean abs
 - [Fort Baker](screenshots/v0.8/fort-baker.jpg) and [Sausalito in coastal fog](screenshots/v0.8/sausalito-fog.jpg)
 
 The detailed city map ends at its bounded source area. The Bay Area view shows the continuation of the peninsula and the broader coastline.
+
+## Publication
+
+GitHub Actions built and deployed commit `6ab74e2527d721d1947041e6ead42be7dfd6c9c6`. The default public entrance opened v0.8. Fresh Chromium navigation passed for the three release URLs and the retained v0.5 entrance. The run checked both Bay Bridge spans, Oakland and Sausalito ferries, wet-night loading, release-specific imagery and a round trip to Bay Area. It observed zero page or console errors and zero failing HTTP responses. The three served atlas descriptors, shared mask and shared manifest matched the repository bytes. [GitHub Actions run](https://github.com/Dilee-King/isometric-san-francisco/actions/runs/42955689356)
+
+- [v0.6 public atlas](https://dilee-king.github.io/isometric-san-francisco/?v=0.6.0) · [Citywide view](screenshots/v0.6/online-san-francisco-wide.jpg) · [Bay Bridge East Span](screenshots/v0.6/online-bay-bridge-east.jpg)
+- [v0.7 public atlas](https://dilee-king.github.io/isometric-san-francisco/?v=0.7.0) · [Port of Oakland](screenshots/v0.7/online-oakland-port.jpg) · [Jack London Square in night rain](screenshots/v0.7/online-jack-london-rain-night.jpg)
+- [v0.8 public atlas](https://dilee-king.github.io/isometric-san-francisco/?v=0.8.0) · [Fort Baker](screenshots/v0.8/online-fort-baker.jpg) · [Sausalito in night rain](screenshots/v0.8/online-sausalito-rain-night.jpg) · [Bay Area overview](screenshots/v0.8/online-bay-overview.jpg)
