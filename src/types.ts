@@ -53,6 +53,7 @@ export type RegionTileLayout = {
     root: string;
     blockSize: number;
     blocks: Record<string, string>;
+    appearanceOverrides?: Record<string, string>;
   };
 };
 export type SceneData = {

@@ -229,6 +229,10 @@ def derive():
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = read(CACHE / "inputs.json")
     paths = {key: CACHE / row["path"] for key, row in manifest["inputs"].items()}
+    for key, path in paths.items():
+        entry = manifest["inputs"][key]
+        if not path.is_file() or path.stat().st_size != entry["bytes"] or sha(path) != entry["sha256"]:
+            raise ValueError(f"Cached input does not match its manifest: {path}")
     surface, elevation = terrain(paths["terrain"])
     land, parts = coastline(paths["coastline"])
     # The mainland city limit follows the south side of the retained urban area.

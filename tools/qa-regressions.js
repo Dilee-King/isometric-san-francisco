@@ -77,6 +77,42 @@ async (page) => {
     await fallback.close();
     await page.bringToFront();
   }
+  const limited = await page.context().newPage();
+  try {
+    await limited.addInitScript(() => {
+      const gl = WebGL2RenderingContext.prototype;
+      const getParameter = gl.getParameter;
+      const texImage2D = gl.texImage2D;
+      gl.getParameter = function (parameter) {
+        if (parameter === this.MAX_TEXTURE_SIZE) return 4096;
+        return getParameter.call(this, parameter);
+      };
+      window.maskUploads = [];
+      gl.texImage2D = function (...args) {
+        if (args.length === 9) {
+          window.maskUploads.push([args[3], args[4]]);
+          if (Math.max(args[3], args[4]) > 4096) throw new Error("Texture exceeded simulated device limit");
+        }
+        return texImage2D.apply(this, args);
+      };
+    });
+    await limited.goto("http://127.0.0.1:4186/?v=0.8.0");
+    await limited.waitForFunction(() => window.__sf?.ready && window.__sf.data.release === "inner-bay-v8");
+    await limited.getByRole("button", { name: "Rain", exact: true }).click();
+    await limited.waitForFunction(() => window.__sf.rainDayLayer.getOpacity() > .99 && window.__sf.rainDayLayer.getFullyLoaded());
+    const upload = await limited.evaluate(() => {
+      const { vehicles, atmosphere } = window.__sf;
+      return {
+        masks: window.maskUploads.filter(([width, height]) => width === 4096 && height === 2275).length,
+        errors: [vehicles.gl.getError(), atmosphere.gl.getError()],
+      };
+    });
+    if (upload.masks !== 2 || upload.errors.some(Boolean))
+      failures.push("limited GPU did not upload both packed mask textures");
+  } finally {
+    await limited.close();
+    await page.bringToFront();
+  }
   if (failures.length) throw new Error(failures.join("; "));
   return {
     pass: true,
@@ -85,6 +121,7 @@ async (page) => {
     resume: true,
     noWebGL2NoticeAndDisabledControls: true,
     canvasWorldMeshAndNightFallback: true,
+    simulated4096TextureLimit: true,
     visibilityMethod:
       "synthetic Page Visibility event; no real OS tab-hiding claim",
   };

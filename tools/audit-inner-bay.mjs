@@ -17,13 +17,13 @@ const sourceSHA = digest("data/inner-bay/source.json.gz");
 const prior = json(join(root, "v5/waterfront/scene.json"));
 
 function auditedFiles(folder, manifest) {
-  const entries = new Set();
+  const entries = new Map();
   for (const file of manifest.files) {
     assert.ok(!entries.has(file.path), file.path);
     const content = readFileSync(join(folder, file.path));
     assert.equal(content.length, file.bytes, file.path);
     assert.equal(sha(content), file.sha256, file.path);
-    entries.add(file.path);
+    entries.set(file.path, file.sha256);
   }
   return entries;
 }
@@ -35,6 +35,7 @@ assert.deepEqual([mask.readUInt32BE(16), mask.readUInt32BE(20)], common.maskSize
 assert.equal(mask[25], 2, "Packed mask must use RGB with opaque surface bits");
 let priorBlockCount = 0;
 let priorPlaceCount = prior.landmarks.length;
+const variantFiles = new Set();
 for (const version of [6, 7, 8]) {
   const folder = join(root, `v${version}`);
   const atlas = json(join(folder, "atlas.json"));
@@ -60,6 +61,9 @@ for (const version of [6, 7, 8]) {
   const layout = city.tileLayout;
   const native = Object.entries(common.nativeBlocks).filter(([, [stage]]) => stage <= version);
   assert.deepEqual(layout.sparse.blocks, Object.fromEntries(native.map(([key, [, region]]) => [key, region])));
+  const overrides = layout.sparse.appearanceOverrides ?? {};
+  assert.deepEqual(overrides, common.appearanceOverrides?.[version] ?? {});
+  assert.equal(Object.keys(overrides).length > 0, version < 8);
   assert.ok(native.length > priorBlockCount);
   assert.ok(city.landmarks.length > priorPlaceCount);
   priorBlockCount = native.length;
@@ -79,7 +83,7 @@ for (const version of [6, 7, 8]) {
     assert.deepEqual([image.readUInt32BE(16), image.readUInt32BE(20)], art.size);
   }
 
-  let sharedTiles = 0, nativeTiles = 0;
+  let sharedTiles = 0, nativeTiles = 0, substitutedTiles = 0;
   for (const appearance of appearances) {
     const source = regionTileSource(city, "", appearance);
     for (let level = 0; level <= layout.maxLevel; level++) {
@@ -89,7 +93,18 @@ for (const version of [6, 7, 8]) {
           if (!source.tileExists(level, column, row)) continue;
           const path = source.getTileUrl(level, column, row);
           if (level > layout.sharedMaxLevel) {
-            assert.ok(sharedFiles.has(path.replace(layout.sparse.root, "")), path);
+            const relative = path.replace(layout.sparse.root, "");
+            assert.ok(sharedFiles.has(relative), path);
+            const override = overrides[`${appearance}/${level}/${column}_${row}`];
+            if (override) {
+              const pixels = layout.tileSize * 2 ** (layout.maxLevel - level);
+              const block = `${Math.floor(column * pixels / layout.sparse.blockSize)}_${Math.floor(row * pixels / layout.sparse.blockSize)}`;
+              const normal = `regions/${layout.sparse.blocks[block]}/${appearance}_files/${level}/${column}_${row}.webp`;
+              assert.ok(sharedFiles.has(normal), normal);
+              assert.notEqual(sharedFiles.get(relative), sharedFiles.get(normal), relative);
+              variantFiles.add(relative);
+              substitutedTiles++;
+            }
             nativeTiles++;
           } else {
             assert.ok(cityFiles.has(path), path);
@@ -105,6 +120,8 @@ for (const version of [6, 7, 8]) {
   }
   assert.equal(sharedTiles, cityManifest.tileCount);
   assert.equal(nativeTiles, native.length * 45 * 4);
+  assert.equal(substitutedTiles, Object.keys(overrides).length);
   console.log(`v0.${version}: ${city.landmarks.length} places, ${native.length} detail blocks, ${nativeTiles} native and ${sharedTiles} backdrop tiles`);
 }
-console.log(`Inner Bay audit passed with ${common.tileCount} shared native tiles`);
+assert.equal(common.tileCount, priorBlockCount * 45 * 4 + variantFiles.size);
+console.log(`Inner Bay audit passed with ${priorBlockCount * 45 * 4} shared native tiles and ${variantFiles.size} early-release variants`);

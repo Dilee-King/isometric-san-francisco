@@ -54,7 +54,8 @@ test("existing scene descriptors retain their DZI entry point", () => {
 test("sparse atlases keep lower levels and request native tiles only inside active blocks", () => {
   const tileLayout = {
     ...layout, maxLevel: 16, sharedMaxLevel: 14,
-    sparse: { root: "../../inner-bay/", blockSize: 3072, blocks: { "4_2": "west-city" } },
+    sparse: { root: "../../inner-bay/", blockSize: 3072, blocks: { "4_2": "west-city" },
+      appearanceOverrides: { "scene/16/25_12": "through-v6" } },
   };
   const source = regionTileSource({ width: 55296, height: 30720, tileLayout }, "/map/v6/waterfront/", "scene");
   if (typeof source === "string") throw new Error("Expected sparse source");
@@ -64,5 +65,6 @@ test("sparse atlases keep lower levels and request native tiles only inside acti
   assert.equal(source.tileExists?.(14, 7, 3), true);
   assert.equal(source.tileExists?.(14, -1, 3), false);
   assert.equal(source.getTileUrl(16, 24, 12), "/map/v6/waterfront/../../inner-bay/regions/west-city/scene_files/16/24_12.webp");
+  assert.equal(source.getTileUrl(16, 25, 12), "/map/v6/waterfront/../../inner-bay/regions/through-v6/scene_files/16/25_12.webp");
   assert.equal(source.getTileUrl(14, 7, 3), "/map/v6/waterfront/regions/overview/scene_files/14/7_3.webp");
 });

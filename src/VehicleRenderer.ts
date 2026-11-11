@@ -39,6 +39,7 @@ uniform sampler2D sourceDepth;
 uniform vec2 imageSize;
 uniform vec2 depthEncoding;
 uniform float depthSlope;
+uniform float sourceRows;
 uniform float night;
 uniform float time;
 out vec4 pixel;
@@ -48,7 +49,9 @@ void main(){
  vec2 packed=texture(sourceDepth,uv).rg;
  float structure=(packed.r*65280.+packed.g*255.)/65535.*depthEncoding.y-depthEncoding.x;
  float rows=float(textureSize(sourceDepth,0).y);
- float cell=(floor(uv.y*rows)+.5)*imageSize.y/rows;
+ float row=min(rows-1.,floor(uv.y*rows));
+ float sourceRow=floor((row+.5)*sourceRows/rows);
+ float cell=(sourceRow+.5)*imageSize.y/sourceRows;
  structure+=(imagePoint.y-cell)*depthSlope;
  if(structure>cameraDepth+2.0)discard;
  vec3 paint=color.rgb*(1.-night*.48);
@@ -164,6 +167,7 @@ export class VehicleRenderer {
       "clipDepth",
       "depthEncoding",
       "depthSlope",
+      "sourceRows",
       "sourceDepth",
       "imageSize",
       "night",
@@ -180,18 +184,20 @@ export class VehicleRenderer {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      const depth = sprites.depthTexture(gl);
       gl.texImage2D(
         gl.TEXTURE_2D,
         0,
         gl.RGBA,
-        sprites.maskWidth,
-        sprites.maskHeight,
+        depth.width,
+        depth.height,
         0,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
-        new Uint8Array(sprites.depth!),
+        depth.pixels,
       );
       gl.uniform1i(this.uniforms.sourceDepth, 0);
+      gl.uniform1f(this.uniforms.sourceRows, sprites.maskHeight);
     });
   }
   draw(frame: Frame, v: ViewTransform) {

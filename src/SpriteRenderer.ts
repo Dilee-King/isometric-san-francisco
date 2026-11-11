@@ -1,5 +1,5 @@
 import { maskPath } from "./assets.ts";
-import { decodeSourceDepth, legacyDepthEncoding, maskIndex } from "./atlas.ts";
+import { decodeSourceDepth, fitMaskTexture, legacyDepthEncoding, maskIndex } from "./atlas.ts";
 import { nightAmount, project } from "./model.ts";
 import type { Frame, Point3, SceneData } from "./types.ts";
 export type ViewTransform = {
@@ -10,6 +10,33 @@ export type ViewTransform = {
   height: number;
   dpr: number;
 };
+
+function readMask(image: HTMLImageElement, width: number, height: number) {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+  const read = (left: number, top: number, columns: number, rows: number) => {
+    canvas.width = columns;
+    canvas.height = rows;
+    ctx.drawImage(image, left, top, columns, rows, 0, 0, columns, rows);
+    return ctx.getImageData(0, 0, columns, rows).data;
+  };
+  const canvasLimit = 4096;
+  if (width <= canvasLimit && height <= canvasLimit) return read(0, 0, width, height);
+
+  const pixels = new Uint8ClampedArray(width * height * 4);
+  for (let top = 0; top < height; top += canvasLimit) {
+    for (let left = 0; left < width; left += canvasLimit) {
+      const columns = Math.min(canvasLimit, width - left);
+      const rows = Math.min(canvasLimit, height - top);
+      const strip = read(left, top, columns, rows);
+      for (let row = 0; row < rows; row++) {
+        const start = row * columns * 4;
+        pixels.set(strip.subarray(start, start + columns * 4), ((top + row) * width + left) * 4);
+      }
+    }
+  }
+  return pixels;
+}
 
 export class SpriteRenderer {
   canvas: HTMLCanvasElement;
@@ -37,16 +64,14 @@ export class SpriteRenderer {
         const image = new Image();
         image.src = maskPath(data, name);
         await image.decode();
-        const c = document.createElement("canvas");
-        c.width = this.maskWidth;
-        c.height = this.maskHeight;
-        const ctx = c.getContext("2d", { willReadFrequently: true })!;
-        ctx.drawImage(image, 0, 0);
-        const pixels = ctx.getImageData(0, 0, c.width, c.height).data;
+        const pixels = readMask(image, this.maskWidth, this.maskHeight);
         if (name === "depth") this.depth = pixels;
         if (name === "water" || data.maskBundle) this.water = pixels;
       }),
     ).then(() => {});
+  }
+  depthTexture(gl: WebGL2RenderingContext) {
+    return fitMaskTexture(this.depth!, this.maskWidth, this.maskHeight, gl.getParameter(gl.MAX_TEXTURE_SIZE));
   }
   point(p: Point3, v: ViewTransform) {
     const q = project(p, this.data.projection);

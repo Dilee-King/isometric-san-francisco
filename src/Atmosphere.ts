@@ -2,7 +2,7 @@ import { nightAmount } from "./model.ts";
 import { maskPath } from "./assets.ts";
 import { legacyDepthEncoding } from "./atlas.ts";
 import type { Frame, SceneData } from "./types.ts";
-import type { ViewTransform } from "./SpriteRenderer.ts";
+import type { SpriteRenderer, ViewTransform } from "./SpriteRenderer.ts";
 
 const fragment = `#version 300 es
 precision highp float;
@@ -81,7 +81,7 @@ export class Atmosphere {
   data: SceneData;
   ready: Promise<void>;
   disposed = false;
-  constructor(host: HTMLElement, data: SceneData) {
+  constructor(host: HTMLElement, data: SceneData, sprites: SpriteRenderer) {
     this.data = data;
     this.canvas = document.createElement("canvas");
     this.canvas.className = "atmosphere";
@@ -139,9 +139,14 @@ export class Atmosphere {
     gl.uniform1i(this.uniforms.packedSurface, data.maskBundle ? 1 : 0);
     this.ready = Promise.all(
       (data.maskBundle ? ["depth"] : ["water", "depth", "hard"]).map(async (name, index) => {
-        const image = new Image();
-        image.src = maskPath(data, name);
-        await image.decode();
+        let image: HTMLImageElement | undefined;
+        if (data.maskBundle) {
+          await sprites.ready;
+        } else {
+          image = new Image();
+          image.src = maskPath(data, name);
+          await image.decode();
+        }
         if (this.disposed) return;
         const tex = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0 + index);
@@ -150,14 +155,12 @@ export class Atmosphere {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texImage2D(
-          gl.TEXTURE_2D,
-          0,
-          gl.RGB,
-          gl.RGB,
-          gl.UNSIGNED_BYTE,
-          image,
-        );
+        if (image) {
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+        } else {
+          const depth = sprites.depthTexture(gl);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, depth.width, depth.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, depth.pixels);
+        }
         gl.uniform1i(this.uniforms[`${name}Tex`], index);
       }),
     ).then(() => {});

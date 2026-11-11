@@ -28,6 +28,31 @@ export function maskIndex(
   );
 }
 
+/** Resize to the GPU limit without interpolating the packed depth and surface bytes. */
+export function fitMaskTexture(
+  pixels: Uint8ClampedArray,
+  width: number,
+  height: number,
+  limit: number,
+) {
+  if (Math.max(width, height) <= limit)
+    return { width, height, pixels: new Uint8Array(pixels.buffer, pixels.byteOffset, pixels.byteLength) };
+
+  const scale = limit / Math.max(width, height);
+  const targetWidth = Math.max(1, Math.floor(width * scale));
+  const targetHeight = Math.max(1, Math.floor(height * scale));
+  const source = new Uint32Array(pixels.buffer, pixels.byteOffset, width * height);
+  const target = new Uint32Array(targetWidth * targetHeight);
+  const columns = Array.from({ length: targetWidth }, (_, column) =>
+    Math.floor((column + .5) * width / targetWidth));
+  for (let row = 0; row < targetHeight; row++) {
+    const sourceRow = Math.floor((row + .5) * height / targetHeight) * width;
+    for (let column = 0; column < targetWidth; column++)
+      target[row * targetWidth + column] = source[sourceRow + columns[column]];
+  }
+  return { width: targetWidth, height: targetHeight, pixels: new Uint8Array(target.buffer) };
+}
+
 /** Keep user choices and clocks when the map assets/camera change. */
 export function sceneTransfer(frame: Frame): Frame {
   return {

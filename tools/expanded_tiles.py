@@ -3,6 +3,7 @@
 import argparse
 from concurrent.futures import ProcessPoolExecutor
 import hashlib
+from io import BytesIO
 import json
 import math
 
@@ -12,7 +13,7 @@ from scipy.ndimage import distance_transform_edt
 
 from atlas_geometry import PixelFrame, pack_depth, unpack_depth
 from corridor_inputs import ROOT, sha
-from expanded_geometry import BLOCK, DEPTH_ENCODING, HALO, MASK_DIVISOR, WORLD, art_frames
+from expanded_geometry import BLOCK, DEPTH_ENCODING, HALO, MASK_DIVISOR, PLACES, WORLD, art_frames
 from expanded_render import LEGACY_FRAMES, REFERENCE, WORK, block_frame, blocks, padded
 from golden_gate_lighting import tone
 from package_corridor import APPEARANCES, feather, write_manifest
@@ -27,6 +28,7 @@ SHARED_LEVEL = MAX_LEVEL - 2
 TILE = 512
 OLD = None
 ART_FRAMES = art_frames()
+ART_RELEASE = {key: release for release, places in PLACES.items() for key, *_ in places}
 SHORE_PLATES = {"ocean-beach", "oakland-port", "jack-london", "alameda-main", "fort-baker", "sausalito"}
 
 
@@ -143,42 +145,66 @@ def small_crop(image, divisor):
     return image.crop((margin, margin, margin + size, margin + size))
 
 
-def write_native(image, frame, region, appearance):
+def native_batches(frame, region, appearance):
     for divisor in (1, 2):
         level = MAX_LEVEL - (divisor - 1)
         count = BLOCK // divisor // TILE
-        margin = HALO // divisor
         start_column = (frame.x - WORLD.x) // (divisor * TILE)
         start_row = (frame.y - WORLD.y) // (divisor * TILE)
+        destination = SHARED / "regions" / region / f"{appearance}_files" / str(level)
+        tiles = [(column, row, destination / f"{column}_{row}.webp")
+                 for row in range(start_row, start_row + count)
+                 for column in range(start_column, start_column + count)]
+        yield divisor, start_column, start_row, destination, tiles
+
+
+def write_native(image, frame, region, appearance, base_region=None):
+    overrides = {}
+    for divisor, start_column, start_row, destination, tiles in native_batches(frame, region, appearance):
+        margin = HALO // divisor
         scaled = image if divisor == 1 else image.resize(
             (image.width // divisor, image.height // divisor), Image.Resampling.LANCZOS)
-        destination = SHARED / "regions" / region / f"{appearance}_files" / str(level)
         destination.mkdir(parents=True, exist_ok=True)
-        for row in range(count):
-            for column in range(count):
-                x, y = column + start_column, row + start_row
-                left = margin + column * TILE - int(x > 0)
-                top = margin + row * TILE - int(y > 0)
-                right = margin + (column + 1) * TILE + int((x + 1) * TILE * divisor < WORLD.width)
-                bottom = margin + (row + 1) * TILE + int((y + 1) * TILE * divisor < WORLD.height)
-                scaled.crop((left, top, right, bottom)).save(destination / f"{x}_{y}.webp", quality=88, method=3)
+        for x, y, path in tiles:
+            left = margin + (x - start_column) * TILE
+            top = margin + (y - start_row) * TILE
+            right = left + TILE + int((x + 1) * TILE * divisor < WORLD.width)
+            bottom = top + TILE + int((y + 1) * TILE * divisor < WORLD.height)
+            tile = scaled.crop((left - int(x > 0), top - int(y > 0), right, bottom))
+            if base_region is None:
+                tile.save(path, quality=88, method=3)
+                continue
+            buffer = BytesIO()
+            tile.save(buffer, format="WEBP", quality=88, method=3)
+            level = MAX_LEVEL - (divisor - 1)
+            base = SHARED / "regions" / base_region / f"{appearance}_files" / str(level) / path.name
+            encoded = buffer.getvalue()
+            if encoded != base.read_bytes():
+                path.write_bytes(encoded)
+                overrides[f"{appearance}/{level}/{x}_{y}"] = region
+            else:
+                path.unlink(missing_ok=True)
+    return overrides
 
 
-def native(item):
-    key, region = item
-    frame = block_frame(*map(int, key.split("_")))
-    extended = padded(frame)
-    folder = WORK / "native" / key
-    plates = authored(extended)
-    fingerprint = signature(folder, plates)
-    marker = folder / "pack-complete"
-    if marker.is_file() and marker.read_text(encoding="ascii").strip() == fingerprint:
-        # A new checkout can reuse the derived work cache only when its output exists.
-        x = (frame.x - WORLD.x) // TILE
-        y = (frame.y - WORLD.y) // TILE
-        if (SHARED / "regions" / region / "rain-night_files" / str(MAX_LEVEL) / f"{x}_{y}.webp").is_file():
-            return
-    with Image.open(folder / f"{key}-day.png") as source:
+def cached_pack(marker, fingerprint, outputs):
+    if not marker.is_file():
+        return False
+    try:
+        cache = json.loads(marker.read_text(encoding="ascii"))
+        return cache["signature"] == fingerprint and cache["sha256"] == [sha(path) for path in outputs]
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, TypeError):
+        return False
+
+
+def save_pack_cache(marker, fingerprint, outputs):
+    pending = marker.with_suffix(".part")
+    pending.write_text(json.dumps({"signature": fingerprint, "sha256": [sha(path) for path in outputs]}), encoding="ascii")
+    pending.replace(marker)
+
+
+def block_appearances(extended, folder, plates, bounds, retained):
+    with Image.open(folder / f"{extended.key}-day.png") as source:
         day = source.convert("RGB")
     lamps = json.loads((folder / "lamps.json").read_text(encoding="utf-8"))
     wet_nights = []
@@ -199,8 +225,6 @@ def native(item):
         wet = ART / patch.key / "rain-night.png"
         if wet.is_file():
             wet_nights.append((patch, wet, alpha.point(lambda value: round(value * .86))))
-    with Image.open(folder / "bridge.png") as bridge:
-        bounds, alpha = OLD.mask(extended, bridge.convert("L"))
     for stem, appearance in APPEARANCES.items():
         image = tone(day, appearance, extended, lamps, work=folder)
         if appearance == "day":
@@ -211,16 +235,67 @@ def native(item):
                     if source.size != (patch.width, patch.height):
                         raise ValueError(f"Invalid native wet-night art dimensions for {patch.key}")
                     lay(image, extended, source.convert("RGB"), patch, wet_alpha)
-        if bounds is not None and alpha.getbbox():
-            image.paste(OLD.crop(stem, bounds), local_box(extended, bounds)[:2], alpha)
+        if bounds is not None and retained.getbbox():
+            image.paste(OLD.crop(stem, bounds), local_box(extended, bounds)[:2], retained)
+        yield stem, image
+
+
+def save_overview(image, folder, stem):
+    coarse = image.resize((image.width // 4, image.height // 4), Image.Resampling.LANCZOS)
+    small_crop(coarse, 4).save(folder / f"{stem}-overview.png", compress_level=2)
+
+
+def native(item):
+    key, region = item
+    frame = block_frame(*map(int, key.split("_")))
+    extended = padded(frame)
+    folder = WORK / "native" / key
+    plates = authored(extended)
+    fingerprint = signature(folder, plates)
+    marker = folder / "pack-complete"
+    outputs = [folder / "runtime-mask.png", *(folder / f"{stem}-overview.png" for stem in APPEARANCES)]
+    outputs.extend(path for stem in APPEARANCES for *_, tiles in native_batches(frame, region, stem)
+                   for _, _, path in tiles)
+    if cached_pack(marker, fingerprint, outputs):
+        return
+    with Image.open(folder / "bridge.png") as bridge:
+        bounds, alpha = OLD.mask(extended, bridge.convert("L"))
+    for stem, image in block_appearances(extended, folder, plates, bounds, alpha):
         write_native(image, frame, region, stem)
-        coarse = image.resize((image.width // 4, image.height // 4), Image.Resampling.LANCZOS)
-        small_crop(coarse, 4).save(folder / f"{stem}-overview.png", compress_level=2)
+        save_overview(image, folder, stem)
     with Image.open(folder / "mask.png") as mask:
         restored = OLD.restore_depth(mask, frame, extended, bounds, alpha)
         restored.save(folder / "runtime-mask.png", compress_level=3)
-    marker.write_text(fingerprint + "\n", encoding="ascii")
+    save_pack_cache(marker, fingerprint, outputs)
     print(f"Packaged {region} {key}, {len(plates)} nearby art plates", flush=True)
+
+
+def phase_jobs(active):
+    for key, (first, region) in active.items():
+        frame = padded(block_frame(*map(int, key.split("_"))))
+        later_releases = {ART_RELEASE[patch.key] for patch in authored(frame) if ART_RELEASE[patch.key] > first}
+        for release in sorted(later_releases):
+            yield key, region, first, release - 1
+            first = release
+
+
+def pack_early_art(item):
+    key, base_region, first, last = item
+    frame = block_frame(*map(int, key.split("_")))
+    extended = padded(frame)
+    folder = WORK / "native" / key
+    plates = [patch for patch in authored(extended) if ART_RELEASE[patch.key] <= last]
+    region = f"through-v{last}"
+    staged = folder / region
+    staged.mkdir(parents=True, exist_ok=True)
+    with Image.open(folder / "bridge.png") as bridge:
+        bounds, alpha = OLD.mask(extended, bridge.convert("L"))
+    overrides = {}
+    for stem, image in block_appearances(extended, folder, plates, bounds, alpha):
+        overrides.update(write_native(image, frame, region, stem, base_region))
+        save_overview(image, staged, stem)
+    print(f"v0.{first}–v0.{last} {key}: {len(overrides)} early appearance tiles", flush=True)
+    return key, first, last, region, overrides
 
 
 def context(frame):
@@ -228,7 +303,8 @@ def context(frame):
     folder = WORK / "context" / key
     fingerprint = signature(folder, ())
     marker = folder / "pack-complete"
-    if marker.is_file() and marker.read_text(encoding="ascii").strip() == fingerprint:
+    outputs = [folder / f"{stem}-overview.png" for stem in APPEARANCES]
+    if cached_pack(marker, fingerprint, outputs):
         return
     with Image.open(folder / f"{key}-day.png") as source:
         day = source.convert("RGB")
@@ -236,14 +312,17 @@ def context(frame):
     for stem, appearance in APPEARANCES.items():
         image = tone(day, appearance, padded(frame), lamps, work=folder)
         small_crop(image, 4).save(folder / f"{stem}-overview.png", compress_level=2)
-    marker.write_text(fingerprint + "\n", encoding="ascii")
+    save_pack_cache(marker, fingerprint, outputs)
 
 
-def write_backdrop(version, stem, active):
+def write_backdrop(version, stem, active, staged):
     image = Image.new("RGB", (WORLD.width // 4, WORLD.height // 4))
     for frame in blocks():
         native = frame.key in active and active[frame.key][0] <= version
-        path = WORK / ("native" if native else "context") / frame.key / f"{stem}-overview.png"
+        folder = WORK / ("native" if native else "context") / frame.key
+        if frame.key in staged:
+            folder /= staged[frame.key]
+        path = folder / f"{stem}-overview.png"
         with Image.open(path) as patch:
             image.paste(patch, ((frame.x - WORLD.x) // 4, (frame.y - WORLD.y) // 4))
     root = RUNTIME / f"v{version}/waterfront/regions/overview" / f"{stem}_files"
@@ -294,13 +373,22 @@ def main():
         with ProcessPoolExecutor(max_workers=args.jobs) as pool:
             list(pool.map(context, blocks()))
     else:
+        staged = {6: {}, 7: {}, 8: {}}
+        overrides = {6: {}, 7: {}}
+        with ProcessPoolExecutor(max_workers=args.jobs, initializer=init_pack) as pool:
+            for key, first, last, region, tiles in pool.map(pack_early_art, phase_jobs(active)):
+                for version in range(first, last + 1):
+                    staged[version][key] = region
+                    overrides[version].update(tiles)
         write_masks(active)
         write_manifest(SHARED, {"size": [WORLD.width, WORLD.height], "maskSize": [WORLD.width // MASK_DIVISOR, WORLD.height // MASK_DIVISOR],
-                                "nativeBlocks": active, "tileSize": TILE, "nativeLevels": [MAX_LEVEL - 1, MAX_LEVEL]})
+                                "nativeBlocks": active, "appearanceOverrides": overrides,
+                                "tileSize": TILE, "nativeLevels": [MAX_LEVEL - 1, MAX_LEVEL]})
         versions = [args.version] if args.version else (6, 7, 8)
         appearances = [args.appearance] if args.appearance else APPEARANCES
         with ProcessPoolExecutor(max_workers=args.jobs) as pool:
-            list(pool.map(backdrop_task, [(version, stem, active) for version in versions for stem in appearances]))
+            list(pool.map(backdrop_task, [(version, stem, active, staged[version])
+                                         for version in versions for stem in appearances]))
 
 
 if __name__ == "__main__":

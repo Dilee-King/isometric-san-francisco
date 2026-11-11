@@ -86,7 +86,7 @@ export class MapView {
     });
     this.sprites = new SpriteRenderer(host, data);
     this.vehicles = new VehicleRenderer(host, data, this.sprites);
-    this.atmosphere = new Atmosphere(host, data);
+    this.atmosphere = new Atmosphere(host, data, this.sprites);
     this.worker = new Worker(
       new URL("./simulation.worker.ts", import.meta.url),
       { type: "module" },

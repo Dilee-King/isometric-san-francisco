@@ -52,6 +52,7 @@ def write_city(version, source, active, routes, audit):
     destination = RUNTIME / f"v{version}/waterfront"
     destination.mkdir(parents=True, exist_ok=True)
     native = {key: region for key, (release, region) in active.items() if release <= version}
+    overrides = read(SHARED / "manifest.json").get("appearanceOverrides", {}).get(str(version), {})
     selected = [route for release in range(6, version + 1) for route in routes[release]]
     new_places = places(version)
     terminal_coordinates = {identity.removesuffix("-ferry"): point for _, identity, point, _ in FERRIES}
@@ -72,7 +73,8 @@ def write_city(version, source, active, routes, audit):
         "routes": previous["routes"] + selected,
         "tileLayout": {"tileSize": TILE, "overlap": 1, "maxLevel": MAX_LEVEL,
                        "sharedMaxLevel": SHARED_LEVEL, "fallback": "overview", "regions": [],
-                       "sparse": {"root": "../../inner-bay/", "blockSize": BLOCK, "blocks": native}},
+                       "sparse": {"root": "../../inner-bay/", "blockSize": BLOCK, "blocks": native,
+                                  "appearanceOverrides": overrides}},
     }
     save_json(destination / "scene.json", scene)
     routes_by_kind = dict(Counter(route["kind"] for route in scene["routes"]))
@@ -102,7 +104,7 @@ def write_city(version, source, active, routes, audit):
     })
 
 
-def write_bay(version, footprint):
+def write_bay(version, footprint, signature):
     source = WORK / f"bay-v{version}"
     destination = RUNTIME / f"v{version}/bay"
     destination.mkdir(parents=True, exist_ok=True)
@@ -116,11 +118,31 @@ def write_bay(version, footprint):
     scene = read(destination / "scene.json")
     return write_manifest(destination, {"release": scene["release"], "size": [scene["width"], scene["height"]],
                                         "maskSize": scene["maskSize"], "projection": scene["projection"],
-                                        "appearances": list(APPEARANCES), "sources": scene["sources"]})
+                                        "appearances": list(APPEARANCES), "sources": scene["sources"],
+                                        "renderSignature": signature})
 
 
 def overview_task(args):
     return write_bay(*args)
+
+
+def overview_jobs(versions, coverage, force):
+    renderer = "".join(sha(ROOT / "tools" / path) for path in
+                       ("bay_overview.py", "atlas_geometry.py", "package_corridor.py"))
+    for version in versions:
+        footprint = unary_union([coverage[key] for key in range(6, version + 1)])
+        signature = hashlib.sha256(footprint.normalize().wkb + renderer.encode()).hexdigest()
+        destination = RUNTIME / f"v{version}/bay"
+        manifest_path = destination / "manifest.json"
+        if not force and manifest_path.is_file():
+            manifest = read(manifest_path)
+            if manifest.get("renderSignature") == signature and all(
+                (destination / file["path"]).is_file()
+                and sha(destination / file["path"]) == file["sha256"]
+                for file in manifest["files"]
+            ):
+                continue
+        yield version, footprint, signature
 
 
 def main():
@@ -139,9 +161,9 @@ def main():
             print(json.dumps(audit, indent=2), flush=True)
             return
     coverage = coverages(source, bridge)
-    if args.stage == "overview" or not all((RUNTIME / f"v{version}/bay/manifest.json").is_file() for version in versions):
-        arguments = [(version, unary_union([coverage[key] for key in range(6, version + 1)])) for version in versions]
-        with ProcessPoolExecutor(max_workers=3) as pool:
+    arguments = list(overview_jobs(versions, coverage, args.stage == "overview"))
+    if arguments:
+        with ProcessPoolExecutor(max_workers=len(arguments)) as pool:
             list(pool.map(overview_task, arguments))
     if args.stage == "overview":
         return

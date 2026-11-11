@@ -38,6 +38,17 @@ async page => {
     await page.waitForFunction(id => window.__sf.location === id, identity);
     await settle(`inner-bay-v${version}`);
   };
+  const inspectArea = async (version, left, top, width, height) => {
+    await page.evaluate(([left, top, width, height]) => {
+      const map = window.__sf, viewport = map.viewer.viewport;
+      const [x, y] = map.data.projection.origin, imageWidth = map.data.width;
+      const bounds = viewport.getBounds();
+      Object.assign(bounds, { x: (x + left) / imageWidth, y: (y + top) / imageWidth,
+        width: width / imageWidth, height: height / imageWidth });
+      viewport.fitBoundsWithConstraints(bounds);
+    }, [left, top, width, height]);
+    await settle(`inner-bay-v${version}`);
+  };
   const layer = async name => {
     await ack();
     await page.waitForFunction(key => window.__sf[key].getOpacity() > .99 && window.__sf[key].getFullyLoaded(), name);
@@ -87,14 +98,7 @@ async page => {
     check(await page.evaluate(() => window.__sf.worker === window.__innerBayWorker), "A city jump restarted the worker");
     if (["ocean-beach", "golden-gate-park", "alamo-square", "lake-merced", "bayview"].includes(identity)) await shot(6, identity);
   }
-  await page.evaluate(() => {
-    const map = window.__sf, viewport = map.viewer.viewport;
-    const [x, y] = map.data.projection.origin, width = map.data.width;
-    const bounds = viewport.getBounds();
-    Object.assign(bounds, { x: (x - 26900) / width, y: (y - 9000) / width, width: 29400 / width, height: 21600 / width });
-    viewport.fitBoundsWithConstraints(bounds);
-  });
-  await settle("inner-bay-v6");
+  await inspectArea(6, -26900, -9000, 29400, 21600);
   await shot(6, "san-francisco-wide");
   await jump(6, "bay-bridge-west");
   const westCars = await painted("bay-bridge-");
@@ -117,6 +121,8 @@ async page => {
   await shot(6, "bay-bridge-east");
   await jump(6, "oakland-touchdown");
   check(requests.some(([region]) => region === "bay-bridge"), "No bridge tiles requested on crossing");
+  await inspectArea(6, 9230, 1910, 1515, 1010);
+  check(requests.some(([region]) => region === "through-v6"), "The v0.6 Oakland context did not use its pre-port appearance");
   check(!requests.some(([region]) => region === "east-bay-waterfront" || region === "sausalito-shore"), "Future detail was requested by v0.6");
   await button("Bay Area").click();
   await settle("bay-overview-v6");
@@ -148,6 +154,9 @@ async page => {
   await shot(7, "alameda-main-rain-night");
   await jump(7, "alameda-seaplane");
   check(requests.some(([region, appearance]) => region === "east-bay-waterfront" && appearance === "rain-night"), "East Bay night rain tiles were not requested");
+  await inspectArea(7, -7000, -9700, 1515, 1010);
+  await layer("rainNightLayer");
+  check(requests.some(([region, appearance]) => region === "through-v7" && appearance === "rain-night"), "The v0.7 Marin context did not use its pre-Fort Baker appearance");
 
   const startup8 = await open(8, 63);
   await jump(8, "golden-gate-bridge");

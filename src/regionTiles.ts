@@ -66,7 +66,8 @@ export function regionTileSource(
       },
     } : {}),
     getTileUrl(level, column, row) {
-      const region = regionForTile(layout, data.width, data.height, level, column, row);
+      const region = layout.sparse?.appearanceOverrides?.[`${appearance}/${level}/${column}_${row}`]
+        ?? regionForTile(layout, data.width, data.height, level, column, row);
       const detail = level > layout.sharedMaxLevel ? layout.sparse?.root ?? "" : "";
       return `${root}${detail}regions/${region}/${appearance}_files/${level}/${column}_${row}.webp`;
     },

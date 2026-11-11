@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { decodeSourceDepth, maskIndex, sceneTransfer } from "./atlas.ts";
+import { decodeSourceDepth, fitMaskTexture, maskIndex, sceneTransfer } from "./atlas.ts";
 import { defaultControls } from "./model.ts";
 import type { Frame } from "./types.ts";
 
@@ -55,4 +55,16 @@ test("expanded depth encoding does not saturate the southern waterfront", () => 
       decodeSourceDepth(packed >> 8, packed & 255, { offset, range }) - depth,
     ) < 0.13,
   );
+});
+
+test("texture fitting preserves complete depth and surface samples", () => {
+  const pixels = new Uint8ClampedArray([
+    1, 253, 128, 255, 2, 254, 129, 255, 3, 255, 130, 255, 4, 0, 131, 255,
+    5, 1, 2, 255, 6, 2, 1, 255, 7, 3, 0, 255, 8, 4, 3, 255,
+  ]);
+  const native = fitMaskTexture(pixels, 4, 2, 4);
+  assert.equal(native.pixels.buffer, pixels.buffer);
+  const fitted = fitMaskTexture(pixels, 4, 2, 2);
+  assert.deepEqual([fitted.width, fitted.height], [2, 1]);
+  assert.deepEqual([...fitted.pixels], [6, 2, 1, 255, 8, 4, 3, 255]);
 });
