@@ -50,6 +50,7 @@
 - [x] Extend the illustrated atlas around the Bay, including the Peninsula and South Bay, both estuary reaches and the Pacific coast.
 - [x] Add a continuous regional pyramid and separate close-up tiles for the airport, bridge, wetland, harbor and town views.
 - [x] Measure wheel zoom performance, audit both tile tiers and publish the verified atlas on GitHub Pages.
+- [x] Load the original City tiles and 16 additional v0.5-scale close-ups directly in Bay Area.
 - [x] Ship an English interface and documentation, without the decorative lower-left caption.
 
-Street-level coverage beyond the inner Bay, airport ground operations, live feeds and LCZ research functions have no delivery date in this roadmap.
+Street-level coverage beyond the current areas, airport ground operations, live feeds and LCZ research functions have no delivery date in this roadmap.

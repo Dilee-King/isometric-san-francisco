@@ -1,5 +1,6 @@
 import OpenSeadragon from "openseadragon";
 import { Atmosphere } from "./Atmosphere.ts";
+import { RegisteredDetails } from "./RegisteredDetails.ts";
 import { SpriteRenderer } from "./SpriteRenderer.ts";
 import { VehicleRenderer } from "./VehicleRenderer.ts";
 import { sceneRoot } from "./assets.ts";
@@ -17,6 +18,7 @@ export class MapView {
   sprites: SpriteRenderer;
   vehicles: VehicleRenderer;
   atmosphere: Atmosphere;
+  readonly details?: RegisteredDetails;
   worker: Worker;
   frame: Frame;
   sequence = 0;
@@ -89,6 +91,7 @@ export class MapView {
       imageLoaderLimit: 6,
       maxImageCacheCount: 180,
     });
+    if (data.nativeDetail) this.details = new RegisteredDetails(this.viewer, data, data.nativeDetail);
     this.sprites = new SpriteRenderer(host, data);
     this.vehicles = new VehicleRenderer(host, data, this.sprites);
     this.atmosphere = new Atmosphere(host, data, this.sprites);
@@ -135,6 +138,8 @@ export class MapView {
         this.rainDayLayer = await addLayer("rain-day");
         if (this.disposed) return;
         this.rainNightLayer = await addLayer("rain-night");
+        if (this.disposed) return;
+        await this.details?.load();
       })();
       Promise.all([
         this.sprites.ready,
@@ -187,6 +192,7 @@ export class MapView {
     this.setControls({ autoHour: false }, hour);
   }
   zoom(factor: number) {
+    this.details?.limitZoom(undefined, this.viewer.viewport.getZoom(true));
     this.viewer.viewport.zoomBy(factor);
     this.viewer.viewport.applyConstraints();
   }
@@ -204,6 +210,7 @@ export class MapView {
       aspect = Math.max(1, this.host.clientWidth) / Math.max(1, this.host.clientHeight),
       h = Math.max(landmark.viewHeight ?? 1080, (landmark.viewWidth ?? 0) / aspect) / w,
       span = h * aspect;
+    this.details?.limitZoom(new OpenSeadragon.Point(p.x / w, p.y / w));
     this.viewer.viewport.fitBoundsWithConstraints(
       new OpenSeadragon.Rect(p.x / w - span / 2, p.y / w - h / 2, span, h),
       immediate,
@@ -253,6 +260,7 @@ export class MapView {
       this.nightLayer?.setOpacity(this.rainNightPainted ? 0 : night);
       this.rainDayLayer?.setOpacity(this.rainNightPainted ? 0 : wet);
       this.rainNightLayer?.setOpacity(wet * night);
+      this.details?.update(view.scale * this.data.projection.scale, night, !!wet);
       const filter = dusk ? `sepia(${dusk * 0.12}) saturate(${1 + dusk * 0.08})` : "";
       if (filter !== this.duskFilter) this.base.style.filter = this.duskFilter = filter;
       if (this.frame !== this.lastPainted || this.labels !== this.lastLabels

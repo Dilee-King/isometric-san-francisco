@@ -31,6 +31,7 @@ jobs:
       - run: node --experimental-strip-types tools/audit-city-core.mjs
       - run: node --experimental-strip-types tools/audit-illustrated-expansion.mjs
       - run: node --experimental-strip-types tools/audit-full-bay.mjs
+      - run: node --experimental-strip-types tools/audit-native-bay.mjs
       - run: npm run build
       - name: Size the Pages artifact for the current viewer
         run: |
@@ -39,7 +40,7 @@ jobs:
           import shutil
 
           archive = Path("dist/map")
-          for name in ("v1", "v2", "v3", "v6", "v7", "v8"):
+          for name in ("v1", "v2", "v3", "v4", "v6", "v7", "v8"):
               path = archive / name
               if path.is_dir():
                   shutil.rmtree(path)

@@ -102,3 +102,18 @@ test("full Bay reads the continuous regional pyramid and only registered close-u
   assert.equal(source.getTileUrl(16, 24, 12),
     "/map/v9-art/bay/regions/detail-sfo/rain-night_files/16/24_12.webp?rev=v9-revision");
 });
+
+test("native overlays request no tiles below their starting level or outside their footprint", () => {
+  const tileLayout = {
+    ...layout, minLevel: 14, maxLevel: 19, sharedMaxLevel: 0, regions: [],
+    detail: { baseLevel: 0, tiles: { "14/2_1": "sfo", "19/79_55": "sfo" } },
+  };
+  const source = regionTileSource({ width: 282624, height: 196608, tileLayout }, "/detail/", "night");
+  if (typeof source === "string") throw new Error("Expected sparse overlay source");
+  assert.equal(source.minLevel, 14);
+  assert.equal(source.tileExists?.(0, 0, 0), false);
+  assert.equal(source.tileExists?.(14, 2, 1), true);
+  assert.equal(source.tileExists?.(19, 79, 55), true);
+  assert.equal(source.tileExists?.(19, 80, 55), false);
+  assert.equal(source.getTileUrl(19, 79, 55), "/detail/regions/sfo/night_files/19/79_55.webp");
+});

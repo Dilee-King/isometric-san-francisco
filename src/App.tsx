@@ -10,6 +10,7 @@ const coverage = {
   "0.7.1": { scope: "City & East Bay", text: "Explore San Francisco and the Bay Bridge, then follow the waterfront from the Port of Oakland to Jack London Square and Alameda." },
   "0.8.1": { scope: "City & Inner Bay", text: "Explore all of San Francisco, the Bay Bridge, the Oakland and Alameda waterfront, and the north shore from Fort Baker to Sausalito." },
   "0.9.0": { scope: "City & Inner Bay", text: "Follow the illustrated coast, shoreline and bridges around the Bay. The City view opens San Francisco and the inner Bay at street level." },
+  "0.9.1": { scope: "City & Inner Bay", text: "Zoom into San Francisco and selected Bay Area places to see their street-level artwork." },
 }[ATLAS_VERSION];
 
 function Icon({ name }: { name: string }) {
@@ -233,11 +234,17 @@ export default function App() {
             {FULL_BAY && scene === "bay" ? (
               <>
                 <optgroup label="Closer views">
-                  {landmarks.filter(l => l.detail).map(l =>
+                  {landmarks.filter(l => l.detail && !l.cityDetail).map(l =>
                     <option key={l.id} value={l.id}>{l.name}</option>)}
                 </optgroup>
+                {landmarks.some(l => l.cityDetail) && (
+                  <optgroup label="San Francisco & inner Bay">
+                    {landmarks.filter(l => l.cityDetail).map(l =>
+                      <option key={l.id} value={l.id}>{l.name}</option>)}
+                  </optgroup>
+                )}
                 <optgroup label="Around the Bay">
-                  {landmarks.filter(l => !l.detail).map(l =>
+                  {landmarks.filter(l => !l.detail && !l.cityDetail).map(l =>
                     <option key={l.id} value={l.id}>{l.name}</option>)}
                 </optgroup>
               </>

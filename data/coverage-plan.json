@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.9.0",
+  "schemaVersion": "0.9.1",
   "project": "isometric-san-francisco",
   "status": "continuous-imagegen-bay-area-and-inner-bay-street-detail",
   "plannedTarget": "An illustrated Bay Area atlas with closer regional views and inner Bay street detail",
@@ -86,13 +86,27 @@
       "crs": "EPSG:32610",
       "scene": "../public/map/v9-art/bay/scene.json",
       "version": "0.9.0"
+    },
+    {
+      "release": "full-bay-native-v9",
+      "role": "illustrated-region-with-native-detail",
+      "description": "Continuous Bay Area art, directly reused City tiles and 16 native-scale close-ups",
+      "retainedNativeBlocks": 97,
+      "nativeCloseUps": 16,
+      "nativePixelsPerMetre": 1.8545454545454545,
+      "nativeTiles": 1492,
+      "locationJumps": 96,
+      "crs": "EPSG:32610",
+      "scene": "../public/map/v9-native/bay/scene.json",
+      "version": "0.9.1"
     }
   ],
-  "publishedTileCount": 21452,
+  "publishedTileCount": 22944,
   "boundaryGeoJSON": null,
   "cameraManifest": "../public/map/v8-art/atlas.json",
   "tileReleaseManifest": "../public/map/illustrated-bay/manifest.json",
   "regionalTileReleaseManifest": "../public/map/v9-art/bay/manifest.json",
-  "note": "The City atlas uses the original native scale. The Bay Area view adds continuous illustrated regional coverage and loads its closer views on demand.",
+  "nativeTileReleaseManifest": "../public/map/v9-native/detail/manifest.json",
+  "note": "Bay Area loads the original City tiles and new native close-ups on demand. The regional artwork fills the rest of the atlas.",
   "appearanceCount": 4
 }

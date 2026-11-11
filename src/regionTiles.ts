@@ -59,12 +59,12 @@ export function regionTileSource(
     height: data.height,
     tileSize: layout.tileSize,
     tileOverlap: layout.overlap,
-    minLevel: 0,
+    minLevel: layout.minLevel ?? 0,
     maxLevel: layout.maxLevel,
     ...(layout.sparse || layout.detail ? {
       tileExists(level: number, column: number, row: number) {
         const divisor = layout.tileSize * 2 ** (layout.maxLevel - level);
-        if (level < 0 || level > layout.maxLevel || column < 0 || row < 0 ||
+        if (level < (layout.minLevel ?? 0) || level > layout.maxLevel || column < 0 || row < 0 ||
             column >= Math.ceil(data.width / divisor) || row >= Math.ceil(data.height / divisor)) return false;
         if (layout.detail)
           return level <= layout.detail.baseLevel || !!layout.detail.tiles[`${level}/${column}_${row}`];

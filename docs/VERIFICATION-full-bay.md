@@ -29,3 +29,13 @@ The production preview loaded nine regional daylight tiles at startup and reques
 [Actual browser recording](Full-Bay-browser-demo.mp4) · [Full Bay](screenshots/v0.9.0/whole-bay.jpg) · [SFO in rain](screenshots/v0.9.0/sfo-rain-night.jpg) · [Alviso](screenshots/v0.9.0/alviso.jpg) · [Vallejo in rain](screenshots/v0.9.0/vallejo-rain-night.jpg)
 
 The Pages upload contains the viewer and supported v0.5–v0.9 releases. Historical v0.3 tile files remain in the source archive.
+
+## Native detail in v0.9.1
+
+At the same 0.34 screen pixels per metre, the v0.9.0 downtown view used a regional tile at 0.034 source pixels per metre. The v0.9.1 view progressively opens the original City pyramid. Wheel zoom and drag across the Ferry Building waterfront reached native level 16 in Bay Area. [Same-camera browser capture](screenshots/v0.9.1/downtown-before-after.jpg)
+
+The default view requests regional tiles. The City and regional detail layers open as their coverage enters the view at higher zoom. New close-ups use native level 19 at 1.854545 source pixels per metre. The location-based zoom limit caps enlargement at 1.25 CSS pixels per available source pixel. As the camera leaves a close-up, its feathered edges give way to the regional artwork.
+
+The browser checks visit all 16 close-ups, check the native day, night and rain URLs, and exercise fog, traffic controls, City switching and a 390 × 844 viewport. The source and tile audit checks 97 retained City blocks, 16 aerial-guided ImageGen plates and 1,492 new tiles across four appearances. [Browser script](../tools/qa-native-bay.js) · [Tile audit](../tools/audit-native-bay.mjs)
+
+The Pages artifact publishes the v0.5–v0.9.1 viewer and assets. The v0.4 tile archive is available in the repository.

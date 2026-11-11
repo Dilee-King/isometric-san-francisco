@@ -45,6 +45,7 @@ export type Pose = {
 export type RegionTileLayout = {
   tileSize: number;
   overlap: number;
+  minLevel?: number;
   maxLevel: number;
   sharedMaxLevel: number;
   fallback: string;
@@ -62,6 +63,18 @@ export type RegionTileLayout = {
     backdropOverrides?: string[];
   };
 };
+export type ImageBounds = [number, number, number, number];
+export type DetailLayer = {
+  width: number;
+  height: number;
+  projection: Projection;
+  assetRoot: string;
+  appearanceRevision?: string;
+  tileLayout: RegionTileLayout;
+  bounds: ImageBounds[];
+  crop?: [number, number][][];
+  revealScale: [number, number];
+};
 export type SceneData = {
   width: number;
   height: number;
@@ -77,6 +90,10 @@ export type SceneData = {
   adaptiveTransport?: boolean;
   defaultLocation?: string;
   tileLayout?: RegionTileLayout;
+  nativeDetail?: {
+    layers: DetailLayer[];
+    regionalBounds: ImageBounds[];
+  };
   projection: Projection;
   extent: number[];
   sourceBuildings: number;
@@ -92,6 +109,7 @@ export type SceneData = {
     viewHeight?: number;
     viewWidth?: number;
     detail?: boolean;
+    cityDetail?: boolean;
   }[];
 };
 export type Frame = {
