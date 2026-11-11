@@ -108,6 +108,14 @@ async page => {
   check(!requests.some(request => ["golden-gate", "south-waterfront"].includes(request.region)), "City navigation requested distant detail regions");
   check(!requests.some(request => request.region === "marina" && request.level > 12), "City navigation requested distant Marina detail");
   const cityRequests = requests.length;
+  await jump("north-beach");
+  await button("Play animation").click();
+  await page.waitForFunction(() => window.__sf.frame.clock.transportTime >= 12);
+  await button("Pause animation").click();
+  await ack();
+  const flight = await painted("core-overflight");
+  check(flight.pixels > 20, "City aircraft did not render over North Beach");
+  await shot("north-beach-clear");
   await jump("financial-district");
   const beforePan = await state();
   await page.mouse.move(600, 320);
@@ -189,6 +197,6 @@ async page => {
   check(failed.length === 0, "Failed resources " + JSON.stringify(failed));
   return {
     passed: true, initialRequests: initialRequests.length, initialRegions,
-    cityRequests, counts, movedKinds, bridge, sharedClock: true, mobile390: true, errors, failed,
+    cityRequests, counts, movedKinds, flight, bridge, sharedClock: true, mobile390: true, errors, failed,
   };
 }

@@ -5,6 +5,7 @@ from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict
 import json
+import math
 
 import numpy as np
 from PIL import Image, ImageChops
@@ -51,9 +52,22 @@ def prepare():
     raster = CoreRaster(data, ATLAS, 4)
     raster.draw(data)
     stamp_depth(raster)
-    Image.fromarray(pack_depth(raster.depth, raster.structure, DEPTH_ENCODING)).save(destination / "depth.png")
-    Image.fromarray((~raster.land).astype("uint8") * 255).save(destination / "water.png")
-    Image.fromarray(raster.hard.astype("uint8") * 255).save(destination / "hard.png")
+    left, top = ATLAS.local(PATCH.x, PATCH.y)
+    mask_box = (
+        math.floor(left * raster.w / ATLAS.width), math.floor(top * raster.h / ATLAS.height),
+        math.ceil((left + PATCH.width) * raster.w / ATLAS.width),
+        math.ceil((top + PATCH.height) * raster.h / ATLAS.height),
+    )
+    masks = {
+        "depth.png": pack_depth(raster.depth, raster.structure, DEPTH_ENCODING),
+        "water.png": (~raster.land).astype("uint8") * 255,
+        "hard.png": raster.hard.astype("uint8") * 255,
+    }
+    # Keep source occlusion and weather masks registered to the retained coast.
+    for name, pixels in masks.items():
+        with Image.open(BASE / "waterfront" / name) as retained:
+            retained.paste(Image.fromarray(pixels).crop(mask_box), mask_box[:2])
+            retained.save(destination / name)
 
     cars, loops = west_cars(data, frames=CORE_ART, prefix="core")
     overflight = {

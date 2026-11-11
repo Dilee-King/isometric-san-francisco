@@ -203,20 +203,25 @@ def crop_lidar(reuse=None):
     return dest
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--reuse-ept', type=Path, help='Optional existing read-only LAZ directory')
-    args = parser.parse_args()
+def acquire(reuse_ept=None):
     with ThreadPoolExecutor(max_workers=5) as pool:
-        tasks = {'footprints': pool.submit(footprints), 'osm': pool.submit(osm_vectors),
-                 'lidar': pool.submit(crop_lidar, args.reuse_ept)}
-        tasks.update({k: pool.submit(fetch, url, f'ne-{k}.zip') for k,url in NE.items()})
+        tasks = {'footprints': pool.submit(footprints, cache=CACHE),
+                 'osm': pool.submit(osm_vectors, cache=CACHE),
+                 'lidar': pool.submit(crop_lidar, reuse_ept)}
+        tasks.update({k: pool.submit(fetch, url, f'ne-{k}.zip', cache=CACHE) for k,url in NE.items()})
         paths = {k: f.result() for k,f in tasks.items()}
     audit = {'retrievedUTC': datetime.now(timezone.utc).isoformat(), 'bboxLonLat': list(geographic_bbox()),
              'inputs': {k: {'name': p.name, 'bytes': p.stat().st_size, 'sha256': sha(p)} for k,p in paths.items()},
              'sources': {'footprints': FOOTPRINTS, 'lidar': EPT, **NE}}
     (CACHE/'inputs.json').write_text(json.dumps(audit, indent=2), encoding='utf-8')
-    print(json.dumps(audit, indent=2))
+    return audit
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--reuse-ept', type=Path, help='Optional existing read-only LAZ directory')
+    args = parser.parse_args()
+    print(json.dumps(acquire(args.reuse_ept), indent=2))
 
 
 if __name__ == '__main__':

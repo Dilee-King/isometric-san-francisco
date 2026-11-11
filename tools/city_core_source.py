@@ -8,7 +8,7 @@ import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
 from city_core_geometry import CORE_FRAMES, jump_points
-from corridor_inputs import ROOT, crop_lidar, footprints, osm_vectors, sha
+from corridor_inputs import ROOT, acquire, sha
 from corridor_source import derive
 from golden_gate_source import load as load_waterfront
 
@@ -73,9 +73,7 @@ def main():
     parser.add_argument("--refresh", action="store_true")
     args = parser.parse_args()
     if args.refresh or not (SOURCE_DIR / "source.json.gz").exists():
-        footprints()
-        osm_vectors()
-        crop_lidar()
+        acquire()
         derive(out=SOURCE_DIR, frames=CORE_FRAMES)
     data = load()
     report = {

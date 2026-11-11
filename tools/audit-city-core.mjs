@@ -63,6 +63,7 @@ for (const entry of atlas.scenes) {
     assert.equal(scene.landmarks.length, 30);
     assert.equal(scene.detailFrames.length, 28);
     assert.ok(scene.routes.filter((route) => route.id.startsWith("core-")).length >= 80);
+    assert.ok(scene.routes.some(route => route.id === "core-overflight" && route.kind === "plane"), "Missing the city overflight");
     assert.equal(new Set(scene.routes.map(route => route.id)).size, scene.routes.length);
     assert.equal(hash(readFileSync("data/city-core/source.json.gz")), manifest.coreSourceSHA256);
     assert.equal(hash(readFileSync("public/map/v4/waterfront/manifest.json")), manifest.baseManifestSHA256);
