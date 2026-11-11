@@ -27,6 +27,8 @@ export function regionForTile(
   row: number,
 ): string {
   if (level <= layout.sharedMaxLevel) return "overview";
+  if (layout.detail && level > layout.detail.baseLevel)
+    return layout.detail.tiles[`${level}/${column}_${row}`] ?? layout.fallback;
   if (layout.sparse) return sparseRegion(layout, level, column, row) ?? layout.fallback;
   const divisor = 2 ** (layout.maxLevel - level);
   const levelWidth = Math.ceil(width / divisor);
@@ -59,12 +61,14 @@ export function regionTileSource(
     tileOverlap: layout.overlap,
     minLevel: 0,
     maxLevel: layout.maxLevel,
-    ...(layout.sparse ? {
+    ...(layout.sparse || layout.detail ? {
       tileExists(level: number, column: number, row: number) {
         const divisor = layout.tileSize * 2 ** (layout.maxLevel - level);
-        return level >= 0 && level <= layout.maxLevel && column >= 0 && row >= 0
-          && column < Math.ceil(data.width / divisor) && row < Math.ceil(data.height / divisor)
-          && (level <= layout.sharedMaxLevel || !!sparseRegion(layout, level, column, row));
+        if (level < 0 || level > layout.maxLevel || column < 0 || row < 0 ||
+            column >= Math.ceil(data.width / divisor) || row >= Math.ceil(data.height / divisor)) return false;
+        if (layout.detail)
+          return level <= layout.detail.baseLevel || !!layout.detail.tiles[`${level}/${column}_${row}`];
+        return level <= layout.sharedMaxLevel || !!sparseRegion(layout, level, column, row);
       },
     } : {}),
     getTileUrl(level, column, row) {

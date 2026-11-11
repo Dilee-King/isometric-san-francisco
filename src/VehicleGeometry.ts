@@ -7,6 +7,7 @@ export type VehicleFace = {
   emissive?: boolean;
   nightOnly?: boolean;
   pulse?: boolean;
+  worldShift?: [number, number];
 };
 type Point2 = [number, number];
 
@@ -17,14 +18,22 @@ export function worldOffset(
   side: number,
   up: number,
 ): Point3 {
-  const length = Math.hypot(pose.direction[0], pose.direction[1]) || 1;
-  const x = pose.direction[0] / length || (!pose.direction[1] ? 1 : 0),
-    n = pose.direction[1] / length;
+  const [x, n] = heading(pose.direction);
   return [
     pose.point[0] + x * forward - n * side,
     pose.point[1] + n * forward + x * side,
     pose.point[2] + up,
   ];
+}
+
+export function heading([east, north]: Point3): Point2 {
+  const length = Math.hypot(east, north);
+  return length ? [east / length, north / length] : [1, 0];
+}
+
+export function carStyle(id: string) {
+  const index = Number(id.split("-").at(-1)) || 0;
+  return index % 11 === 5 ? "van" : index % 7 === 3 ? "suv" : "sedan";
 }
 
 export function vehicleFaces(pose: Pose): VehicleFace[] {
@@ -110,9 +119,9 @@ export function vehicleFaces(pose: Pose): VehicleFace[] {
     );
 
   if (pose.kind === "car") {
-    const index = Number(pose.id.split("-").at(-1)) || 0;
-    const suv = index % 7 === 3,
-      van = index % 11 === 5;
+    const style = carStyle(pose.id),
+      suv = style === "suv",
+      van = style === "van";
     const l = van ? 5.6 : suv ? 4.9 : 4.5,
       w = van ? 2 : suv ? 1.95 : 1.8,
       h = van ? 1.95 : suv ? 0.95 : 0.8;
@@ -124,6 +133,7 @@ export function vehicleFaces(pose: Pose): VehicleFace[] {
       color: "#101b22",
       alpha: 0.22,
       emissive: true,
+      worldShift: [0.35, -0.2],
     });
     box(0, 0, l, w, 0.18, h, pose.color);
     for (const f of [-l * 0.3, l * 0.3])

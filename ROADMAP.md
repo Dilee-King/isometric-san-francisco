@@ -47,8 +47,9 @@
 - [x] Cover the mainland city and nearby islands, and connect both Bay Bridge spans through Yerba Buena Island.
 - [x] Add the Port of Oakland, Jack London Square, Alameda terminals and source-constrained vessels.
 - [x] Connect the Golden Gate north landing to Fort Baker and Sausalito, with a ferry to San Francisco.
-- [ ] Add meaningful code checks, versioned manifests and a measured performance budget.
-- [x] Publish the verified sample with GitHub Pages and update instructions; large-area asset storage remains future work.
+- [x] Extend the illustrated atlas around the Bay, including the Peninsula and South Bay, both estuary reaches and the Pacific coast.
+- [x] Add a continuous regional pyramid and separate close-up tiles for the airport, bridge, wetland, harbor and town views.
+- [x] Measure wheel zoom performance, audit both tile tiers and publish the verified atlas on GitHub Pages.
 - [x] Ship an English interface and documentation, without the decorative lower-left caption.
 
-Wider street-level coverage, airport ground operations, live feeds and LCZ research functions have no delivery date in this roadmap.
+Street-level coverage beyond the inner Bay, airport ground operations, live feeds and LCZ research functions have no delivery date in this roadmap.

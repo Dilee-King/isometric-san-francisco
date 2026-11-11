@@ -29,6 +29,10 @@ export class MapView {
   nightLayer: OpenSeadragon.TiledImage | null = null;
   rainDayLayer: OpenSeadragon.TiledImage | null = null;
   rainNightLayer: OpenSeadragon.TiledImage | null = null;
+  private lastPainted?: Frame;
+  private lastLabels = false;
+  private duskFilter = "";
+  private rainNightPainted = false;
   transform: ViewTransform = {
     left: 0,
     top: 0,
@@ -67,7 +71,7 @@ export class MapView {
     this.viewer = OpenSeadragon({
       element: this.base,
       tileSources: regionTileSource(data, sceneRoot(data), "scene"),
-      homeFillsViewer: data.kind !== "waterfront",
+      homeFillsViewer: data.kind !== "waterfront" && !data.tileLayout?.detail,
       showNavigationControl: false,
       showNavigator: false,
       showFullPageControl: false,
@@ -78,7 +82,8 @@ export class MapView {
       visibilityRatio: 1,
       constrainDuringPan: true,
       minZoomImageRatio: 0.85,
-      maxZoomPixelRatio: 3,
+      maxZoomPixelRatio: data.tileLayout?.detail ? 1.25 : 3,
+      minPixelRatio: data.tileLayout?.detail ? 0.8 : 0.5,
       gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true },
       gestureSettingsTouch: { pinchToZoom: true },
       imageLoaderLimit: 6,
@@ -186,8 +191,10 @@ export class MapView {
     this.viewer.viewport.applyConstraints();
   }
   home() {
-    if (!this.focusLocation(this.data.defaultLocation))
+    if (!this.focusLocation(this.data.defaultLocation)) {
       this.viewer.viewport.goHome();
+      this.location = undefined;
+    }
   }
   focusLocation(id?: string, immediate = false) {
     const landmark = this.data.landmarks.find((l) => l.id === id);
@@ -229,7 +236,8 @@ export class MapView {
       const px = item.imageToViewerElementCoordinates(
         new OpenSeadragon.Point(1, 0),
       );
-      this.transform = {
+      const previous = this.transform;
+      const view = {
         left: origin.x,
         top: origin.y,
         scale: px.x - origin.x,
@@ -239,14 +247,24 @@ export class MapView {
       };
       const night = nightAmount(this.frame.clock.hour),
         dusk = Math.max(0, 1 - Math.abs(this.frame.clock.hour - 18.5) / 2.5);
-      this.nightLayer?.setOpacity(night);
       const wet = this.frame.controls.weather === "rain" ? 1 : 0;
-      this.rainDayLayer?.setOpacity(wet);
+      if (!wet || night < 1) this.rainNightPainted = false;
+      else if (this.rainNightLayer?.getFullyLoaded()) this.rainNightPainted = true;
+      this.nightLayer?.setOpacity(this.rainNightPainted ? 0 : night);
+      this.rainDayLayer?.setOpacity(this.rainNightPainted ? 0 : wet);
       this.rainNightLayer?.setOpacity(wet * night);
-      this.base.style.filter = `sepia(${dusk * 0.12}) saturate(${1 + dusk * 0.08})`;
-      this.sprites.draw(this.frame, this.transform, this.labels);
-      this.vehicles.draw(this.frame, this.transform);
-      this.atmosphere.draw(this.frame, this.transform);
+      const filter = dusk ? `sepia(${dusk * 0.12}) saturate(${1 + dusk * 0.08})` : "";
+      if (filter !== this.duskFilter) this.base.style.filter = this.duskFilter = filter;
+      if (this.frame !== this.lastPainted || this.labels !== this.lastLabels
+          || view.left !== previous.left || view.top !== previous.top || view.scale !== previous.scale
+          || view.width !== previous.width || view.height !== previous.height || view.dpr !== previous.dpr) {
+        this.transform = view;
+        this.lastPainted = this.frame;
+        this.lastLabels = this.labels;
+        this.sprites.draw(this.frame, view, this.labels);
+        this.vehicles.draw(this.frame, view);
+        this.atmosphere.draw(this.frame, view);
+      }
     }
     this.raf = requestAnimationFrame(this.tick);
   };

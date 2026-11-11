@@ -30,6 +30,7 @@ jobs:
       - run: node tools/audit-atlas.mjs
       - run: node --experimental-strip-types tools/audit-city-core.mjs
       - run: node --experimental-strip-types tools/audit-illustrated-expansion.mjs
+      - run: node --experimental-strip-types tools/audit-full-bay.mjs
       - run: npm run build
       - name: Size the Pages artifact for the current viewer
         run: |
@@ -38,10 +39,14 @@ jobs:
           import shutil
 
           archive = Path("dist/map")
-          for name in ("v1", "v2", "v6", "v7", "v8"):
+          for name in ("v1", "v2", "v3", "v6", "v7", "v8"):
               path = archive / name
               if path.is_dir():
                   shutil.rmtree(path)
+          byte_count = sum(path.stat().st_size for path in Path("dist").rglob("*") if path.is_file())
+          if byte_count > 1_000_000_000:
+              raise SystemExit(f"Pages artifact exceeds 1 GB: {byte_count:,} bytes")
+          print(f"Pages artifact: {byte_count:,} bytes")
           PY
       - uses: actions/configure-pages@v6.0.0
       - uses: actions/upload-pages-artifact@v5.0.0

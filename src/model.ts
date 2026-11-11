@@ -89,6 +89,11 @@ export function nightAmount(hour: number) {
     };
   return h < 8 ? 1 - smooth((h - 5) / 3) : smooth((h - 17.5) / 3.5);
 }
+
+export function transportMagnification(maximum: number, pixelsPerMetre: number, adaptive?: boolean) {
+  return adaptive ? Math.max(1, Math.min(maximum, 1.1 / pixelsPerMetre)) : maximum;
+}
+
 export function transportFrame(
   clock: Clock,
   routes: Route[],

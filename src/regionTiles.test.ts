@@ -85,3 +85,20 @@ test("cumulative releases share matching backdrops and keep different tiles", ()
   assert.equal(source.getTileUrl(11, 0, 0), "/map/v6-art/waterfront/../../v8-art/waterfront/regions/overview/night_files/11/0_0.webp");
   assert.equal(source.getTileUrl(11, 1, 1), "/map/v6-art/waterfront/regions/overview/night_files/11/1_1.webp");
 });
+
+test("full Bay reads the continuous regional pyramid and only registered close-up tiles", () => {
+  const tileLayout = {
+    ...layout, maxLevel: 16,
+    detail: { baseLevel: 13, tiles: { "16/24_12": "detail-sfo", "15/12_6": "detail-sfo" } },
+  };
+  const source = regionTileSource({
+    width: 40960, height: 28672, tileLayout, appearanceRevision: "v9-revision",
+  }, "/map/v9-art/bay/", "rain-night");
+  if (typeof source === "string") throw new Error("Expected regional source");
+  assert.equal(source.tileExists?.(13, 9, 6), true);
+  assert.equal(source.tileExists?.(13, 10, 6), false);
+  assert.equal(source.tileExists?.(16, 24, 12), true);
+  assert.equal(source.tileExists?.(16, 25, 12), false);
+  assert.equal(source.getTileUrl(16, 24, 12),
+    "/map/v9-art/bay/regions/detail-sfo/rain-night_files/16/24_12.webp?rev=v9-revision");
+});

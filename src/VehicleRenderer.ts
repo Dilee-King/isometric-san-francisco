@@ -1,17 +1,22 @@
-import { vehicleFaces } from "./VehicleGeometry.ts";
+import { carStyle, heading, vehicleFaces } from "./VehicleGeometry.ts";
 import { interpolateImageOffset, legacyDepthEncoding } from "./atlas.ts";
 import bridgeOffsets from "../data/illustrated-expansion/bridge-image-offsets.json";
 import type { VehicleFace } from "./VehicleGeometry.ts";
-import { nightAmount, project } from "./model.ts";
+import { nightAmount, project, transportMagnification } from "./model.ts";
 import type { Frame, Pose, SceneData } from "./types.ts";
 import type { SpriteRenderer, ViewTransform } from "./SpriteRenderer.ts";
 
 const vertex = `#version 300 es
 precision highp float;
-in vec3 position;
+in vec3 localPosition;
+in vec3 localNormal;
 in vec4 paint;
 in float emission;
+in vec2 worldShift;
+in vec3 anchor;
+in vec2 heading;
 in float imageOffsetY;
+uniform float modelScale;
 uniform vec4 view;
 uniform vec2 viewport;
 uniform vec4 basis;
@@ -22,14 +27,20 @@ out vec2 imagePoint;
 out float cameraDepth;
 out vec4 color;
 out float lit;
+vec2 rotateENU(vec2 p){
+ return vec2(p.x*heading.x-p.y*heading.y,p.x*heading.y+p.y*heading.x);
+}
 void main(){
+ vec3 position=anchor+modelScale*vec3(rotateENU(localPosition.xy)+worldShift,localPosition.z);
  float u=position.x*basis.x+position.y*basis.z;
  float q=position.x*basis.y+position.y*basis.w;
  imagePoint=origin+camera.x*vec2(u,q*camera.y-position.z*camera.z);
  cameraDepth=q*camera.z+position.z*camera.y;
  vec2 screen=view.xy+(imagePoint+vec2(0.,imageOffsetY))*view.z;
  gl_Position=vec4(screen.x/viewport.x*2.-1.,1.-screen.y/viewport.y*2.,-cameraDepth/clipDepth,1.);
- color=paint;lit=emission;
+ vec3 normal=vec3(rotateENU(localNormal.xy),localNormal.z);
+ float shade=emission>.5 ? 1. : .64+.36*max(0.,dot(vec3(-.37,-.22,.9),normal));
+ color=vec4(paint.rgb*shade,paint.a);lit=emission;
 }`;
 const fragment = `#version 300 es
 precision highp float;
@@ -64,30 +75,44 @@ void main(){
  pixel=vec4(paint,alpha);
 }`;
 
-function rgba(face: VehicleFace): number[] {
+function normalOf(face: VehicleFace) {
+  const [a, b, c] = face.points;
+  const u = b.map((value, i) => value - a[i]),
+    v = c.map((value, i) => value - a[i]);
+  const n = [
+    u[1] * v[2] - u[2] * v[1],
+    u[2] * v[0] - u[0] * v[2],
+    u[0] * v[1] - u[1] * v[0],
+  ];
+  const length = Math.hypot(...n) || 1;
+  return n.map(component => component / length);
+}
+
+function paintOf(face: VehicleFace, shade = 1) {
   const color = face.color.replace("#", "");
-  let shade = 1;
-  if (!face.emissive) {
-    const [a, b, c] = face.points,
-      u = b.map((v, i) => v - a[i]),
-      v = c.map((value, i) => value - a[i]);
-    const n = [
-        u[1] * v[2] - u[2] * v[1],
-        u[2] * v[0] - u[0] * v[2],
-        u[0] * v[1] - u[1] * v[0],
-      ],
-      length = Math.hypot(...n) || 1;
-    shade =
-      0.64 +
-      0.36 * Math.max(0, (-0.37 * n[0] - 0.22 * n[1] + 0.9 * n[2]) / length);
-  }
   return [0, 2, 4]
     .map((i) => (parseInt(color.slice(i, i + 2), 16) / 255) * shade)
     .concat(face.alpha ?? 1);
 }
 
+function rgba(face: VehicleFace) {
+  if (face.emissive) return paintOf(face);
+  const [e, n, z] = normalOf(face);
+  return paintOf(face, 0.64 + 0.36 * Math.max(0, -0.37 * e - 0.22 * n + 0.9 * z));
+}
+
+type Mesh = {
+  vao: WebGLVertexArrayObject | null;
+  geometry: WebGLBuffer | null;
+  instanceBuffer: WebGLBuffer | null;
+  instances: number[];
+  opaque: number;
+  transparent: number;
+};
+
 /** Each hull/body/wing vertex shares the city's world-to-image camera. */
-const floatsPerVertex = 9;
+const floatsPerVertex = 13;
+const floatsPerInstance = 6;
 export class VehicleRenderer {
   canvas: HTMLCanvasElement;
   gl: WebGL2RenderingContext | null;
@@ -95,13 +120,14 @@ export class VehicleRenderer {
   data: SceneData;
   sprites: SpriteRenderer;
   program: WebGLProgram | null = null;
-  buffer: WebGLBuffer | null = null;
   texture: WebGLTexture | null = null;
-  vao: WebGLVertexArrayObject | null = null;
+  meshes = new Map<string, Mesh>();
+  activeMeshes: Mesh[] = [];
   uniforms: Record<string, WebGLUniformLocation | null> = {};
   ready: Promise<void>;
   disposed = false;
-  lastKey = "";
+  lastCandidates: Pose[] = [];
+  private lastScale = 1;
   opaqueCount = 0;
   transparentCount = 0;
   faces: (VehicleFace & { imageOffsetY?: number })[] = [];
@@ -148,20 +174,6 @@ export class VehicleRenderer {
       );
     this.program = program;
     gl.useProgram(program);
-    this.vao = gl.createVertexArray();
-    gl.bindVertexArray(this.vao);
-    this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-    for (const [name, size, offset] of [
-      ["position", 3, 0],
-      ["paint", 4, 12],
-      ["emission", 1, 28],
-      ["imageOffsetY", 1, 32],
-    ] as const) {
-      const location = gl.getAttribLocation(program, name);
-      gl.enableVertexAttribArray(location);
-      gl.vertexAttribPointer(location, size, gl.FLOAT, false, floatsPerVertex * 4, offset);
-    }
     for (const name of [
       "view",
       "viewport",
@@ -174,6 +186,7 @@ export class VehicleRenderer {
       "sourceRows",
       "sourceDepth",
       "imageSize",
+      "modelScale",
       "night",
       "time",
     ])
@@ -214,17 +227,82 @@ export class VehicleRenderer {
     // Shift the painted position while keeping the registered source-depth sample.
     return interpolateImageOffset(bridgeOffsets[direction], x);
   }
+  private meshFor(pose: Pose, gl: WebGL2RenderingContext) {
+    const key = pose.kind === "car" ? `${carStyle(pose.id)}/${pose.color}` : pose.kind;
+    const cached = this.meshes.get(key);
+    if (cached) return cached;
+    // Bake the same faces used by Canvas once, in the vehicle's local axes.
+    const faces = vehicleFaces({ ...pose, point: [0, 0, 0], direction: [1, 0, 0] });
+    const opaque: number[] = [], transparent: number[] = [];
+    for (const face of faces) {
+      const target = (face.alpha ?? 1) < 1 || face.nightOnly ? transparent : opaque;
+      const normal = normalOf(face), paint = paintOf(face);
+      const flag = face.nightOnly ? 3 : face.pulse ? 2 : face.emissive ? 1 : 0;
+      const [dx, dy] = face.worldShift ?? [0, 0];
+      for (let i = 1; i < face.points.length - 1; i++) {
+        for (const [e, n, z] of [face.points[0], face.points[i], face.points[i + 1]]) {
+          target.push(e - dx, n - dy, z, ...normal, ...paint, flag, dx, dy);
+        }
+      }
+    }
+    const mesh: Mesh = {
+      vao: gl.createVertexArray(),
+      geometry: gl.createBuffer(),
+      instanceBuffer: gl.createBuffer(),
+      instances: [],
+      opaque: opaque.length / floatsPerVertex,
+      transparent: transparent.length / floatsPerVertex,
+    };
+    gl.bindVertexArray(mesh.vao);
+    gl.bindBuffer(gl.ARRAY_BUFFER, mesh.geometry);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([...opaque, ...transparent]), gl.STATIC_DRAW);
+    for (const [name, size, offset] of [
+      ["localPosition", 3, 0], ["localNormal", 3, 3], ["paint", 4, 6],
+      ["emission", 1, 10], ["worldShift", 2, 11],
+    ] as const) {
+      const location = gl.getAttribLocation(this.program!, name);
+      gl.enableVertexAttribArray(location);
+      gl.vertexAttribPointer(location, size, gl.FLOAT, false, floatsPerVertex * 4, offset * 4);
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, mesh.instanceBuffer);
+    for (const [name, size, offset] of [
+      ["anchor", 3, 0], ["heading", 2, 3], ["imageOffsetY", 1, 5],
+    ] as const) {
+      const location = gl.getAttribLocation(this.program!, name);
+      gl.enableVertexAttribArray(location);
+      gl.vertexAttribPointer(location, size, gl.FLOAT, false, floatsPerInstance * 4, offset * 4);
+      gl.vertexAttribDivisor(location, 1);
+    }
+    this.meshes.set(key, mesh);
+    return mesh;
+  }
+  private updateInstances(candidates: Pose[], gl: WebGL2RenderingContext) {
+    for (const mesh of this.activeMeshes) mesh.instances.length = 0;
+    this.activeMeshes.length = 0;
+    for (const pose of candidates) {
+      const mesh = this.meshFor(pose, gl);
+      if (!mesh.instances.length) this.activeMeshes.push(mesh);
+      mesh.instances.push(...pose.point, ...heading(pose.direction), this.imageOffsetY(pose));
+    }
+    this.opaqueCount = this.transparentCount = 0;
+    for (const mesh of this.activeMeshes) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, mesh.instanceBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.instances), gl.DYNAMIC_DRAW);
+      const count = mesh.instances.length / floatsPerInstance;
+      this.opaqueCount += mesh.opaque * count;
+      this.transparentCount += mesh.transparent * count;
+    }
+  }
   draw(frame: Frame, v: ViewTransform) {
+    const pixelsPerMetre = this.data.projection.scale * v.scale;
+    const scale = transportMagnification(this.data.transportScale ?? 1, pixelsPerMetre, this.data.adaptiveTransport);
+    const unit = pixelsPerMetre * scale;
     const candidates = frame.poses.filter((pose) => {
+      if (pose.kind === "car" && unit * 5.6 < 0.75) return false;
       const p = project(pose.point, this.data.projection),
         x = p.x * v.scale + v.left,
         y = p.y * v.scale + v.top,
-        margin =
-          85 +
-          40 *
-            this.data.projection.scale *
-            v.scale *
-            (this.data.transportScale ?? 1);
+        margin = 85 + 40 * unit;
       return (
         x >= -margin &&
         x <= v.width + margin &&
@@ -232,11 +310,12 @@ export class VehicleRenderer {
         y <= v.height + margin
       );
     });
-    const key = `${frame.clock.transportTime}/${candidates.map((p) => p.id).join(",")}`;
-    if (key !== this.lastKey) {
-      this.lastKey = key;
-      const scale = this.data.transportScale ?? 1;
-      this.faces = candidates.flatMap((pose) => {
+    if ((!this.gl && this.lastScale !== scale) || candidates.length !== this.lastCandidates.length ||
+        candidates.some((pose, i) => pose !== this.lastCandidates[i])) {
+      this.lastCandidates = candidates;
+      this.lastScale = scale;
+      if (this.gl) this.updateInstances(candidates, this.gl);
+      else this.faces = candidates.flatMap((pose) => {
         const faces = vehicleFaces(pose);
         const imageOffsetY = this.imageOffsetY(pose);
         if (scale === 1 && imageOffsetY === 0) return faces;
@@ -251,31 +330,6 @@ export class VehicleRenderer {
           ),
         }));
       });
-      if (this.gl) {
-        const opaque: number[] = [],
-          transparent: number[] = [];
-        for (const face of this.faces) {
-          const target =
-              (face.alpha ?? 1) < 1 || face.nightOnly ? transparent : opaque,
-            color = rgba(face),
-            flag = face.nightOnly ? 3 : face.pulse ? 2 : face.emissive ? 1 : 0;
-          for (let i = 1; i < face.points.length - 1; i++)
-            for (const point of [
-              face.points[0],
-              face.points[i],
-              face.points[i + 1],
-            ])
-              target.push(...point, ...color, flag, face.imageOffsetY ?? 0);
-        }
-        this.opaqueCount = opaque.length / floatsPerVertex;
-        this.transparentCount = transparent.length / floatsPerVertex;
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
-        this.gl.bufferData(
-          this.gl.ARRAY_BUFFER,
-          new Float32Array([...opaque, ...transparent]),
-          this.gl.DYNAMIC_DRAW,
-        );
-      }
     }
     if (
       this.canvas.width !== Math.round(v.width * v.dpr) ||
@@ -357,7 +411,6 @@ export class VehicleRenderer {
     gl.depthFunc(gl.LEQUAL);
     gl.disable(gl.CULL_FACE);
     gl.useProgram(this.program);
-    gl.bindVertexArray(this.vao);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     const p = this.data.projection,
@@ -374,8 +427,12 @@ export class VehicleRenderer {
     gl.uniform2f(u.imageSize, this.data.width, this.data.height);
     gl.uniform1f(u.night, night);
     gl.uniform1f(u.time, frame.clock.transportTime);
+    gl.uniform1f(u.modelScale, scale);
     gl.disable(gl.BLEND);
-    gl.drawArrays(gl.TRIANGLES, 0, this.opaqueCount);
+    for (const mesh of this.activeMeshes) {
+      gl.bindVertexArray(mesh.vao);
+      gl.drawArraysInstanced(gl.TRIANGLES, 0, mesh.opaque, mesh.instances.length / floatsPerInstance);
+    }
     gl.enable(gl.BLEND);
     gl.blendFuncSeparate(
       gl.SRC_ALPHA,
@@ -384,16 +441,22 @@ export class VehicleRenderer {
       gl.ONE_MINUS_SRC_ALPHA,
     );
     gl.depthMask(false);
-    gl.drawArrays(gl.TRIANGLES, this.opaqueCount, this.transparentCount);
+    for (const mesh of this.activeMeshes) {
+      gl.bindVertexArray(mesh.vao);
+      gl.drawArraysInstanced(gl.TRIANGLES, mesh.opaque, mesh.transparent, mesh.instances.length / floatsPerInstance);
+    }
     gl.depthMask(true);
   }
   destroy() {
     this.disposed = true;
     const gl = this.gl;
     if (gl) {
-      gl.deleteBuffer(this.buffer);
+      for (const mesh of this.meshes.values()) {
+        gl.deleteBuffer(mesh.geometry);
+        gl.deleteBuffer(mesh.instanceBuffer);
+        gl.deleteVertexArray(mesh.vao);
+      }
       gl.deleteTexture(this.texture);
-      gl.deleteVertexArray(this.vao);
       gl.deleteProgram(this.program);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     }

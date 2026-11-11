@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MapView } from "./MapView.ts";
-import { ATLAS_ROOT, ATLAS_VERSION, type SceneKey } from "./assets.ts";
+import { ATLAS_VERSION, FULL_BAY, START_LOCATION, START_SCENE, scenePath, type SceneKey } from "./assets.ts";
 import { defaultControls } from "./model.ts";
 import type { Frame, SceneData, Weather } from "./types.ts";
 
@@ -9,6 +9,7 @@ const coverage = {
   "0.6.1": { scope: "Citywide & Bay Bridge", text: "Explore San Francisco from Ocean Beach to Hunters Point, then cross the Bay Bridge through Yerba Buena Island to Oakland." },
   "0.7.1": { scope: "City & East Bay", text: "Explore San Francisco and the Bay Bridge, then follow the waterfront from the Port of Oakland to Jack London Square and Alameda." },
   "0.8.1": { scope: "City & Inner Bay", text: "Explore all of San Francisco, the Bay Bridge, the Oakland and Alameda waterfront, and the north shore from Fort Baker to Sausalito." },
+  "0.9.0": { scope: "City & Inner Bay", text: "Follow the illustrated coast, shoreline and bridges around the Bay. The City view opens San Francisco and the inner Bay at street level." },
 }[ATLAS_VERSION];
 
 function Icon({ name }: { name: string }) {
@@ -109,9 +110,9 @@ export default function App() {
   const host = useRef<HTMLDivElement>(null),
     map = useRef<MapView | null>(null),
     savedFrame = useRef<Frame | undefined>(undefined),
-    savedLocation = useRef<string | undefined>(undefined),
+    savedLocations = useRef<Partial<Record<SceneKey, string>>>({ [START_SCENE]: START_LOCATION }),
     aboutClose = useRef<HTMLButtonElement>(null);
-  const [scene, setScene] = useState<SceneKey>("waterfront"),
+  const [scene, setScene] = useState<SceneKey>(START_SCENE),
     [landmarks, setLandmarks] = useState<SceneData["landmarks"]>([]),
     [frame, setFrame] = useState(initial),
     [ready, setReady] = useState(false),
@@ -126,7 +127,7 @@ export default function App() {
     const abort = new AbortController();
     setReady(false);
     setError("");
-    fetch(`${ATLAS_ROOT}${scene}/scene.json`, { signal: abort.signal, cache: "no-cache" })
+    fetch(scenePath(scene), { signal: abort.signal, cache: "no-cache" })
       .then((r) => {
         if (!r.ok) throw new Error();
         return r.json();
@@ -149,7 +150,7 @@ export default function App() {
             if (!stopped) setError(message);
           },
           savedFrame.current,
-          scene === "waterfront" ? savedLocation.current : undefined,
+          savedLocations.current[scene],
         );
         instance.labels = labels;
         (window as unknown as { __sf: MapView }).__sf = map.current;
@@ -163,7 +164,7 @@ export default function App() {
       abort.abort();
       if (instance) {
         savedFrame.current = instance.frame;
-        if (scene === "waterfront") savedLocation.current = instance.location;
+        savedLocations.current[scene] = instance.location;
         instance.destroy();
         if (map.current === instance) map.current = null;
         const diagnostic = window as unknown as { __sf?: MapView };
@@ -199,7 +200,7 @@ export default function App() {
           <h1>{scene === "bay" ? "San Francisco Bay" : "San Francisco"}</h1>
           <p className="scope">
             {scene === "bay"
-              ? "Bay Area overview"
+              ? FULL_BAY ? "Illustrated Bay Area" : "Bay Area overview"
               : coverage.scope}
           </p>
         </div>
@@ -219,7 +220,7 @@ export default function App() {
             Bay Area
           </button>
         </div>
-        {scene === "waterfront" && (
+        {(scene === "waterfront" || FULL_BAY) && (
           <select
             aria-label="Jump to a place"
             value=""
@@ -229,9 +230,18 @@ export default function App() {
             <option value="" disabled>
               Jump to a place
             </option>
-            {landmarks
-              .filter((l) => l.id)
-              .map((l) => (
+            {FULL_BAY && scene === "bay" ? (
+              <>
+                <optgroup label="Closer views">
+                  {landmarks.filter(l => l.detail).map(l =>
+                    <option key={l.id} value={l.id}>{l.name}</option>)}
+                </optgroup>
+                <optgroup label="Around the Bay">
+                  {landmarks.filter(l => !l.detail).map(l =>
+                    <option key={l.id} value={l.id}>{l.name}</option>)}
+                </optgroup>
+              </>
+            ) : landmarks.filter(l => l.id).map(l => (
                 <option key={l.id} value={l.id}>
                   {l.name}
                 </option>
@@ -455,7 +465,7 @@ export default function App() {
       <footer className="map-credit">
         <button onClick={() => setAbout(true)}>
           {scene === "bay"
-            ? "Natural Earth · USGS"
+            ? FULL_BAY ? "U.S. Census · USGS · Natural Earth" : "Natural Earth · USGS"
             : "DataSF · USGS · © OpenStreetMap"}
         </button>
       </footer>
@@ -510,15 +520,16 @@ export default function App() {
             </div>
             <h2 id="about-title">San Francisco, in motion.</h2>
             <p>
-              {coverage.text} Switch to Bay Area for the regional view.
+              {coverage.text}{!FULL_BAY && " Switch to Bay Area for the regional view."}
             </p>
             <h3>Artwork and data</h3>
             <p>
               DataSF footprints, USGS lidar and elevation, and OpenStreetMap
               shape the atlas. The artwork, bridges and traffic share one
               fixed camera.
-              The regional view uses Natural Earth geography, with transport
-              enlarged for legibility.
+              {FULL_BAY
+                ? " The regional artwork follows U.S. Census shoreline and roads, Natural Earth, and USDA aerial imagery."
+                : " The regional view uses Natural Earth geography, with transport enlarged for legibility."}
             </p>
             <p>
               Traffic routes, light and weather are illustrative. Rain changes

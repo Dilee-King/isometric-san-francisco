@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0 — Illustrated Bay Area
+
+- Added continuous regional ImageGen artwork, 16 closer views, and paired appearances at SFO, San Jose and Vallejo.
+- Extended projected traffic around the Bay with new road, vessel and airport routes. Retained the City view and earlier release URLs.
+- Reduced repeated geometry uploads, offscreen lighting work and covered appearance draws during zoom. [Verification](docs/VERIFICATION-full-bay.md)
+
 ## Landmark detail repairs for v0.6.1–v0.8.1
 
 - Refined the Steiner Street Painted Ladies and the Twin Peaks summit roads and reservoir.

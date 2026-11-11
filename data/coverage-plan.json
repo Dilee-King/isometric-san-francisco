@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "0.8.1",
+  "schemaVersion": "0.9.0",
   "project": "isometric-san-francisco",
-  "status": "continuous-imagegen-san-francisco-and-inner-bay",
-  "plannedTarget": "San Francisco and the inner Bay with a regional Bay Area atlas",
+  "status": "continuous-imagegen-bay-area-and-inner-bay-street-detail",
+  "plannedTarget": "An illustrated Bay Area atlas with closer regional views and inner Bay street detail",
   "plannedSequence": [
     "Ferry Building / Financial District / Embarcadero contiguous quality sample",
     "Adjacent downtown neighborhoods and northern waterfront",
@@ -11,12 +11,11 @@
     "Ferry Building / Financial District / Chinatown / North Beach / Fisherman's Wharf / Union Square",
     "Citywide San Francisco and both Bay Bridge spans through Yerba Buena Island",
     "Port of Oakland / Jack London Square / Alameda ferry terminals",
-    "Golden Gate north landing / Fort Baker / Sausalito"
+    "Golden Gate north landing / Fort Baker / Sausalito",
+    "Peninsula and South Bay / East Bay and Delta / North Bay / Pacific coast"
   ],
   "futureExpansion": [
-    "Peninsula and SFO",
-    "South Bay and Alviso",
-    "Further Bay Area detail"
+    "Additional street-level detail beyond the inner Bay"
   ],
   "publishedCoverage": [
     {
@@ -74,12 +73,26 @@
       ],
       "crs": "EPSG:32610",
       "scene": "../public/map/v8-art/bay/scene.json"
+    },
+    {
+      "release": "full-bay-v9",
+      "role": "illustrated-region-with-closer-views",
+      "description": "Continuous regional artwork from the Pacific coast through both estuary reaches, Sonoma and Napa to the South Bay",
+      "imageSize": [40960, 28672],
+      "regionalImageSize": [5120, 3584],
+      "regionalPlates": 16,
+      "closerViews": 16,
+      "locationJumps": 35,
+      "crs": "EPSG:32610",
+      "scene": "../public/map/v9-art/bay/scene.json",
+      "version": "0.9.0"
     }
   ],
-  "publishedTileCount": 19872,
+  "publishedTileCount": 21452,
   "boundaryGeoJSON": null,
   "cameraManifest": "../public/map/v8-art/atlas.json",
   "tileReleaseManifest": "../public/map/illustrated-bay/manifest.json",
-  "note": "The detail releases extend v0.5 with overlapping ImageGen plates on the same camera grid. Named detail plates use the original pixel scale. The regional view uses its existing lower scale.",
+  "regionalTileReleaseManifest": "../public/map/v9-art/bay/manifest.json",
+  "note": "The City atlas uses the original native scale. The Bay Area view adds continuous illustrated regional coverage and loads its closer views on demand.",
   "appearanceCount": 4
 }

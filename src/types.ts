@@ -49,6 +49,10 @@ export type RegionTileLayout = {
   sharedMaxLevel: number;
   fallback: string;
   regions: { id: string; bounds: [number, number, number, number] }[];
+  detail?: {
+    baseLevel: number;
+    tiles: Record<string, string>;
+  };
   sparse?: {
     root: string;
     blockSize: number;
@@ -70,6 +74,7 @@ export type SceneData = {
   depthEncoding?: { offset: number; range: number };
   clipDepth?: number;
   transportScale?: number;
+  adaptiveTransport?: boolean;
   defaultLocation?: string;
   tileLayout?: RegionTileLayout;
   projection: Projection;
@@ -86,6 +91,7 @@ export type SceneData = {
     p: Point3;
     viewHeight?: number;
     viewWidth?: number;
+    detail?: boolean;
   }[];
 };
 export type Frame = {
