@@ -61,7 +61,7 @@ def paint(r,appearance='day'):
         h,j=p.deck(a),p.deck(b)
         face([(a,-13.5,h),(b,-13.5,j),(b,13.5,j),(a,13.5,h)],'walk',road=True)
         face([(a,-9.5,h+.04),(b,-9.5,j+.04),(b,9.5,j+.04),(a,9.5,h+.04)],'deck',road=True)
-        for side in (-1,1):
+        for side in (-1,1) if a>=p.start else ():
             u=side*13.4
             face([(a,u,h-7),(b,u,j-7),(b,u,j+.6),(a,u,h+.6)],'shade')
             line((a,u,h-6.5),(b,u,j-6.5),.8,'steel')

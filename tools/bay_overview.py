@@ -14,7 +14,7 @@ from shapely.geometry import LineString, Point, box
 from shapely.ops import transform, unary_union
 
 from atlas_geometry import ART_FRAMES, CE, SE, ORIGIN_UTM, PixelFrame, camera_point, ground_point, pack_depth
-from corridor_inputs import CACHE, TO_GEO, fetch, local_xy, sha
+from corridor_inputs import CACHE, NE, TO_GEO, fetch, local_xy, sha
 from corridor_source import polygons
 
 BAY = PixelFrame('bay', -1080, -930, 2560, 1792)
@@ -69,7 +69,8 @@ def font(size, bold=False):
 
 
 def earth_geometry(kind, bounds):
-    data=pyogrio.read_dataframe(str(CACHE/f'ne-{kind}.zip'),bbox=bounds)
+    path=fetch(NE[kind],f'ne-{kind}.zip',cache=CACHE)
+    data=pyogrio.read_dataframe(str(path),bbox=bounds)
     clip=box(*bounds)
     return unary_union([transform(local_xy,make_valid(g).intersection(clip)) for g in data.geometry if g is not None])
 

@@ -11,7 +11,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4186",
     "test": "node --experimental-strip-types --test src/model.test.ts src/VehicleGeometry.test.ts src/atlas.test.ts",
-    "tiles": "python tools/package_corridor.py"
+    "tiles": "python tools/render_golden_gate.py && python tools/package_golden_gate.py"
   },
   "dependencies": {
     "openseadragon": "6.1.1",

@@ -23,5 +23,5 @@
 ### Task 3: Real preview and publication
 
 - [x] Exercise desktop/mobile, pan/zoom, projected vehicles, fog/rain/night, reduced motion, scene switch and the existing east. Inspect matched wide-water before/after captures.
-- [ ] Review, verify and show a real browser recording and captures before synchronizing.
+- [x] Review, verify and show a real browser recording and captures before synchronizing.
 - [ ] Publish the tested commit to GitHub, confirm Pages and smoke-test the public HTTPS map.

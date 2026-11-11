@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 import math
 
-from atlas_geometry import ART_FRAMES, PixelFrame, camera_point
+from atlas_geometry import ART_FRAMES, PixelFrame, camera_point, ground_point
 
 ATLAS = PixelFrame('waterfront', -10900, -10160, 12722, 14408)
 WEST_ART = (
@@ -63,28 +63,42 @@ class BridgeProfile:
     def approach_end(self):
         return self.end+60
 
-    def point(self, station, across=0., z=None):
+    def axis(self,station):
         e,n = self.center_metres
         s,c = math.sin(self.heading),math.cos(self.heading)
-        if station < self.start or station > self.end:
-            if station < self.start:
-                a=self.start
-                goal=(-7201.,1193.)
-                t=min(1.,(a-station)/(a-self.approach_start))
-            else:
-                a=self.end
-                goal=(-7637.17,4039.21)
-                t=min(1.,(station-a)/(self.approach_end-a))
-            b=self.point(a,across)
-            return (b[0]*(1-t)+(goal[0]+across*c)*t,
-                    b[1]*(1-t)+(goal[1]-across*s)*t,self.deck(station) if z is None else z)
-        # Taper into the mapped land approaches outside the straight suspension.
+        if station < -510:
+            # Join the painted highway's center and tangent at (552, 797)
+            # in the Fort Point plate, then invert the same metric camera.
+            ex,nx=self.axis(-510)
+            x,y,_=camera_point((ex,nx,self.deck(-510)))
+            t=min(1.,(-510-station)/(-510-self.approach_start))
+            f=next(f for f in WEST_ART if f.key=='fort-point')
+            a,b=f.x+552,f.y+797
+            p0=(x,y);p1=(x-46,y+66);p2=(a-27,b-93);p3=(a,b)
+            u=1-t
+            target=[u**3*g+3*u*u*t*h+3*u*t*t*j+t**3*k for g,h,j,k in zip(p0,p1,p2,p3)]
+            return ground_point(*target,self.deck(station))
+        if station > self.end:
+            a,b=self.axis(self.end)
+            t=min(1.,(station-self.end)/(self.approach_end-self.end))
+            return a*(1-t)-7637.17*t,b*(1-t)+4039.21*t
+        across=0.
         if station < -343:
             across += 61.*min(1.,((-343-station)/(-343-self.start))**2)
         if station > 1623:
             across -= 58.*min(1.,((station-1623)/(self.end-1623))**2)
-        return (e+(station-640)*s+across*c,
-                n+(station-640)*c-across*s, self.deck(station) if z is None else z)
+        return e+(station-640)*s+across*c,n+(station-640)*c-across*s
+
+    def point(self, station, across=0., z=None):
+        e,n=self.axis(station)
+        if across and station < -510:
+            a,b=self.axis(station-.4),self.axis(station+.4)
+            dx,dy=b[0]-a[0],b[1]-a[1]
+            length=math.hypot(dx,dy) or 1.
+            e,n=e+across*dy/length,n-across*dx/length
+        else:
+            e,n=e+across*math.cos(self.heading),n-across*math.sin(self.heading)
+        return e,n,self.deck(station) if z is None else z
 
     def deck(self, station):
         if station < self.start:

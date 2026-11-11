@@ -70,6 +70,18 @@ class GoldenGateTest(unittest.TestCase):
             self.assertTrue(raster.occupied[i,j],station)
             self.assertGreaterEqual(raster.depth[i,j],z-4.5,station)
 
+    def test_bridge_approach_ends_on_the_illustrated_road(self):
+        profile=BridgeProfile()
+        # The connector finishes 36 native pixels into the painted highway.
+        # The highway center here is (552,797) in the Fort Point art plate.
+        south=next(f for f in DETAIL_FRAMES if f.key=='fort-point')
+        x,y,_=camera_point(profile.point(profile.approach_start))
+        self.assertLess(math.hypot(x-south.x-552,y-south.y-797),3.0)
+        # Match the paved tangent and keep the approach separate from the fort.
+        x0,y0,_=camera_point(profile.point(profile.approach_start+8.))
+        self.assertGreater(y-y0,3.)
+        self.assertGreater(x-x0,0.)
+
 
 if __name__ == '__main__':
     unittest.main()

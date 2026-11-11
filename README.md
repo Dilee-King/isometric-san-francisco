@@ -57,7 +57,7 @@ python tools/package_golden_gate.py
 node tools/audit-atlas.mjs
 ```
 
-Raw network inputs stay in the ignored local cache. Skip acquisition and source derivation to repackage the checked-in geometry and selected artwork. The package rebuild does not require new artwork generation. The v1–v3 tiles remain available as release history.
+Raw network inputs stay in the ignored local cache. On a clean checkout, source derivation and a full regional rebuild fetch missing Natural Earth and 3DEP context. Skip western acquisition and source derivation to repackage the checked-in geometry and selected artwork with `npm run tiles`. To rebuild just the detailed view, render the references and run `python tools/package_golden_gate.py prepare`, then `tiles` and `manifest` with the checked-in regional view. The v1–v3 tiles remain available as release history.
 
 ## Scope
 
