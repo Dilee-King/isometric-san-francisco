@@ -126,7 +126,7 @@ export default function App() {
     const abort = new AbortController();
     setReady(false);
     setError("");
-    fetch(`${ATLAS_ROOT}${scene}/scene.json`, { signal: abort.signal })
+    fetch(`${ATLAS_ROOT}${scene}/scene.json`, { signal: abort.signal, cache: "no-cache" })
       .then((r) => {
         if (!r.ok) throw new Error();
         return r.json();

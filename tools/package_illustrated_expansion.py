@@ -22,6 +22,9 @@ from golden_gate_lighting import lamps_for, tone
 from illustrated_guides import (APPROVED, SELECTED, WATER_CORRECTIONS, WORK, crop_water,
                                 read_packed_mask, reference_mask, reference_scene)
 from illustrated_layout import ART, DETAIL_FOCUS, LAYOUT, bridge_area, map_geometry, rectangle
+from illustrated_weather import (OVERCAST_EXPOSURE, OVERVIEW_DIMMING, blend_night_edge,
+                                 legacy_lighting, legacy_night_edge_mask, overcast_overview_mask,
+                                 painted_windows, pavement_material, puddle_reflections, wet_surfaces)
 from package_corridor import APPEARANCES, save_json, write_manifest
 
 SOURCE_MAP = ROOT / "public/map"
@@ -29,6 +32,7 @@ PUBLISHED = ART / "plates"
 OUTPUT = WORK / "public/map"
 COMPOSED = WORK / "blocks"
 SOUTH_FRAME = PixelFrame("southern-context", -27648, -3072, 27648, 18432)
+PAINTED_WEATHER = {"night": "-dry-night", "rain-day": "-rain-day", "rain-night": "-night"}
 LEGACY = None
 PACKED = None
 WATER = None
@@ -47,8 +51,8 @@ def read(path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def plate(row, wet=False):
-    key = row["id"] + ("-night" if wet else "")
+def plate(row, appearance="scene"):
+    key = row["id"] + PAINTED_WEATHER.get(appearance, "")
     for folder in (PUBLISHED, SELECTED):
         path = folder / f"{key}.png"
         if path.is_file():
@@ -85,7 +89,7 @@ def south_appearances(day):
     wet = colors * [.73, .78, .86] + [6, 8, 10]
     night = np.array([.24, .33, .46])
     convert = lambda value: Image.fromarray(np.clip(value, 0, 255).astype("uint8"))
-    return {"scene": day, "rain-day": convert(wet),
+    return {"scene": day, "rain-day": convert(wet * OVERCAST_EXPOSURE),
             "night": convert(colors * night + [5, 6, 8]),
             "rain-night": convert(wet * night + [5, 6, 8])}
 
@@ -228,9 +232,9 @@ def land_art(frame, version):
     return artwork, keep, coverage
 
 
-def place_plate(image, frame, target, area, path, keep=None):
+def place_plate(image, frame, target, area, path, keep=None, transition=48):
     left, top, right, bottom = deep_zoom.local_box(frame, area)
-    fade = np.clip((distance_to_edge(target, area) - 24) / 48, 0, 1)
+    fade = np.clip((distance_to_edge(target, area) - 24) / transition, 0, 1)
     support = keep[top:bottom, left:right] if keep is not None else 255
     alpha = Image.fromarray((fade * support).astype("uint8"))
     image.paste(image_crop(path, target, area), (left, top), alpha)
@@ -242,22 +246,28 @@ def compose(frame, version, folder):
     old, old_alpha = legacy_mask(extended, coverage)
     water = crop_water(WATER, extended)
     hard = source_mask(1, extended)
+    buildings = np.asarray(source_mask(128, extended)) > 0
+    water_mask = np.asarray(water) > 0
+    material = pavement_material(day, np.asarray(hard) > 0, buildings, water_mask)
     folder.mkdir(parents=True, exist_ok=True)
     water.save(folder / f"{frame.key}-water.png")
     hard.save(folder / f"{frame.key}-hard.png")
-    (folder / f"{frame.key}-windows.json").write_text("[]", encoding="ascii")
+    save_json(folder / f"{frame.key}-windows.json", painted_windows(day, extended, buildings, water_mask, keep))
     use = (LAMP_PIXELS[:, 0] >= extended.x) & (LAMP_PIXELS[:, 0] < extended.right)
     use &= (LAMP_PIXELS[:, 1] >= extended.y) & (LAMP_PIXELS[:, 1] < extended.bottom)
     lamps = [LAMPS[index] for index in np.flatnonzero(use)]
+    reflections = puddle_reflections(extended, lamps, material[0])
     for stem, appearance in APPEARANCES.items():
         image = tone(day, appearance, extended, lamps, work=folder).copy()
+        if stem.startswith("rain-"):
+            image = wet_surfaces(image, material, reflections if stem == "rain-night" else None)
         # The sampled v0.5 water keeps the offshore field uniform at every zoom.
         image.paste(background(extended, stem), mask=Image.fromarray(255 - keep))
-        if stem == "rain-night":
+        if stem in PAINTED_WEATHER:
             for row, target, area in rows_in(extended, version, "detail"):
-                path = plate(row, wet=True)
+                path = plate(row, stem)
                 if path is not None:
-                    place_plate(image, extended, target, area, path, keep)
+                    place_plate(image, extended, target, area, path, keep, transition=116)
         if old is not None and old_alpha.getbbox():
             image.paste(LEGACY.crop(stem, old), deep_zoom.local_box(extended, old)[:2], old_alpha)
         yield stem, image
@@ -347,6 +357,8 @@ def block_outputs(frame, folder, region, alternate):
 def backdrop(item):
     version, stem, output, packed = item
     image = background(WORLD, stem, 4)
+    reference_divisor = 32
+    reference = background(WORLD, "scene", reference_divisor) if stem == "rain-day" else None
     for key, first, _, alternatives in packed:
         if first > version:
             continue
@@ -355,6 +367,18 @@ def backdrop(item):
         frame = block_frame(*map(int, key.split("_")))
         with Image.open(path) as patch:
             image.paste(patch, ((frame.x - WORLD.x) // 4, (frame.y - WORLD.y) // 4))
+        if reference is not None:
+            with Image.open(path.with_name("scene-overview.png")) as dry:
+                size = (frame.width // reference_divisor, frame.height // reference_divisor)
+                reference.paste(dry.resize(size, Image.Resampling.BOX),
+                                ((frame.x - WORLD.x) // reference_divisor,
+                                 (frame.y - WORLD.y) // reference_divisor))
+    if reference is not None:
+        grade = overcast_overview_mask(image, reference, WATER)
+    elif stem.endswith("night"):
+        grade = legacy_night_edge_mask(WORLD, APPROVED, reference_divisor)
+    else:
+        grade = None
     root = output / f"v{version}-art/waterfront/regions/overview/{stem}_files"
     for level in range(deep_zoom.SHARED_LEVEL + 1):
         divisor = 2 ** (deep_zoom.MAX_LEVEL - level)
@@ -367,7 +391,21 @@ def backdrop(item):
             for col in range((size[0] + tile - 1) // tile):
                 crop = (max(0, col * tile - 1), max(0, row * tile - 1),
                         min(size[0], (col + 1) * tile + 1), min(size[1], (row + 1) * tile + 1))
-                scaled.crop(crop).save(folder / f"{col}_{row}.webp", quality=82, method=3)
+                tile_image = scaled.crop(crop)
+                if grade is not None:
+                    bounds = tuple(value * grade.size[index % 2] / size[index % 2]
+                                   for index, value in enumerate(crop))
+                    alpha = grade.resize(tile_image.size, Image.Resampling.BILINEAR, box=bounds)
+                    strength = min(1, (deep_zoom.SHARED_LEVEL + 1 - level) / 3)
+                    if strength < 1:
+                        alpha = alpha.point(lambda value: round(value * strength))
+                    if alpha.getbbox():
+                        if stem == "rain-day":
+                            darker = tile_image.point([round(value * OVERVIEW_DIMMING) for value in range(256)] * 3)
+                            tile_image = Image.composite(darker, tile_image, alpha)
+                        else:
+                            tile_image = blend_night_edge(tile_image, alpha)
+                tile_image.save(folder / f"{col}_{row}.webp", quality=82, method=3)
     print(f"v0.{version} {stem} backdrop", flush=True)
 
 
@@ -377,13 +415,18 @@ def describe(output, packed, rows, preview):
     native = {key: [first, region] for key, first, region, _ in packed}
     overrides = {stage: {name: region for _, _, _, alternatives in packed if stage in alternatives
                          for name, region in alternatives[stage][1].items()} for stage in (6, 7, 8)}
+    weather_art = [{"id": row["id"], "appearance": appearance, "sha256": digest}
+                   for row in rows for appearance, digest in row["weatherSHA256"].items()]
     common = write_manifest(shared, {"size": [WORLD.width, WORLD.height], "nativeBlocks": native,
                                      "appearanceOverrides": overrides,
                                      "layoutSHA256": sha(LAYOUT), "artwork": len(rows),
+                                     "weatherArtwork": weather_art,
                                      "southernContextSHA256": sha(PUBLISHED / "southern-context.png")})
+    lights = legacy_lighting(deep_zoom.RetainedArtwork())
     for stage in (6, 7, 8):
         root = output / f"v{stage}-art"
         city = reference_scene(stage)
+        city.update(lights)
         for mark in city["landmarks"]:
             if mark["id"] in DETAIL_FOCUS:
                 height = mark["p"][2]
@@ -443,12 +486,13 @@ def main():
     rows = [row for row in rows if plate(row) is not None]
     for row in rows:
         row["daySHA256"] = sha(plate(row))
-        night = plate(row, wet=True)
-        row["wetNightSHA256"] = sha(night) if night is not None else None
+        row["weatherSHA256"] = {appearance: sha(path) for appearance in PAINTED_WEATHER
+                                if (path := plate(row, appearance)) is not None}
     args.out.mkdir(parents=True, exist_ok=True)
     lamps, offshore_bridge = drawing_references()
     inputs = (
         Path(__file__), ROOT / "tools/expanded_tiles.py", ROOT / "tools/golden_gate_lighting.py",
+        ROOT / "tools/illustrated_weather.py",
         ROOT / "data/inner-bay/source.json.gz", reference_mask(), WATER_CORRECTIONS,
         ROOT / "tools/illustrated_guides.py", SOURCE_MAP / "v5/waterfront/manifest.json",
         PUBLISHED / "southern-context.png",

@@ -2,6 +2,7 @@
 
 import argparse
 import filecmp
+import hashlib
 import json
 from pathlib import Path
 
@@ -94,6 +95,19 @@ def finalize(root):
     if stale:
         write_manifest(shared, {k: v for k, v in manifest.items() if k not in ("files", "tileCount", "bytes")})
     shared_sha = deep_zoom.sha(shared / "manifest.json")
+    backdrop_overrides = {}
+    for version in (6, 7):
+        overview = root / f"v{version}-art/waterfront/regions/overview"
+        kept, reused = share_backdrop(overview, latest)
+        backdrop_overrides[version] = kept
+        print(f"v0.{version}: {len(kept)} distinct backdrop tiles, {reused:,} duplicate bytes shared", flush=True)
+    revision = hashlib.sha256(bytes.fromhex(shared_sha))
+    for version in (6, 7, 8):
+        overview = root / f"v{version}-art/waterfront/regions/overview"
+        for tile in sorted(overview.rglob("*.webp")):
+            if tile.relative_to(overview).parts[0] != "scene_files":
+                revision.update(bytes.fromhex(deep_zoom.sha(tile)))
+    appearance_revision = revision.hexdigest()[:12]
     with Image.open(shared / "masks.png") as packed:
         flags = np.asarray(packed)[:, :, 2].copy()
     legacy = [box(f.x + 24, f.y + 24, f.right - 24, f.bottom - 24) for f in APPROVED]
@@ -102,12 +116,11 @@ def finalize(root):
         city = release / "waterfront"
         scene_path = city / "scene.json"
         scene = read(scene_path)
+        scene["appearanceRevision"] = appearance_revision
         manifest = read(city / "manifest.json")
         if version < 8:
-            kept, reused = share_backdrop(city / "regions/overview", latest)
             scene["tileLayout"]["sparse"]["backdropRoot"] = "../../v8-art/waterfront/"
-            scene["tileLayout"]["sparse"]["backdropOverrides"] = kept
-            print(f"v0.{version}: {len(kept)} distinct backdrop tiles, {reused:,} duplicate bytes shared", flush=True)
+            scene["tileLayout"]["sparse"]["backdropOverrides"] = backdrop_overrides[version]
         artwork = unary_union([*legacy, *(rectangle(row["frame"], 28) for row in manifest["artwork"])])
         count = hide_unpainted_roads(scene["routes"], len(original["routes"]), artwork, flags)
         save_json(scene_path, scene)

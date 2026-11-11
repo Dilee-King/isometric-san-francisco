@@ -64,6 +64,7 @@ export type SceneData = {
   release: string;
   assetRoot?: string;
   kind?: "waterfront" | "bay";
+  appearanceRevision?: string;
   maskSize?: [number, number];
   maskBundle?: string;
   depthEncoding?: { offset: number; range: number };
@@ -77,6 +78,8 @@ export type SceneData = {
   routes: Route[];
   lamps: Point3[];
   windows: { p: Point3; seed: number; angle: number }[];
+  /** The original high-resolution depth mask has already culled these lights. */
+  lightsPreFiltered?: boolean;
   landmarks: {
     id?: string;
     name: string;

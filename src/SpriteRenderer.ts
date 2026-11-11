@@ -144,26 +144,28 @@ export class SpriteRenderer {
     ctx.clip();
     const night = nightAmount(frame.clock.hour),
       unit = this.data.projection.scale * v.scale;
+    // At citywide zoom the minimum on-screen lamp size would saturate dense districts.
+    const light = this.data.lightsPreFiltered ? night * Math.min(1, v.scale / 0.24) ** 1.65 : night;
     this.visible = { cars: 0, boats: 0, planes: 0, occluded: 0 };
-    if (night > 0.01) {
+    if (light > 0.01) {
       ctx.globalCompositeOperation = "screen";
       for (const w of this.data.windows) {
         if (w.seed > 62) continue;
         const p = this.point(w.p, v);
         if (p.x < 0 || p.x > v.width || p.y < 0 || p.y > v.height) continue;
-        if (!this.isVisible(w.p)) continue;
-        ctx.fillStyle = `rgba(255,${185 + (w.seed % 50)},${95 + (w.seed % 65)},${night * (0.12 + (w.seed % 7) * 0.015)})`;
+        if (!this.data.lightsPreFiltered && !this.isVisible(w.p)) continue;
+        ctx.fillStyle = `rgba(255,${185 + (w.seed % 50)},${95 + (w.seed % 65)},${light * (0.12 + (w.seed % 7) * 0.015)})`;
         const ww = Math.max(1.2, unit * 0.8),
           hh = Math.max(1.6, unit * 1.4);
         ctx.fillRect(p.x - ww / 2, p.y - hh / 2, ww, hh);
       }
       for (const lamp of this.data.lamps) {
-        if (!this.isVisible(lamp)) continue;
+        if (!this.data.lightsPreFiltered && !this.isVisible(lamp)) continue;
         const p = this.point(lamp, v),
           r = Math.max(3, unit * 4);
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-        g.addColorStop(0, `rgba(255,218,133,${night * 0.8})`);
-        g.addColorStop(0.25, `rgba(255,196,104,${night * 0.28})`);
+        g.addColorStop(0, `rgba(255,218,133,${light * 0.8})`);
+        g.addColorStop(0.25, `rgba(255,196,104,${light * 0.28})`);
         g.addColorStop(1, "rgba(255,196,104,0)");
         ctx.fillStyle = g;
         ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);

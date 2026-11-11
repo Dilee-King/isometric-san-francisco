@@ -49,16 +49,36 @@ const mask = readFileSync(join(shared, "masks.png"));
 assert.deepEqual([mask.readUInt32BE(16), mask.readUInt32BE(20)], [4608, 2560]);
 assert.equal(mask[25], 2, "Packed mask must be RGB");
 const sharedSHA = digest(readFileSync(join(shared, "manifest.json")));
+const weatherHash = createHash("sha256").update(Buffer.from(sharedSHA, "hex"));
+for (const stage of [6, 7, 8]) {
+  const manifest = json(join(root, `v${stage}-art/waterfront/manifest.json`));
+  for (const file of manifest.files) {
+    if (/^regions\/overview\/(night|rain-day|rain-night)_files\//.test(file.path)) {
+      weatherHash.update(Buffer.from(file.sha256, "hex"));
+    }
+  }
+}
+const weatherRevision = weatherHash.digest("hex").slice(0, 12);
 let earlierRoutes = original.routes;
 let earlierPlaces = original.landmarks.length;
 const allVariants = new Set();
 const physicalRoute = ({ hiddenSegments, ...route }) => route;
-for (const key of ["bay-bridge-east", "civic-center", "jack-london", "sausalito", "bayview"]) {
-  const path = join(assetRoot, "plates", key + "-night");
-  const bytes = readFileSync(path + ".png");
-  assert.deepEqual([bytes.readUInt32BE(16), bytes.readUInt32BE(20)], [1536, 1024], key);
-  assert.notEqual(digest(bytes), originalArt.get(key), key);
-  assert.ok(readFileSync(path + ".prompt.txt", "utf8").trim().length > 100, key);
+const authoredAppearances = {
+  night: ["-dry-night", ["civic-center", "jack-london", "sausalito"]],
+  "rain-day": ["-rain-day", ["civic-center", "jack-london", "sausalito"]],
+  "rain-night": ["-night", ["bay-bridge-east", "civic-center", "jack-london", "sausalito", "bayview"]],
+};
+const weatherArt = new Map(common.weatherArtwork.map(row => [`${row.id}/${row.appearance}`, row.sha256]));
+assert.equal(weatherArt.size, 11);
+for (const [appearance, [suffix, ids]] of Object.entries(authoredAppearances)) {
+  for (const id of ids) {
+    const path = join(assetRoot, "plates", id + suffix);
+    const bytes = readFileSync(path + ".png");
+    assert.deepEqual([bytes.readUInt32BE(16), bytes.readUInt32BE(20)], [1536, 1024], path);
+    assert.notEqual(digest(bytes), originalArt.get(id), path);
+    assert.equal(digest(bytes), weatherArt.get(`${id}/${appearance}`), path);
+    assert.ok(readFileSync(path + ".prompt.txt", "utf8").trim().length > 100, path);
+  }
 }
 for (const stage of [6, 7, 8]) {
   const folder = join(root, `v${stage}-art`);
@@ -72,6 +92,8 @@ for (const stage of [6, 7, 8]) {
   assert.equal(scene.release, `inner-bay-v${stage}`);
   assert.equal(scene.assetRoot, `map/v${stage}-art/waterfront/`);
   assert.equal(scene.maskBundle, "map/illustrated-bay/masks.png");
+  assert.equal(scene.lightsPreFiltered, true);
+  assert.equal(scene.appearanceRevision, weatherRevision);
   assert.equal(manifest.sharedManifestSHA256, sharedSHA);
   assert.deepEqual(scene.projection, layout.camera);
   assert.deepEqual(scene.routes.slice(0, original.routes.length), original.routes);
@@ -104,7 +126,8 @@ for (const stage of [6, 7, 8]) {
       for (let row = 0; row < Math.ceil(scene.height / divisor); row++) {
         for (let col = 0; col < Math.ceil(scene.width / divisor); col++) {
           if (!source.tileExists(level, col, row)) continue;
-          const path = source.getTileUrl(level, col, row);
+          const [path, query] = source.getTileUrl(level, col, row).split("?");
+          assert.equal(query, appearance === "scene" ? undefined : `rev=${scene.appearanceRevision}`);
           if (level <= layoutForStage.sharedMaxLevel) {
             if (sharedBackdropRoot && path.startsWith(sharedBackdropRoot)) {
               assert.ok(latestBackdrop.has(path.slice(sharedBackdropRoot.length)), path);

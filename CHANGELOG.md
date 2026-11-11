@@ -1,5 +1,11 @@
 # Changelog
 
+## Night and rain alignment for v0.6.1–v0.8.1
+
+- Restored v0.5 window and streetlight visibility using the original depth mask at build time.
+- Added Wharf-referenced ImageGen clear-night and rainy-day artwork at Civic Center, Jack London Square and Sausalito.
+- Updated the surrounding night lighting and wet surfaces with cooler overcast daylight, wet paving and stronger local light reflections. [Browser comparison](docs/screenshots/weather-alignment.jpg)
+
 ## 0.8.1 — Illustrated Marin waterfront
 
 - Extended the approved Golden Gate illustration through Fort Baker, Bridgeway and Sausalito with overlapping ImageGen plates.

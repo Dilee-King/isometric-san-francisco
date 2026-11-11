@@ -44,12 +44,13 @@ export function regionForTile(
 }
 
 export function regionTileSource(
-  data: Pick<SceneData, "width" | "height" | "tileLayout">,
+  data: Pick<SceneData, "width" | "height" | "tileLayout" | "appearanceRevision">,
   root: string,
   appearance: string,
 ): string | RegionalSourceOptions {
   const layout = data.tileLayout;
   if (!layout) return `${root}${appearance}.dzi`;
+  const revision = appearance !== "scene" && data.appearanceRevision ? `?rev=${data.appearanceRevision}` : "";
   const backdropOverrides = new Set(layout.sparse?.backdropOverrides);
   return {
     width: data.width,
@@ -72,7 +73,7 @@ export function regionTileSource(
         ?? regionForTile(layout, data.width, data.height, level, column, row);
       const tileRoot = level > layout.sharedMaxLevel ? layout.sparse?.root
         : backdropOverrides.has(key) ? undefined : layout.sparse?.backdropRoot;
-      return `${root}${tileRoot ?? ""}regions/${region}/${appearance}_files/${level}/${column}_${row}.webp`;
+      return `${root}${tileRoot ?? ""}regions/${region}/${appearance}_files/${level}/${column}_${row}.webp${revision}`;
     },
   };
 }

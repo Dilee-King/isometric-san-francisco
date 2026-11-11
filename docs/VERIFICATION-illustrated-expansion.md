@@ -27,3 +27,13 @@ The production build passed 28 JavaScript tests, 14 Python tests, the historical
 The [build and deployment](https://github.com/Dilee-King/isometric-san-francisco/actions/runs/42969571226) completed successfully for a0a6445fbf153aa7a14b9ca824f3639dce4e0bad. Chromium passed the same city, bridge, East Bay and Marin interactions on all three published URLs. Each opened with 20 visible detail requests and reported zero page, console or HTTP errors. The public default opened v0.8.1, the old v0.8.0 URL resolved to the illustrated edition, and the v0.5.0 URL opened the original city scene. SHA-256 matched 49 served files against the local build inputs, including the atlases, manifests, shared mask and sampled tiles in all four appearances.
 
 [San Francisco on Pages](screenshots/v0.6.1/online-san-francisco-wide.jpg) · [Bay Bridge East Span on Pages](screenshots/v0.6.1/online-bay-bridge-east.jpg) · [Jack London Square on Pages](screenshots/v0.7.1/online-jack-london-rain-night.jpg) · [Sausalito on Pages](screenshots/v0.8.1/online-sausalito-rain-night.jpg)
+
+## Night and rain alignment
+
+The expanded atlas now uses the original v0.5 depth mask to determine visibility for retained window and street lights. The expanded vehicle mask continues to handle moving traffic. New districts use the v0.5 light-baking pass on window details sampled from the illustrations. Rain uses a cooler overcast exposure calibrated to the Wharf, Pier 39 and Mission Bay artwork, with specular highlights on paving and wet-night reflections near lamps.
+
+Six ImageGen variants match the v0.5 Wharf clear-night and rainy-day plates at Civic Center, Jack London Square and Sausalito. All six are 1536 × 1024 with at most one pixel of overall edge displacement against the clear-day originals. Their source PNGs and prompts are checked in. [Selected plates and prompts](../assets/illustrated-expansion/plates/)
+
+At distant zoom, the atlas equalizes rainy-day exposure and tapers amber light where the original and expanded artwork meet. The opacity of the retained lamp sprites follows zoom to keep closely spaced lights legible.
+
+Chromium compared the Union Square lighting overlay at the same camera and time in all four versions. Each produced 8,293 lit pixels and the same summed alpha in the measured crop. The comparison also includes the three weather states at the Wharf and the three new locations. The daytime material changed in each location with the rain animation hidden. [Browser comparison](screenshots/weather-alignment.jpg) · [Browser verification script](../tools/qa-weather-alignment.js)
